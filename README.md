@@ -34,13 +34,17 @@ The original newspaper PNG assets are preserved in `assets/`.
 
 ### Controls
 
-- Move: arrow keys / WASD, click a destination, or use the mobile direction pad.
-- Talk near the rival: E, Space, or the interaction button.
+- Move: arrow keys / WASD, PC keyboard input only.
+- Talk near the rival: E or Space.
 - Dialogue: Space / Enter / Continue. First press reveals an unfinished line.
-- Attack: select 내려치기, then stop the gauge with Space, click, or touch.
-- Fold: select the highlighted corner or its corresponding button.
+- Attack: select 내려치기, then stop the gauge with Space or mouse click.
+- Fold: use number keys 1–4, or click the highlighted corner.
 - Pause: Escape or Ⅱ. The game clock, gauge, and events freeze together.
 - Sound and fullscreen controls are in the upper-right corner.
+
+The screen keeps essential combat and menu labels. The rival introduces movement
+and interaction through an in-world speech bubble, then explains attack and timing
+in dialogue before the first hit. Focus uses F and is introduced on the rematch.
 
 ### Chapter flow
 
@@ -71,10 +75,10 @@ attacks and transitions. Sound preferences are also saved locally.
 - `game.js`: chapter state, input, simulation clock, save, combat and audio.
 - `world.js`: canvas scenes, movement rendering, fold / hit / flip effects.
 - `rules.js`: shared timing and damage rules.
-- `style.css`: integrated game HUD and responsive controls.
+- `style.css`: integrated game HUD and PC controls.
 
 Run `npm test` for rules and `npm run check` for JavaScript syntax.
 Browser verification covers the full chapter, movement, paused timing, folding,
 practice, checkpoint reload, one-use focus, both rematch outcomes, title navigation
-during a pending enemy attack, and mobile controls. Screenshot artifacts and the
+during a pending enemy attack. Screenshot artifacts and the
 playable ZIP are delivered separately.

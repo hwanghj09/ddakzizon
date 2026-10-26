@@ -22,3 +22,18 @@ The managed browser rejects `file://` navigation with
 `ERR_BLOCKED_BY_ADMINISTRATOR`. Direct-file launch was therefore not runtime
 verified here. The game uses only relative classic scripts and styles; there are
 no runtime network dependencies. Use `npm start` for the verified serving path.
+
+## PC tutorial revision
+
+Verified on desktop Chromium at 1440×900:
+
+- Rival speech introduces arrow keys / WASD, then E when the player approaches.
+- First battle teaches lifting the ttakji in rival dialogue.
+- First attack explains Space and the center timing zone before the gauge starts.
+- Full keyboard flow reaches defeat, folding with keys 1–4, practice, and rematch.
+- Rematch dialogue introduces F; F slows the next gauge to 2400 ms.
+- Escape pauses the gauge and resumes keyboard play correctly.
+- Permanent instruction text, battle narration, and mobile direction pad are absent.
+
+The earlier mobile checks above describe the previous revision. This revision is
+intended for PC keyboard/mouse play; mobile-specific controls have been removed.
