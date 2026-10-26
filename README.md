@@ -29,8 +29,11 @@ The skill contains instructions and prompts. Generated newspaper PNG assets are 
 Open `index.html` in a modern browser, or run `npm start` and visit
 `http://localhost:4173`. No install, build, external fonts, or network connection
 is required to play. The game uses Canvas 2D, CSS, and synthesized Web Audio;
-characters, scenery and ttakji are intentionally simple rectangular placeholders.
-The original newspaper PNG assets are preserved in `assets/`.
+characters, scenery and the opponent’s colored-paper ttakji use rectangular placeholders.
+The newspaper ttakji uses the four previously generated transparent PNG sprites.
+Newspaper sprites in `assets/` appear in the title, school, battle, completed folding,
+and inventory HUD. The front changes to damaged after taking a hit; the reverse
+image appears after the flip passes its midpoint. HP and damage rules are unchanged.
 
 ### Controls
 

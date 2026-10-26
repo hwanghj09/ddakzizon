@@ -37,3 +37,16 @@ Verified on desktop Chromium at 1440×900:
 
 The earlier mobile checks above describe the previous revision. This revision is
 intended for PC keyboard/mouse play; mobile-specific controls have been removed.
+
+## Newspaper sprite integration
+
+Verified all four existing 256×256 RGBA files retain their transparent alpha.
+In Chromium, all four PNGs loaded successfully and were observed in canvas draw
+calls. A normal rematch was exercised through a surviving enemy hit (damaged
+front) and a lethal enemy hit (reverse face after the flip midpoint). Verified the
+completed folding scene draws the inventory sprite and the HUD icon appears only
+while a folded newspaper ttakji is owned. No JavaScript errors were observed.
+
+Artwork is drawn at its original aspect ratio in resting poses. Temporary vertical
+compression is used only for the flip animation, with the reverse image drawn
+without mirroring. No HP, damage, or victory rules changed.
