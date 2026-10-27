@@ -50,3 +50,27 @@ while a folded newspaper ttakji is owned. No JavaScript errors were observed.
 Artwork is drawn at its original aspect ratio in resting poses. Temporary vertical
 compression is used only for the flip animation, with the reverse image drawn
 without mirroring. No HP, damage, or victory rules changed.
+
+## Colored-paper sprite integration
+
+Created four matching red/orange colored-paper sprites: base front, actual reverse,
+48px-readable inventory icon, and torn/crumpled front. All files are 256×256 RGBA
+PNGs with transparent margins and centered artwork spanning at most 204px.
+Visually reviewed the normalized set and desktop battle screenshots.
+
+Verified in Chromium at 1440×900:
+
+- All four colored-paper assets load successfully; the base appears on the title
+  screen and in battle through the shared renderer used by the playground.
+- A nonlethal player attack selects the damaged front using the same existing
+  damage-state rule as the newspaper ttakji.
+- A lethal attack shows the reverse after the flip midpoint, retaining the
+  original aspect ratio when the flip completes.
+- Victory displays the colored-paper inventory icon; resetting to the opening
+  school scene clears that icon.
+- Existing newspaper battle states, completed folding sprite, and inventory
+  visibility still pass their browser checks after sharing the sprite loader.
+- No uncaught JavaScript errors; syntax checks and all four rules tests pass.
+
+Only artwork and its rendering were changed; combat balance and controls remain
+unchanged.
