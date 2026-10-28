@@ -14,13 +14,14 @@ const City={
  },
  enter(){
   if(!G.profile.cityEntered||G.profile.round!==3){Village.enter();return}
-  this.setup();G.state='explore';panels('explore-ui');checkpoint('city');this.updateInteract();$('game').focus({preventScroll:true})
+  this.setup();G.state='explore';panels('explore-ui');checkpoint('city');if(Journeys.resume())return;this.updateInteract();$('game').focus({preventScroll:true})
  },
  nearest(){return this.places.find(p=>Math.hypot(G.hero.x-p.x,G.hero.y-365)<88)},
  updateInteract(){const place=this.nearest();coach(place?`${place.name} · E`:'다음 경기는 접수대에서!')},
  interact(){const place=this.nearest();if(!place)return;G.keys.clear();this.open(place.id)},
  close(){G.state='explore';panels('explore-ui');this.updateInteract();$('game').focus({preventScroll:true})},
  open(id){
+  if(id==='stories'){Journeys.open();return}
   if(id==='forge'){Forge.open();return}
   if(['training','press'].includes(id)){Village.open(id);return}
   G.state='facility';G.facility=id;G.keys.clear();panels('facility');Village.hud();
@@ -33,13 +34,15 @@ const City={
    const list=document.createElement('ol');list.className='bracket';
    P.cityOpponents.forEach((opponent,i)=>{const row=document.createElement('li');row.className=i<p.cityRound?'won':i===p.cityRound?'current':'';row.textContent=`${opponent.title} · ${opponent.name}  ${i<p.cityRound?'승리':i===p.cityRound?'대기':'예정'} · ${opponent.prize}원`;list.append(row)});content.append(list);
    if(p.cityRound===3){paragraph('시 대회 챔피언 · 도 대회 출전권 획득');button(p.provinceEntered?'도 대회장으로 이동':'도 대회에 도전',()=>Province.travel());button('대장과 다시 이야기하기',()=>this.rewardStory(false));button('대장과 연습 대결 · 보상 없음',()=>{checkpoint('city');G.opponent=P.cityOpponents[2];transition(()=>battle('sparring'))})}
-   else button(`${P.cityOpponents[p.cityRound].title} 출전`,()=>this.startTournament());
+   else button(`${P.cityOpponents[p.cityRound].title}${J.canCompete(p,'city')?' 출전':' · 이야기 먼저'}`,()=>this.startTournament());
    if(p.powerUnlocked)button('코치에게 승부수 다시 듣기',()=>this.skillStory(false))
   }
+  if(id==='cup')Journeys.link(content);
   $('facility-close').onclick=()=>{if(!G.paused)this.close()};(content.querySelector('button')||$('facility-close')).focus({preventScroll:true})
  },
  startTournament(){
   if(G.profile.round!==3||!G.profile.cityEntered||G.profile.cityRound>=3)return;
+  if(Journeys.gate('city'))return;
   G.tournamentRound=G.profile.cityRound;G.opponent=P.cityOpponents[G.tournamentRound];checkpoint('city');
   const dialogue=[
    [['박자왕','두 번째, 네 번째… 짝수 턴엔 무조건 정타다!'],['박자왕','버틸 타이밍을 잘 골라봐.'],['나','아저씨한테 배운 기술을 써볼까.']],

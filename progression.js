@@ -1,5 +1,6 @@
 /* Persistent campaign rules; no DOM or clock dependencies. */
 (function(root){
+ const Journeys=typeof module!=='undefined'?require('./journey-data.js'):root.TtakjiJourneys;
  const items={
   newspaper:{name:'신문지 딱지',hp:110,attack:20,description:'잘 접은 한 장. 튼튼하고 균형 잡혔다.'},
   colored_paper:{name:'색종이 딱지',hp:90,attack:24,description:'가볍고 날렵하다. 내구도보다 한 방.'},
@@ -20,11 +21,16 @@
   {name:'엇박자 선수',title:'준결승',hp:280,attack:36,material:'colored_paper',prize:260,kind:'offbeat'},
   {name:'도 챔피언',title:'결승',hp:320,attack:40,material:'hair',prize:500,kind:'champion'}
  ];
+ const nationalOpponents=[
+  {name:'한방 승부사',title:'8강',hp:380,attack:42,material:'colored_paper',prize:300,kind:'charger'},
+  {name:'종이 수비수',title:'준결승',hp:420,attack:44,material:'newspaper',prize:450,kind:'fortress'},
+  {name:'전국 챔피언',title:'결승',hp:480,attack:48,material:'hair',prize:800,kind:'national_champion'}
+ ];
  const forms={balanced:{name:'기본형',attack:0,hp:0,cost:0},striker:{name:'공격형',attack:8,hp:-20,cost:90},sturdy:{name:'수비형',attack:-4,hp:35,cost:90}};
  const freshRefining=()=>Object.fromEntries(Object.keys(items).map(id=>[id,{active:'balanced',unlocked:['balanced']}]));
- const upgradeLimit=p=>p.provinceEntered?12:p.cityEntered?8:5;
- const trainingLimit=p=>p.provinceEntered?45:p.cityEntered?30:15;
- const fresh=()=>({coins:0,owned:['newspaper'],equipped:'newspaper',upgrades:{newspaper:0,colored_paper:0,hair:0},xp:0,refining:freshRefining(),homeAllowance:false,homeUpgradeDone:false,homePracticeDone:false,round:0,cityEntered:false,cityRound:0,provinceEntered:false,provinceRound:0,powerUnlocked:false,schoolReward:false,guardUnlocked:false,seen:{}});
+ const upgradeLimit=p=>p.nationalEntered?16:p.provinceEntered?12:p.cityEntered?8:5;
+ const trainingLimit=p=>p.nationalEntered?60:p.provinceEntered?45:p.cityEntered?30:15;
+ const fresh=()=>({coins:0,owned:['newspaper'],equipped:'newspaper',upgrades:{newspaper:0,colored_paper:0,hair:0},xp:0,journey:Journeys.fresh(),refining:freshRefining(),homeAllowance:false,homeUpgradeDone:false,homePracticeDone:false,round:0,cityEntered:false,cityRound:0,provinceEntered:false,provinceRound:0,nationalEntered:false,nationalRound:0,powerUnlocked:false,schoolReward:false,guardUnlocked:false,seen:{}});
  const integer=(x,max)=>Number.isSafeInteger(x)?Math.max(0,Math.min(max,x)):0;
  function restore(raw){
   const p=fresh();if(!raw||typeof raw!=='object')return p;
@@ -33,6 +39,8 @@
   if(p.round===3)p.owned.push('hair');p.guardUnlocked=p.round===3;
   p.cityEntered=p.round===3&&raw.cityEntered===true;p.cityRound=p.cityEntered?integer(raw.cityRound,3):0;p.powerUnlocked=p.cityRound>=1;
   p.provinceEntered=p.cityRound===3&&raw.provinceEntered===true;p.provinceRound=p.provinceEntered?integer(raw.provinceRound,3):0;
+  p.nationalEntered=p.provinceRound===3&&raw.nationalEntered===true;p.nationalRound=p.nationalEntered?integer(raw.nationalRound,3):0;
+  p.journey=Journeys.restore(raw.journey,p);
   p.equipped=p.owned.includes(raw.equipped)?raw.equipped:'newspaper';
   p.coins=integer(raw.coins,999999);p.xp=integer(raw.xp,trainingLimit(p));
   for(const id of p.owned)p.upgrades[id]=integer(raw.upgrades?.[id],upgradeLimit(p));
@@ -61,7 +69,13 @@
  function awardCity(p,round){if(!p.cityEntered||p.round!==3||!Number.isInteger(round)||round!==p.cityRound||round<0||round>=cityOpponents.length)return false;p.coins=Math.min(999999,p.coins+cityOpponents[round].prize);p.cityRound++;p.powerUnlocked=true;return true}
  function enterProvince(p){if(!p.cityEntered||p.cityRound!==3||p.provinceEntered)return false;p.provinceEntered=true;return true}
  function awardProvince(p,round){if(!p.provinceEntered||p.cityRound!==3||!Number.isInteger(round)||round!==p.provinceRound||round<0||round>=provinceOpponents.length)return false;p.coins=Math.min(999999,p.coins+provinceOpponents[round].prize);p.provinceRound++;return true}
+ function enterNational(p){if(!p.provinceEntered||p.provinceRound!==3||p.nationalEntered)return false;p.nationalEntered=true;return true}
+ function awardNational(p,round){if(!p.nationalEntered||p.provinceRound!==3||!Number.isInteger(round)||round!==p.nationalRound||round<0||round>=nationalOpponents.length)return false;p.coins=Math.min(999999,p.coins+nationalOpponents[round].prize);p.nationalRound++;return true}
+ const openingMultiplier=intent=>intent.exposed?1.5:1;
  function intent(kind,turn){
+  if(kind==='charger')return {defending:turn%2===1,weak:turn%2===1,perfect:turn%2===0,exposed:turn%2===0,pierce:false};
+  if(kind==='fortress')return {defending:turn%3!==0,weak:turn%3===0,perfect:false,exposed:turn%3===0,pierce:false};
+  if(kind==='national_champion')return {defending:turn%4===1,weak:turn%4===0,perfect:turn%4===3,exposed:turn%4===0,pierce:false};
   if(kind==='wall')return {defending:true,perfect:false,pierce:true};
   if(kind==='offbeat')return {defending:false,perfect:turn%2===1,weak:turn%2===0,pierce:false};
   if(kind==='champion')return {defending:turn%3===1,perfect:turn%3===2,weak:turn%3===0,pierce:false};
@@ -71,6 +85,6 @@
  }
  const wager=(grade,active)=>active?(grade==='BAD'?.5:1.5):1;
  const damage=(base,attack,defending=false)=>Math.max(1,Math.round(base*attack/20*(defending ? .5 : 1)));
- const api={provinceOpponents,enterProvince,awardProvince,forms,formOf,refineCost,refine,grantHomeAllowance,upgradeAtHome,finishHomePractice,items,opponents,cityOpponents,upgradeLimit,trainingLimit,enterCity,awardCity,intent,wager,fresh,restore,level,stats,cost,upgrade,equip,schoolReward,award,train,damage};
+ const api={nationalOpponents,enterNational,awardNational,openingMultiplier,provinceOpponents,enterProvince,awardProvince,forms,formOf,refineCost,refine,grantHomeAllowance,upgradeAtHome,finishHomePractice,items,opponents,cityOpponents,upgradeLimit,trainingLimit,enterCity,awardCity,intent,wager,fresh,restore,level,stats,cost,upgrade,equip,schoolReward,award,train,damage};
  if(typeof module!=='undefined')module.exports=api;else root.TtakjiProgression=api;
 })(globalThis);

@@ -15,13 +15,14 @@ const Province={
  },
  enter(){
   if(!this.eligible()||!G.profile.provinceEntered){City.enter();return}
-  this.setup();G.state='explore';panels('explore-ui');checkpoint('province');this.updateInteract();$('game').focus({preventScroll:true})
+  this.setup();G.state='explore';panels('explore-ui');checkpoint('province');if(Journeys.resume())return;this.updateInteract();$('game').focus({preventScroll:true})
  },
  nearest:City.nearest,
  updateInteract:City.updateInteract,
  interact:City.interact,
  close:City.close,
  open(id){
+  if(id==='stories'){Journeys.open();return}
   if(id==='forge'){Forge.open();return}
   if(['training','press'].includes(id)){Village.open(id);return}
   G.state='facility';G.facility=id;G.keys.clear();panels('facility');Village.hud();
@@ -35,14 +36,17 @@ const Province={
    P.provinceOpponents.forEach((opponent,i)=>{const row=document.createElement('li');row.className=i<p.provinceRound?'won':i===p.provinceRound?'current':'';row.textContent=`${opponent.title} · ${opponent.name}  ${i<p.provinceRound?'승리':i===p.provinceRound?'대기':'예정'} · ${opponent.prize}원`;list.append(row)});content.append(list);
    if(p.provinceRound===3){
     paragraph('도 대회 챔피언 · 전국 대회 출전권 획득');
+    button(p.nationalEntered?'전국 대회장으로 이동':'전국 대회에 도전',()=>National.travel());
     button('우승 이야기 다시 보기',()=>this.rewardStory(false));
     button('전 챔피언과 연습 대결 · 보상 없음',()=>{checkpoint('province');G.opponent=P.provinceOpponents[2];transition(()=>battle('sparring'))})
-   }else button(`${P.provinceOpponents[p.provinceRound].title} 출전`,()=>this.startTournament())
+   }else button(`${P.provinceOpponents[p.provinceRound].title}${J.canCompete(p,'province')?' 출전':' · 이야기 먼저'}`,()=>this.startTournament())
   }
+  if(id==='cup')Journeys.link(content);
   $('facility-close').onclick=()=>{if(!G.paused)this.close()};(content.querySelector('button')||$('facility-close')).focus({preventScroll:true})
  },
  startTournament(){
   if(!this.eligible()||!G.profile.provinceEntered||G.profile.provinceRound>=3)return;
+  if(Journeys.gate('province'))return;
   G.tournamentRound=G.profile.provinceRound;G.opponent=P.provinceOpponents[G.tournamentRound];checkpoint('province');
   const lines=[
    [['철벽 선배','난 매 턴 방어한다. 어설픈 타격은 절반만 들어와.'],['철벽 선배','PERFECT면 뚫리겠지만, 매번 맞출 수 있겠어?'],['나','집중해서… 틈을 뚫자.']],

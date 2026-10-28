@@ -3,7 +3,7 @@ const artifacts=process.env.ARTIFACT_DIR||path.join(require('node:os').tmpdir(),
 (async()=>{const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||(fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});try{
  const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
- const profile=P.fresh();P.schoolReward(profile);for(let i=0;i<3;i++)P.award(profile,i);P.enterCity(profile);P.awardCity(profile,0);profile.coins=280;
+ const profile=require('./prepared-profile.cjs')(P.fresh());P.schoolReward(profile);for(let i=0;i<3;i++)P.award(profile,i);P.enterCity(profile);P.awardCity(profile,0);profile.coins=280;
  // Begin with an older city save, which has no refining data.
  delete profile.refining;
  await page.evaluate(profile=>localStorage.setItem('ddakzizon.campaign.v3',JSON.stringify({version:3,checkpoint:'city',profile})),profile);

@@ -24,7 +24,7 @@ Use $ttakji-sprite-artist to write four prompts for a metal ttakji. Do not gener
 
 The skill contains instructions and prompts. Generated newspaper PNG assets are available in `assets/sprites/ttakji/newspaper/`.
 
-## Play — school through province championship
+## Play — school through national championship
 
 Open `index.html` in a modern browser, or run `npm start` and visit
 `http://localhost:4173`. No install, build, external fonts, or network connection
@@ -43,6 +43,7 @@ the school rematch and later tournament stats.
 - Dialogue: Space / Enter / Continue. First press reveals an unfinished line.
 - Attack: select 내려치기, then stop the gauge with Space or mouse click.
 - Fold: use number keys 1–4, or click the highlighted corner.
+- Story notebook: J, or the story button at training/tournament facilities.
 - Pause: Escape or Ⅱ. The game clock, gauge, and events freeze together.
 - Sound and fullscreen controls are in the upper-right corner.
 
@@ -131,8 +132,8 @@ when no campaign save exists. Reloading mid-match returns to the village with th
 same round available. Reloading after the final reward resumes its story without
 awarding money twice. Starting a new game resets campaign progress.
 
-The playable campaign continues through the province championship (see v0.7 below).
-National and higher tournaments and the fusion facility remain future content.
+The playable campaign continues through the national championship (see v0.8 below).
+Continental and higher tournaments and the fusion facility remain future content.
 The city refinery is playable (see v0.6 below).
 
 ### Campaign development and verification
@@ -272,7 +273,7 @@ form bonuses affect actual battle HP and damage. The material's four existing
 sprites are retained, while inventory, workshop and battle labels identify its
 form. There is no chance of failure or item destruction.
 
-Processing happens in city and province workshops outside combat. I opens the inventory to change
+Processing happens in city, province and national workshops outside combat. I opens the inventory to change
 the item under the workshop; its preview refreshes without making a purchase.
 Processed equipment works in village matches too. Money, unlocked forms and active
 choices save together immediately. Older saves default to the original form;
@@ -311,8 +312,8 @@ scripted; province matches use ordinary damage and zero-HP defeat.
 
 Winning the final gives 500 coins and national qualification, followed by a short
 award scene. The menu records the province championship. The desk offers the story
-again and a reward-free former-champion sparring match. National matches are future
-content; the qualification is a recorded milestone, not an active travel option.
+again, a reward-free former-champion sparring match, and travel to the national
+championship added in v0.8 below.
 
 `province.js` owns the hub and story; growth, reward gates and attack intentions
 remain in `progression.js`. Shared facilities return to the current hub, including
@@ -326,3 +327,99 @@ save, the intro reload, upgrades/refining, inventory, training, all three matche
 precise announced damage, skill combinations, return travel, reward reload,
 loss/retry, cancellation, locked entry and fresh-game reset. The existing browser
 suite remains part of `npm run test:browser`.
+
+
+## National championship — v0.8
+
+At the province desk after winning its final, select **전국 대회에 도전**. Father
+comes to watch, and the coach introduces the new opening mechanic in dialogue.
+The national hub includes a free return bus, training, compression/refining and
+an eight-player bracket represented by the player's three matches.
+
+| Round | Opponent | HP / attack | Pattern | Prize |
+| --- | --- | --- | --- | --- |
+| Quarterfinal | 한방 승부사 | 380 / 42 | Odd turns: defense + BAD; even turns: exposed + PERFECT | 300 |
+| Semifinal | 종이 수비수 | 420 / 44 | Two defending turns, then exposed + BAD; repeats | 450 |
+| Final | 전국 챔피언 | 480 / 48 | Defense → ordinary counter → PERFECT → exposed + BAD; repeats | 800 |
+
+An **exposed** turn takes 1.5× player damage. This multiplies the existing timing,
+attack and wager factors before a single final rounding. A PERFECT wager into an
+opening therefore deals 2.25× the ordinary PERFECT damage, while BAD still suffers
+the wager penalty. National opponents' defense halves even PERFECT hits. Their
+patterns are explained before each match; exposed turns display both the damage
+bonus and the incoming strong/weak counter. The final's ordinary counters use the
+existing random timing distribution. Existing opponents retain their damage rules.
+
+Entry raises compression to +16 and training to 60; equipment, forms, coins and all
+F/R/C skills carry over. Facilities and inventory save to the current national
+checkpoint. Going back to previous areas retains the new caps and every bracket.
+Defeat is fair and preserves earlier wins; each prize is paid once, totaling 1,550.
+The final leads to a family award scene and continental qualification. That next
+competition remains future content. The completed desk offers the story again and
+reward-free sparring.
+
+`national.js` owns the hub and story, while `progression.js` owns entry/reward gates,
+opening bonuses and save normalization. Old saves default national progress to
+locked; only a province champion may enter. Intro/final checkpoints resume their
+stories after reload without issuing duplicate rewards. Fresh games clear progress.
+The existing geometric scenery and four-state material sprites are reused.
+
+`tests/national.browser.cjs` plays through keyboard travel, intro reload, growth,
+refining/inventory, training, all three matches and opening/skill combinations,
+return travel, final reload, defeat/retry, cancellation and entry/reset gates.
+
+
+## Stories between matches — v0.9
+
+Each village, city, province and national tournament now has three story chapters,
+one before each match. The next match opens after both activities in its chapter
+and their closing dialogue are complete. This adds **12 chapters, 24 activities
+(17 fair duels and 7 accuracy drills), and 132 dialogue lines**, before counting
+the existing school tutorial and 12 main tournament matches. Animation speed,
+enemy HP in the original brackets, and travel speed have not been stretched.
+
+| Region | Chapters |
+| --- | --- |
+| Village | 같이 놀 사람 / 아빠의 접힌 기억 / 아저씨의 비밀 특훈 |
+| City | 낯선 경기장의 첫 친구 / 한 번에 끝내려는 마음 / 끝내지 못한 운동장 |
+| Province | 두 사람의 원정 / 틀려도 이어지는 박자 / 응원석 한 자리 |
+| National | 예전의 나를 만나다 / 이기는 법을 나누다 / 한 장에 담긴 사람들 |
+
+The former school rival learns to play without taking another child's ttakji;
+the father shares his unfinished childhood tournament; the balding uncle talks
+about his daughter; the former boss becomes a practice partner. Later chapters
+bring these characters together and let the protagonist help a child facing the
+same loss that started the game.
+
+Press **J** for the paused story notebook. It shows all regions and progress;
+select an available chapter in the current region to open its facility page.
+The training ground and tournament desk also link to the notebook. Future chapters
+show when they unlock, the next activity shows its objective, and completed stories
+can be reread without receiving rewards again. Inventory stays usable outside
+encounters, including while viewing a story facility.
+
+Each drill has five hits with a displayed minimum GOOD/PERFECT requirement. Some
+duels require using Focus, Guard or a Wager hit as well as winning. Objectives are
+introduced through NPC dialogue and shown in the battle header; failing a goal
+allows a free retry or a return to preparation. Defeat and failed objectives pay
+nothing and preserve completed activities. Skills reset per encounter.
+
+Each successfully completed activity pays once: 10/20/35/50 coins by region and
+one training point, respecting existing caps. Across all stories this is 690 coins
+and up to 24 training points. These rewards fund equipment upgrades during the
+longer journey. There are no added timers, entry fees or mandatory repeat-farming
+loops. Actual playtime depends on reading, timing accuracy and retries; the tests
+measure content coverage, not a promised human completion time.
+
+Progress saves per activity before its result screen. A pending ending also saves,
+so reloading resumes the dialogue and cannot pay again or erase the completed
+encounter. Old saves retain all tournament wins and start the new stories unplayed:
+already unlocked chapters remain available, including for existing champions.
+Previously completed tournaments are not relocked. A fresh game clears the notebook.
+
+`journey-data.js` holds authored chapters and pure progression rules; `journeys.js`
+connects them to the common battle, facility, save and menu systems. Browser tests
+play all 24 activities and all 12 tournament matches from an ordinary post-school
+profile, using earned coins/upgrades only. Timing and RNG are controlled and scene
+timers accelerated for reproducibility. Existing combat regression fixtures explicitly
+start after story preparation; the new full campaign test exercises the real gates.

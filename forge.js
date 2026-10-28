@@ -1,7 +1,7 @@
 'use strict';
 const Forge={
  selected:'balanced',item:null,
- available(){return ['city','province'].includes(G.scene)&&G.scene===G.hub&&G.profile.cityEntered},
+ available(){return ['city','province','national'].includes(G.scene)&&G.scene===G.hub&&G.profile.cityEntered},
  visit(){
   if(!this.available()||G.paused||G.state!=='facility')return;
   this.item=null;

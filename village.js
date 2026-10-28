@@ -2,10 +2,10 @@
 const P=TtakjiProgression;
 const Village={
  places:[{id:'house',name:'우리 집',x:145},{id:'training',name:'연습장',x:365},{id:'press',name:'딱지 압축기',x:585},{id:'cup',name:'마을 대회',x:805}],
- isBattle(){return ['tournament','city_tournament','province_tournament','sparring','training'].includes(G.mode)},
- hub(){return G.hub==='province'?Province:G.hub==='city'?City:this},
- hubCheckpoint(){return ['city','province'].includes(G.hub)?G.hub:'village'},
- hubLabel(){return G.hub==='province'?'도 대회장으로':G.hub==='city'?'시 대회장으로':'마을로 돌아가기'},
+ isBattle(){return ['tournament','city_tournament','province_tournament','national_tournament','sparring','training','story_battle','story_training'].includes(G.mode)},
+ hub(){return G.hub==='national'?National:G.hub==='province'?Province:G.hub==='city'?City:this},
+ hubCheckpoint(){return ['city','province','national'].includes(G.hub)?G.hub:'village'},
+ hubLabel(){return G.hub==='national'?'전국 대회장으로':G.hub==='province'?'도 대회장으로':G.hub==='city'?'시 대회장으로':'마을로 돌아가기'},
  returnHub(){this.hub().enter()},
  hud(){const p=G.profile;setInventory(`${P.items[p.equipped].name} +${p.upgrades[p.equipped]} · ${p.coins}원`,false,false);$('inventory').classList.add('campaign-item');$('inventory').style.setProperty('--item-icon',`url('assets/sprites/ttakji/${p.equipped}/ttakji_${p.equipped}_inventory.png')`)},
  epilogue(){
@@ -14,7 +14,8 @@ const Village={
  },
  enter(first=false){
   cancelScene();G.hub='village';G.scene='village';G.state='explore';G.mode='village';G.flipPlayer=G.flipEnemy=0;G.stolen=false;G.hero={x:145,y:393,walk:0,facing:1};panels('explore-ui');this.hud();checkpoint(this.hubCheckpoint());
-  if(first)say([['앞집 아저씨','대회 나간다며? 난 1회전 상대다. 잘 부탁해.'],['앞집 아저씨','집에선 딱지를 고르고, 연습장에선 실력을 키워. 오른쪽 압축기도 써보고.'],['앞집 아저씨','방향키로 돌아다니다 문 앞에서 E. 준비되면 맨 오른쪽 대회장으로 와!'],['앞집 아저씨','가방은 I로 열어. 잠깐 쉴 땐 Esc로 메뉴를 켜고.']],()=>{G.state='explore';panels('explore-ui');this.updateInteract()});else this.updateInteract();$('game').focus({preventScroll:true})
+  if(Journeys.resume())return;
+  if(first)say([['앞집 아저씨','대회 나간다며? 난 1회전 상대다. 잘 부탁해.'],['앞집 아저씨','집에선 딱지를 고르고, 연습장에선 실력을 키워. 오른쪽 압축기도 써보고.'],['앞집 아저씨','방향키로 돌아다니다 문 앞에서 E. 준비되면 맨 오른쪽 대회장으로 와!'],['앞집 아저씨','경기 사이에 만나기로 한 친구들도 있지? J로 수첩을 열면 약속이 보여.'],['앞집 아저씨','가방은 I로 열어. 잠깐 쉴 땐 Esc로 메뉴를 켜고.']],()=>{G.state='explore';panels('explore-ui');this.updateInteract()});else this.updateInteract();$('game').focus({preventScroll:true})
  },
  nearest(){return this.places.find(p=>Math.hypot(G.hero.x-p.x,G.hero.y-365)<88)},
  updateInteract(){const place=this.nearest();coach(place?`${place.name} · E`:'준비됐으면 대회장으로 와!')},
@@ -23,6 +24,7 @@ const Village={
   if(!p.seen[place.id]){p.seen[place.id]=true;checkpoint(this.hubCheckpoint());say(greetings[place.id],()=>this.open(place.id))}else this.open(place.id)
  },
  open(id){
+  if(id==='stories'){Journeys.open();return}
   G.state='facility';G.facility=id;G.keys.clear();panels('facility');this.hud();const p=G.profile,stats=P.stats(p),content=$('facility-content');content.replaceChildren();$('facility-title').textContent=this.hub().places.find(x=>x.id===id).name;$('facility-wallet').textContent=`${p.coins}원`;
   const paragraph=text=>{const el=document.createElement('p');el.textContent=text;content.append(el)};
   const button=(label,action,disabled=false)=>{const b=document.createElement('button');b.className='facility-choice';b.textContent=label;b.disabled=disabled;b.onclick=()=>{if(!G.paused&&G.state==='facility')action()};content.append(b);return b};
@@ -35,22 +37,23 @@ const Village={
    paragraph(`${P.items[p.equipped].name} +${p.upgrades[p.equipped]} · ${P.forms[P.formOf(p)].name}`);
    paragraph(price===null?`공격 ${stats.attack} · 내구 ${stats.hp} · 최대 강화`:`공격 ${stats.attack} → ${stats.attack+3} · 내구 ${stats.hp} → ${stats.hp+10}`);
    button(price===null?'최대 강화 완료':`압축하기 · ${price}원${p.coins<price?' · 잔액 부족':''}`,()=>{if(P.upgrade(p)){sound('fold');checkpoint(this.hubCheckpoint());this.open(id);toast('더 납작하고 단단해졌다!')}},price===null||p.coins<price);
-   if(['city','province'].includes(G.hub))button('제련소 · 형태 가공',()=>Forge.visit());
+   if(['city','province','national'].includes(G.hub))button('제련소 · 형태 가공',()=>Forge.visit());
   }else if(id==='training'){
    paragraph(`선수 Lv.${P.level(p)+1} · 훈련 ${p.xp}/${P.trainingLimit(p)}`);
    paragraph(p.xp===P.trainingLimit(p)?'현재 훈련 숙련 완료 · 타이밍 연습과 5원 보상은 계속 받을 수 있다.':`다음 성장까지 ${3-p.xp%3}회 · 타격 +2 / 집중 +1`);
    button('타이밍 훈련 · 3번 치기',()=>{checkpoint(this.hubCheckpoint());G.practice=[];transition(()=>battle('training'))});
-   button('연습 대결 · 보상 없음',()=>{checkpoint(this.hubCheckpoint());G.opponent=G.hub==='province'?P.provinceOpponents[Math.min(p.provinceRound,2)]:G.hub==='city'?P.cityOpponents[Math.min(p.cityRound,2)]:P.opponents[p.guardUnlocked?2:0];transition(()=>battle('sparring'))});
+   button('연습 대결 · 보상 없음',()=>{checkpoint(this.hubCheckpoint());G.opponent=G.hub==='national'?P.nationalOpponents[Math.min(p.nationalRound,2)]:G.hub==='province'?P.provinceOpponents[Math.min(p.provinceRound,2)]:G.hub==='city'?P.cityOpponents[Math.min(p.cityRound,2)]:P.opponents[p.guardUnlocked?2:0];transition(()=>battle('sparring'))});
   }else{
    const list=document.createElement('ol');list.className='bracket';for(let i=0;i<3;i++){const o=P.opponents[i],row=document.createElement('li');row.className=i<p.round?'won':i===p.round?'current':'';row.textContent=`${o.title} · ${o.name}  ${i<p.round?'승리':i===p.round?'대기':'예정'} · ${o.prize}원`;list.append(row)}content.append(list);
    if(p.round===3){paragraph('마을 챔피언 · 머리카락 딱지와 뿌리 버티기 획득');button(p.cityEntered?'시 대회장으로 이동':'시 대회에 도전',()=>City.travel());button('아저씨에게 기술 다시 듣기',()=>this.rewardStory(false))}
-   else button(`${P.opponents[p.round].title} 출전`,()=>this.startTournament());
+   else button(`${P.opponents[p.round].title}${J.canCompete(p,'village')?' 출전':' · 이야기 먼저'}`,()=>this.startTournament());
   }
+  if(id==='training'||id==='cup')Journeys.link(content);
   $('facility-close').onclick=()=>{if(!G.paused)this.close()};const first=content.querySelector('button:not(:disabled)');(first||$('facility-close')).focus({preventScroll:true})
  },
  close(){G.state='explore';panels('explore-ui');updateInteract();$('game').focus({preventScroll:true})},
  startTournament(){
-  if(G.profile.round>=3)return;checkpoint(this.hubCheckpoint());G.tournamentRound=G.profile.round;G.opponent=P.opponents[G.tournamentRound];
+  if(G.profile.round>=3)return;if(Journeys.gate('village'))return;checkpoint(this.hubCheckpoint());G.tournamentRound=G.profile.round;G.opponent=P.opponents[G.tournamentRound];
   const lines=[[['앞집 아저씨','평소엔 양보하지만, 대회에선 안 봐준다!'],['앞집 아저씨','집중은 F. 쓸 차례를 잘 골라봐.']],[['유치원 친구','나 기억나? 오늘은 안 질 거야.'],['유치원 친구','짝수 턴에는 딱지를 눌러서 버틸 거야. 그땐 네 공격이 절반만 들어와!']],[['탈모 아저씨','머리숱은 잃었어도 승부 감각은 안 잃었다.'],['탈모 아저씨','세 번째 턴마다 강하게 친다. 그 전에 뒤집어 보든가!']]];
   say(lines[G.tournamentRound],()=>transition(()=>battle('tournament')))
  },
@@ -63,18 +66,21 @@ const Village={
   $('guard').hidden=!G.profile.guardUnlocked;$('guard').disabled=!G.guardAvailable||G.guarding;
   $('power').hidden=!G.profile.powerUnlocked;$('power').disabled=!G.powerAvailable;$('power-count').textContent=G.powered?'준비':G.powerAvailable?'1 / 1':'0 / 1';
   if(G.mode==='training')$('turn-label').textContent=`훈련 ${G.practice.length+1} / 3`;
-  else {const intent=P.intent(G.opponent.kind,G.round);if(intent.defending)coach(intent.pierce?'방어한다! PERFECT만 뚫을 수 있어!':'이번엔 방어! 들어오는 피해 절반!',0);else if(intent.perfect)coach('다음 반격은 PERFECT다!',0);else if(intent.weak)coach('이번 반격은 힘을 뺀다! BAD 타격!',0)}
+  else {const intent=P.intent(G.opponent.kind,G.round);if(intent.exposed)coach(intent.perfect?'빈틈! 피해 1.5배 · 반격 PERFECT!':'빈틈! 피해 1.5배 · 반격 BAD!',0);else if(intent.defending)coach(intent.pierce?'방어한다! PERFECT만 뚫을 수 있어!':'이번엔 방어! 들어오는 피해 절반!',0);else if(intent.perfect)coach('다음 반격은 PERFECT다!',0);else if(intent.weak)coach('이번 반격은 힘을 뺀다! BAD 타격!',0)}
  },
- guard(){if(G.state!=='ready'||!this.isBattle()||!G.guardAvailable||G.guarding)return;G.guardAvailable=false;G.guarding=true;sound('fold');$('guard').disabled=true;toast('다음 상대 공격 피해 50% 감소')},
+ guard(){if(G.state!=='ready'||!this.isBattle()||!G.guardAvailable||G.guarding)return;G.guardAvailable=false;G.guarding=true;if(G.storyJob){G.storyUsed.guard=true;Journeys.ready()}sound('fold');$('guard').disabled=true;toast('다음 상대 공격 피해 50% 감소')},
  power(){if(G.state!=='ready'||!this.isBattle()||!G.powerAvailable)return;G.powerAvailable=false;G.powered=true;sound('click');ready();toast('승부수 · GOOD 이상 1.5배 / BAD 절반')},
  playerDamage(grade){
   const intent=P.intent(G.opponent.kind,G.round),defending=G.mode!=='training'&&intent.defending&&!(intent.pierce&&grade==='PERFECT');
-  const damage=P.damage(R.damage(grade),P.stats(G.profile).attack*P.wager(grade,G.powered),defending);G.powered=false;return damage
+  if(G.storyJob&&G.powered)G.storyUsed.power=true;
+  const damage=P.damage(R.damage(grade),P.stats(G.profile).attack*P.wager(grade,G.powered)*P.openingMultiplier(intent),defending);G.powered=false;return damage
  },
  enemyGrade(){const intent=P.intent(G.opponent.kind,G.round);if(intent.perfect)return 'PERFECT';if(intent.weak)return 'BAD';const n=Math.random();return n<.25?'BAD':n<.8?'GOOD':'PERFECT'},
  enemyDamage(grade){const damage=P.damage(R.damage(grade),G.opponent.attack,G.guarding);G.guarding=false;return damage},
  trainingComplete(){const before=P.level(G.profile);P.train(G.profile,G.practice);checkpoint(this.hubCheckpoint());this.hud();result('손에 감이 붙었다.',P.level(G.profile)>before?'타격 +2 · 집중 +1':'세 번 더, 조금 더 정확하게.',this.hubLabel(),()=>transition(()=>this.returnHub()),[{value:'+5원',label:'훈련 보상'},{value:`Lv.${P.level(G.profile)+1}`,label:'선수'}])},
  finish(win){
+  if(['story_battle','story_training'].includes(G.mode)){Journeys.finish(win);return}
+  if(G.mode==='national_tournament'){National.finish(win);return}
   if(G.mode==='province_tournament'){Province.finish(win);return}
   if(G.mode==='city_tournament'){City.finish(win);return}
   G.animation=null;if(G.mode==='sparring'){result(win?'연습도 실전처럼.':'한 번 더 연습하자.','상금 없는 연습 대결',this.hubLabel(),()=>transition(()=>this.returnHub()));return}

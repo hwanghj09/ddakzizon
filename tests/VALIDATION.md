@@ -241,3 +241,66 @@ caps and opponent patterns. Syntax checks passed for all ten game scripts.
 
 All seven existing school, village, inventory/menu, city and refinery browser
 suites also passed with the province changes (eight browser suites in total).
+
+## National championship v0.8
+
+Verified in desktop Chromium at 1440×900:
+
+- A legacy province-champion save unlocks national travel. The entry story resumes
+  after reload; an unfinished province save cannot enter the national bracket.
+- Keyboard travel reaches training, compression/refining, the bracket and return
+  bus. National caps are +16 and 60 training points. Inventory changes and refining
+  preserve the national checkpoint, and completed training returns to its hub.
+- All three tournament opponents can be defeated through the actual battle UI.
+  With 66 attack, GOOD into defense deals 40. PERFECT with wager into an opening
+  deals 297 after combining the two 1.5× factors. Guard reduces the charger's strong
+  counter from 84 to 42 and the champion's from 96 to 48. NPC speech announces both
+  the opening bonus and the expected counter, including overlapping strong turns.
+- National prizes total 1,550 coins once. The final reward checkpoint reloads its
+  family scene without paying twice. The menu records the championship and
+  continental qualification. Reward-free post-final sparring remains available.
+- Deliberately weak equipment loses normally. Defeat/retry, mid-hit cancellation,
+  reload and return travel preserve earlier wins and wallet contents. New game
+  clears national progress, and malformed premature entry fields are normalized.
+- Hub and opening-turn screenshots were visually reviewed. Existing material
+  sprites and rectangular character/scenery placeholders are retained. No uncaught
+  JavaScript errors were observed during the national walkthrough.
+
+`national.browser.cjs` seeds a province champion and controls timing/RNG while
+accelerating animations. Twenty-nine unit tests and eleven script syntax checks
+passed, covering gate/reward persistence, caps and the new multiplier composition.
+
+All eight existing school, village, menu, city, refinery and province browser
+suites also passed after the national changes (nine browser suites in total).
+
+## Story/playtime expansion v0.9
+
+Verified in desktop Chromium at 1440×900 and 1024×600:
+
+- Twelve authored chapters add 24 activities: 17 duels, seven five-hit accuracy
+  drills, and 132 dialogue lines. Each unfinished main tournament match is gated
+  by its corresponding two activities and closing dialogue.
+- The new campaign walkthrough begins with the normal post-school allowance,
+  +1 newspaper and training reward. It completes all 24 activities and all twelve
+  tournament matches using earned money and upgrades; player stats/HP and prizes
+  are not overridden. Timing/RNG are controlled and animation timers accelerated.
+- Five BAD hits fail without rewards. A mixed set meeting the stated accuracy
+  threshold succeeds. Winning a skill challenge without the requested skill also
+  fails without paying. Retry and return-to-preparation work in both cases.
+- Completing an activity saves its stage, reward and pending dialogue together.
+  Reloading the result resumes the ending, retains money, and opens the following
+  activity without replaying the completed encounter or issuing duplicate rewards.
+- J toggles the paused journal. Encounter pause freezes the timing clock. Future
+  chapters stay unavailable; complete chapters can be reread without payment.
+  The journal and chapter panel were visually inspected, including the short PC
+  viewport. All activities and tournament results remain complete after reload.
+- An additional legacy national-champion walkthrough opens a newly added chapter
+  while preserving the completed bracket, coins and XP. No migration rewards are
+  granted; old champions can play all unlocked new stories. Fresh game clears them.
+- All nine prior browser suites pass with explicit story-prepared fixtures for
+  combat-only checks. The new story suite exercises the gates and the whole longer
+  campaign. No uncaught JavaScript errors were observed. Thirty-four unit tests
+  cover data integrity, ordered completion, pending saves, migration and objectives.
+
+The tests establish playable content and persistence, not a measured human
+completion-time estimate. Reading speed, accuracy and retry frequency vary.

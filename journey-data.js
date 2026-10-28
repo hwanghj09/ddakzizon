@@ -1,0 +1,54 @@
+/* Story chapters and save rules shared by the game and Node tests. */
+(function(root){
+ const regions={village:{name:'마을',field:'round'},city:{name:'시 대회',field:'cityRound'},province:{name:'도 대회',field:'provinceRound'},national:{name:'전국 대회',field:'nationalRound'}};
+ const drill=(title,good,perfect,lines,ending)=>({title,type:'drill',good,perfect,lines,ending});
+ const duel=(title,name,hp,attack,kind,material,goal,lines,ending)=>({title,type:'duel',opponent:{name,hp,attack,kind,material},goal,lines,ending});
+ const episodes=[
+  {id:'village_0',region:'village',round:0,title:'같이 놀 사람',summary:'빼앗긴 딱지를 돌려받은 뒤, 학교로 돌아온 친구의 속마음을 듣는다.',steps:[
+   drill('친구에게 타이밍 보여주기',3,0,[['부하','너 대회 나간다며. 나도 보고 싶어서 왔어.'],['나','또 딱지 뺏으려고?'],['부하','그땐… 미안했다. 나도 제대로 배우고 싶어.'],['나','그럼 다섯 번 보여줄게. 세 번은 GOOD 이상으로.']],[['부하','너도 빗맞히네?'],['나','당연하지. 그래서 연습하는 거야.']]),
+   duel('딱지를 걸지 않는 한 판','부하',95,16,'neighbor','colored_paper','focus',[['부하','이번에도 지면 딱지 주는 거야?'],['나','오늘은 그냥 하는 거야. 끝나면 각자 가져가.'],['부하','집중하는 것도 보여줘. F 누르는 거 맞지?']],[['부하','졌는데 딱지가 남아 있네. 좀 이상하다.'],['나','다음에도 같이 하자.'],['부하','…대회 때 응원하러 갈게.']])]},
+  {id:'village_1',region:'village',round:1,title:'아빠의 접힌 기억',summary:'아빠의 낡은 신문 속에서 오래된 대회 이야기를 발견한다.',steps:[
+   duel('아빠의 손 풀기','아빠',105,17,'neighbor','newspaper',null,[['아빠','창고에서 옛날 신문을 찾았어. 이걸로 한번 붙어볼까?'],['나','아빠도 딱지 대회 나갔어?'],['아빠','결승 직전에 도망갔지. 지면 창피할 것 같아서.']],[['나','왜 이제 말해?'],['아빠','네가 지고도 다시 학교에 가는 걸 보고 생각났거든.']]),
+   drill('실수해도 손 멈추지 않기',3,0,[['아빠','다섯 번 중 세 번만 제대로 쳐보자. 실수한 건 잊고.'],['나','그럼 아빠도 다음엔 도망가지 마.'],['아빠','알았다. 네 응원석에선 절대 안 도망갈게.']],[['나','마지막 건 잘 맞았다!'],['아빠','앞의 실수가 마지막까지 결정하진 않지.'],['나','신문은 버리지 마. 우승하면 같이 보자.']])]},
+  {id:'village_2',region:'village',round:2,title:'아저씨의 비밀 특훈',summary:'결승 상대의 연습을 돕다가 그가 딱지를 치는 이유를 알게 된다.',steps:[
+   drill('정타 한 번 만들기',3,1,[['탈모 아저씨','결승 전인데 같이 연습 좀 하자.'],['나','상대랑 같이 연습해도 돼요?'],['탈모 아저씨','잘하는 애랑 붙어야 재밌지. 다섯 번 중 정타 하나, GOOD 이상 셋!']],[['탈모 아저씨','좋아. 내 딸도 어릴 땐 저렇게 좋아했는데.'],['나','아저씨도 누가 가르쳐줬어요?']]),
+   duel('결승 전 약속','탈모 아저씨',125,20,'uncle','hair',null,[['탈모 아저씨','딸한테 배웠다. 이젠 멀리 살아서 자주 못 봐.'],['나','오늘 경기 찍어서 보내면 되겠네요.'],['탈모 아저씨','그럼 멋있게 져줄… 아니, 이겨야지. 세 번째 반격 조심해!']],[['탈모 아저씨','결승에선 더 세게 친다. 오늘 건 예고편이야.'],['나','우승하면 딸한테 전화해요.'],['탈모 아저씨','져도 할 거다. 그건 딱지랑 상관없는 일이니까.']])]},
+  {id:'city_0',region:'city',round:0,title:'낯선 경기장의 첫 친구',summary:'시 대회장 구석에서 혼자 연습하는 선수를 만난다.',steps:[
+   duel('먼저 인사하는 승부','박자왕',150,23,'sprinter','colored_paper','guard',[['박자왕','다들 아는 사람끼리만 있네. 넌 어느 학교야?'],['나','지존초. 너도 혼자 왔어?'],['박자왕','응. 한 판 할래? 짝수 턴은 강해. R로 한 번 버텨봐.']],[['박자왕','잘 버티네. 우리 응원도 서로 해줄래?'],['나','정식 경기에서 만나도?']]),
+   drill('응원 소리 속 집중',4,0,[['박자왕','만나기 전까진 친구지! 내가 옆에서 응원할게.'],['나','너무 크게는 하지 마. 손 떨리니까.'],['박자왕','다섯 번 중 네 번 GOOD 이상! 가자!']],[['나','덕분에 주변 소리가 덜 신경 쓰였어.'],['박자왕','이름 불러줄 사람이 있으면 경기장이 덜 낯설잖아.']])]},
+  {id:'city_1',region:'city',round:1,title:'한 번에 끝내려는 마음',summary:'첫 승리 뒤 들뜬 마음을 코치와 함께 다잡는다.',steps:[
+   duel('코치의 승부수 시험','대회 코치',165,24,'neighbor','newspaper','power',[['나','승부수 배웠으니까 이제 다 한 방이겠죠?'],['대회 코치','그러다 BAD 나오면 얼굴부터 구겨진다.'],['대회 코치','C로 준비하고 실제로 내려쳐봐. 이긴 뒤 왜 그때 썼는지도 생각해.']],[['나','생각보다 손에 힘이 들어갔어요.'],['대회 코치','이기고 싶은 마음이 손보다 앞서가니까.']]),
+   duel('급해진 친구와 다시 한 판','박자왕',175,25,'sprinter','colored_paper',null,[['박자왕','나 방금 졌어. 마지막에 급하게 눌러버렸어.'],['나','코치님이 그러는데, 마음이 먼저 가면 손이 못 따라간대.'],['박자왕','그럼 천천히 한 판만 더. 이번엔 결과 말고 손을 볼게.']],[['박자왕','패배할 때마다 끝난 것 같았는데, 또 칠 수 있네.'],['나','내가 학교에서 배운 게 그거야.']])]},
+  {id:'city_2',region:'city',round:2,title:'끝내지 못한 운동장',summary:'이사 간 대장과 결승 전에 마주 앉는다.',steps:[
+   drill('옛날처럼 나란히 서서',4,1,[['대장','그때 네 딱지를 돌려주려고 했는데 이사가 급했어.'],['나','그 말, 믿어도 돼?'],['대장','안 믿어도 돼. 오늘 끝나고 제대로 이야기하자.'],['나','먼저 같이 연습해. 다섯 번 중 GOOD 넷, 정타 하나.']],[['대장','원래 이렇게 조용히 연습하는 애였나?'],['나','원래 이렇게 잘 치는 애는 아니었지.']]),
+   duel('빼앗지 않는 약속','대장',200,28,'boss','colored_paper',null,[['대장','딱지 많이 가지면 다들 나랑 놀 줄 알았어.'],['나','같이 놀려면 뺏지 말았어야지.'],['대장','알아. 이번 판은 아무것도 걸지 말자. 방어, 공격, 강타 순서다.']],[['대장','결승 결과랑 상관없이 사과는 할게. 미안했다.'],['나','결승에선 봐주지 않을 거야.'],['대장','그래야 끝난 승부지.']])]},
+  {id:'province_0',region:'province',round:0,title:'두 사람의 원정',summary:'처음 타는 원정 버스에서 라이벌이 연습 동료가 된다.',steps:[
+   duel('대장의 동행 연습','대장',230,29,'boss','colored_paper','guard',[['대장','같이 가자. 나도 네 경기 보고 배우게.'],['나','너 응원 진짜 못할 것 같은데.'],['대장','버티기 써! 같은 건 잘 외쳐. 이번엔 R을 꼭 써봐.']],[['나','확실히 시끄럽네.'],['대장','그래도 혼자 오는 것보단 낫지?']]),
+   duel('낯선 선배에게 도전','철벽 선배',240,30,'wall','newspaper',null,[['철벽 선배','둘이서만 치지 말고 이쪽으로 와.'],['대장','얘 시 대회 우승자예요.'],['나','소개는 내가 할게!'],['철벽 선배','말 대신 정타로 해봐. 내 방어는 PERFECT로만 뚫린다.']],[['철벽 선배','좋네. 나도 처음엔 동네 친구 한 명이 전부였어.'],['대장','이젠 연습 상대가 셋이네.']])]},
+  {id:'province_1',region:'province',round:1,title:'틀려도 이어지는 박자',summary:'완벽해야 한다는 압박 속에서 자신만의 리듬을 찾는다.',steps:[
+   drill('다섯 번의 호흡',4,1,[['나','여기 사람들은 실수를 안 하는 것 같아.'],['엇박자 선수','내 별명이 왜 엇박자인데. 나도 틀려.'],['엇박자 선수','다섯 번만 쳐봐. GOOD 넷, PERFECT 하나면 충분해.']],[['나','완벽한 다섯 번은 아니었네.'],['엇박자 선수','그래도 목표는 해냈잖아.']]),
+   duel('세게 칠 때와 쉴 때','엇박자 선수',255,32,'offbeat','colored_paper','guard',[['엇박자 선수','홀수에 힘주고 짝수엔 쉬어. 계속 힘주면 못 버틴다.'],['나','나도 네 강한 턴에 R을 써볼게.'],['엇박자 선수','좋아. 내 박자에 네 선택을 섞어봐.']],[['나','매번 완벽할 필요는 없구나.'],['엇박자 선수','오래 치려면 쉬는 것도 실력이야.']])]},
+  {id:'province_2',region:'province',round:2,title:'응원석 한 자리',summary:'결승을 앞두고 아빠에게 전하지 못했던 말을 꺼낸다.',steps:[
+   duel('아빠와 전화 너머 약속','대장',265,31,'boss','colored_paper','focus',[['아빠','이번 결승엔 일이 끝나는 대로 갈게. 늦을 수도 있어.'],['나','안 와도 돼. 아니… 와주면 좋겠어.'],['대장','전화 끝났으면 한 판 하자. 마음 복잡할 땐 F부터 눌러봐.']],[['나','괜히 부담드린 것 같아.'],['대장','보고 싶다는 말이 왜 부담이야.']]),
+   duel('선배의 마지막 점검','도 챔피언',285,34,'champion','hair',null,[['도 챔피언','응원석에 누가 오나 계속 보고 있네.'],['나','아빠가 오기로 했어요.'],['도 챔피언','경기가 시작되면 눈은 딱지에. 방어, 정타, 약한 반격 순서다.']],[['아빠','늦지 않았지?'],['나','응. 이제 시작이야.'],['도 챔피언','좋아. 정식 결승에서 보자.']])]},
+  {id:'national_0',region:'national',round:0,title:'예전의 나를 만나다',summary:'전국 대회장 밖에서 딱지를 잃고 울고 있는 아이를 돕는다.',steps:[
+   drill('작은 관객에게 시범',4,1,[['유치원 친구','이 애가 지고 딱지를 뺏겼대. 네 얘기 같지 않아?'],['나','나도 딱 한 장으로 다시 시작했어.'],['나','먼저 치는 걸 보여줄게. 다섯 번 중 네 번 GOOD, 정타 하나.']],[['유치원 친구','옆에서 따라 누르는 거 봐. 벌써 웃네.'],['나','나도 그때 누가 옆에 있었으면 좋았을 텐데.']]),
+   duel('친구가 마련한 작은 경기','유치원 친구',300,34,'friend','colored_paper','focus',[['유치원 친구','아이 앞에서 한 판 하자. 지더라도 딱지는 안 뺏는 걸로.'],['나','당연하지. F로 집중하는 것도 보여줄게.'],['유치원 친구','짝수 턴에는 내가 방어한다. 대회처럼 해봐.']],[['유치원 친구','나 졌어! 그래도 내 딱지는 내 거다!'],['나','너도 같이 연습하자. 한 장 더 접으면 되니까.']])]},
+  {id:'national_1',region:'national',round:1,title:'이기는 법을 나누다',summary:'정타 비법을 숨기던 선수들이 서로의 연습을 돕기 시작한다.',steps:[
+   duel('한방 승부사의 부탁','한방 승부사',330,36,'charger','colored_paper','power',[['한방 승부사','네가 빈틈을 보고 승부수 쓰는 거, 다시 보고 싶어.'],['나','상대한테 물어봐도 돼?'],['한방 승부사','나중에 더 잘하는 상대가 돼줄게. C 준비해서 직접 쳐줘.']],[['한방 승부사','이제 왜 기다렸는지 알겠다.'],['나','그 대신 네 강한 반격도 다시 배웠어.']]),
+   duel('수비수의 열린 연습','종이 수비수',350,37,'fortress','newspaper',null,[['종이 수비수','둘만 비법 나누지 말고 나도 끼워줘.'],['한방 승부사','이 친구는 세 번째 턴에 빈틈이 생겨.'],['종이 수비수','벌써 알려주면 어떡해!'],['나','그럼 알아도 막을 수 있게 연습하면 되지.']],[['종이 수비수','지고 나서 이렇게 오래 웃은 건 처음이네.'],['나','내일 다시 쳐도 되잖아.']])]},
+  {id:'national_2',region:'national',round:2,title:'한 장에 담긴 사람들',summary:'전국 결승 전날, 지금까지 만난 사람들이 연습장에 모인다.',steps:[
+   duel('아저씨의 원정 응원','탈모 아저씨',360,38,'uncle','hair','guard',[['탈모 아저씨','네 결승 보려고 기차 타고 왔다.'],['나','딸한테 전화는 했어요?'],['탈모 아저씨','같이 왔지. 창피하지 않게 R로 내 강타 한번 버텨봐.']],[['탈모 아저씨','어떤 딱지를 들고 나가든 네 손이 치는 거다.'],['나','그래도 이 딱지 받을 때 약속은 기억해요.']]),
+   duel('마지막 연습 파트너','대장',390,39,'national_champion','colored_paper',null,[['대장','전국 챔피언 흉내 좀 내봤어. 방어, 보통, 정타, 빈틈.'],['아빠','이번엔 내가 응원할 차례지?'],['부하','나도 왔어! 학교 애들한테 다 말해놨다!'],['나','그건 좀 부담되는데… 좋아. 마지막으로 한 판.']],[['대장','오늘은 여기까지. 결승은 네가 직접 끝내.'],['나','처음엔 잃은 딱지 찾으려고 시작했는데.'],['아빠','지금은 같이 칠 사람이 이렇게 많아졌네.'],['나','응. 내일 이 사람들 앞에서 제대로 쳐볼게.']])]},
+ ];
+ const byId=id=>episodes.find(e=>e.id===id);
+ const available=(p,e)=>!!e&&(e.region==='village'?p.schoolReward:p[`${e.region}Entered`])&&p[regions[e.region].field]>=e.round;
+ const fresh=()=>({stages:{},pending:null});
+ function restore(raw,p){const state=fresh();for(const e of episodes){const n=raw?.stages?.[e.id];state.stages[e.id]=Number.isInteger(n)?Math.max(0,Math.min(2,n)):0}const pending=raw?.pending,e=byId(pending?.id);if(e&&available(p,e)&&Number.isInteger(pending.step)&&pending.step>=0&&pending.step<2&&state.stages[e.id]===pending.step+1)state.pending={id:e.id,step:pending.step};return state}
+ const current=(p,region)=>episodes.find(e=>e.region===region&&e.round===p[regions[region].field]);
+ const canCompete=(p,region)=>{const e=current(p,region);return !e||(p.journey.stages[e.id]===2&&!p.journey.pending)};
+ function complete(p,id,step,cap){const e=byId(id);if(!available(p,e)||p.journey.pending||(p.journey.stages[id]||0)!==step||!Number.isInteger(step)||step<0||step>=2)return false;p.journey.stages[id]=step+1;p.journey.pending={id,step};p.coins=Math.min(999999,p.coins+reward(e));p.xp=Math.min(cap,p.xp+1);return true}
+ const reward=e=>({village:10,city:20,province:35,national:50})[e.region];
+ const passed=(activity,grades,used={})=>activity.type==='drill'?grades.length===5&&grades.filter(g=>g==='GOOD'||g==='PERFECT').length>=activity.good&&grades.filter(g=>g==='PERFECT').length>=activity.perfect:!activity.goal||used[activity.goal]===true;
+ const api={regions,episodes,byId,available,fresh,restore,current,canCompete,complete,reward,passed};if(typeof module!=='undefined')module.exports=api;else root.TtakjiJourneys=api;
+})(globalThis);

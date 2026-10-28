@@ -65,3 +65,23 @@ test('province opponents announce deterministic defense and strong/weak counter 
   assert.equal(P.intent('champion',turn).defending,turn%3===1);assert.equal(P.intent('champion',turn).perfect,turn%3===2);assert.equal(P.intent('champion',turn).weak,turn%3===0);assert.equal(P.intent('champion',turn).pierce,false);
  }
 });
+
+test('national entry and one-time rewards require the completed province bracket',()=>{
+ const p=P.fresh();assert.equal(P.enterNational(p),false);P.schoolReward(p);for(let i=0;i<3;i++)P.award(p,i);P.enterCity(p);for(let i=0;i<3;i++)P.awardCity(p,i);P.enterProvince(p);
+ for(let i=0;i<2;i++)P.awardProvince(p,i);assert.equal(P.enterNational(p),false);assert.equal(P.awardNational(p,0),false);P.awardProvince(p,2);assert(P.enterNational(p));assert.equal(P.enterNational(p),false);
+ const before=p.coins;assert.equal(P.awardNational(p,2),false);assert.equal(P.awardNational(p,NaN),false);for(let i=0;i<3;i++){assert(P.awardNational(p,i));assert.equal(P.awardNational(p,i),false)}
+ assert.equal(p.coins-before,1550);assert.equal(p.provinceRound,3);assert.equal(p.nationalRound,3);
+});
+test('national saves preserve equipment and expanded caps while normalizing premature entry',()=>{
+ const raw={schoolReward:true,round:3,cityEntered:true,cityRound:3,provinceEntered:true,provinceRound:3,nationalEntered:true,nationalRound:2,xp:100,upgrades:{hair:100},equipped:'hair',refining:{hair:{active:'striker',unlocked:['striker']}}};
+ const p=P.restore(raw);assert.equal(p.xp,60);assert.equal(p.upgrades.hair,16);assert.equal(P.stats(p).attack,124);assert.equal(P.stats(p).hp,265);assert.equal(p.nationalRound,2);
+ const locked=P.restore({...raw,provinceRound:2});assert.equal(locked.nationalEntered,false);assert.equal(locked.nationalRound,0);assert.equal(locked.upgrades.hair,12);assert.equal(locked.xp,45);
+ const old=P.restore({...raw,nationalEntered:undefined,nationalRound:undefined});assert.equal(old.nationalEntered,false);assert.equal(P.fresh().nationalRound,0);
+});
+test('openings compose with timing, wager and defense without leaking into earlier opponents',()=>{
+ const normal=P.intent('charger',1),opening=P.intent('charger',2);assert(normal.defending&&normal.weak);assert(opening.exposed&&opening.perfect);
+ assert.equal(P.damage(24,66*P.openingMultiplier(normal),normal.defending),40);
+ assert.equal(P.damage(40,66*P.wager('PERFECT',true)*P.openingMultiplier(opening)),297);
+ assert.equal(P.damage(10,66*P.wager('BAD',true)*P.openingMultiplier(opening)),25);
+ for(let t=1;t<=8;t++){assert.equal(P.intent('fortress',t).exposed,t%3===0);assert.equal(P.intent('national_champion',t).exposed,t%4===0);assert.equal(P.intent('national_champion',t).perfect,t%4===3);assert.equal(P.openingMultiplier(P.intent('boss',t)),1)}
+});

@@ -5,12 +5,12 @@ window.GameMenu={
  setInert(value){for(const child of $('game').children)if(child.id!=='pause-screen')child.inert=value},
  release(){this.setInert(false);this.selected=null},
  owned(){return !G.profile.schoolReward&&(G.stolen||G.checkpoint==='home')?[]:G.profile.owned},
- canEquip(){return G.profile.schoolReward&&['village','city','province'].includes(G.scene)&&['explore','facility'].includes(G.state)},
+ canEquip(){return G.profile.schoolReward&&['village','city','province','national'].includes(G.scene)&&['explore','facility'].includes(G.state)},
  icon(id,state='inventory'){const img=document.createElement('img');img.src=`assets/sprites/ttakji/${id}/ttakji_${id}_${state}.png`;img.alt='';return img},
  el(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el},
  button(text,action,className='menu-secondary'){const b=this.el('button',className,text);b.onclick=action;return b},
  show(view='overview'){
-  const names={overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
+  const names={journal:'이야기 수첩',overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
   if(!names[view])return;this.view=view;$('menu-view-title').textContent=names[view];$('menu-message').textContent='';
   document.querySelectorAll('[data-menu]').forEach(b=>{const active=b.dataset.menu===view;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
   const body=$('menu-body');body.replaceChildren();this[view](body);
@@ -20,8 +20,8 @@ window.GameMenu={
   const p=G.profile,owned=this.owned(),card=this.el('div','equipped-summary');
   if(owned.length){card.append(this.icon(p.equipped));const copy=this.el('div');copy.append(this.el('span','menu-eyebrow','장착 딱지'),this.el('h4','',P.items[p.equipped].name),this.el('p','',`강화 +${p.upgrades[p.equipped]} · ${P.forms[P.formOf(p)].name}`));card.append(copy)}else card.append(this.el('p','','지금은 가진 딱지가 없다.'));
   body.append(card);const progress=this.el('div','menu-progress');
-  const current=p.provinceEntered?(p.provinceRound===3?'도 대회 챔피언':`도 대회 · ${P.provinceOpponents[p.provinceRound].title}`):p.cityEntered?(p.cityRound===3?'시 대회 챔피언':`시 대회 · ${P.cityOpponents[p.cityRound].title}`):p.schoolReward?(p.round===3?'마을 챔피언':`마을 대회 · ${P.opponents[p.round].title}`):({school:'학교에서 첫 대결',home:'새 딱지 접기',home_upgrade:'집에서 딱지 강화',practice:'타이밍 연습',rematch:'학교 재대결',complete:'마을 대회로'}[G.checkpoint]||'학교');
-  progress.append(this.el('span','menu-eyebrow','현재 여정'),this.el('h4','',current));if(p.schoolReward)progress.append(this.el('p','',p.provinceEntered?(p.provinceRound===3?'전국 대회 출전권 획득':`다음 상대 · ${P.provinceOpponents[p.provinceRound].name}`):p.cityEntered?(p.cityRound===3?'도 대회 출전권 획득':`다음 상대 · ${P.cityOpponents[p.cityRound].name}`):p.round===3?'다음 목표 · 시 대회':`다음 상대 · ${P.opponents[p.round].name}`));body.append(progress);
+  const current=p.nationalEntered?(p.nationalRound===3?'전국 챔피언':`전국 대회 · ${P.nationalOpponents[p.nationalRound].title}`):p.provinceEntered?(p.provinceRound===3?'도 대회 챔피언':`도 대회 · ${P.provinceOpponents[p.provinceRound].title}`):p.cityEntered?(p.cityRound===3?'시 대회 챔피언':`시 대회 · ${P.cityOpponents[p.cityRound].title}`):p.schoolReward?(p.round===3?'마을 챔피언':`마을 대회 · ${P.opponents[p.round].title}`):({school:'학교에서 첫 대결',home:'새 딱지 접기',home_upgrade:'집에서 딱지 강화',practice:'타이밍 연습',rematch:'학교 재대결',complete:'마을 대회로'}[G.checkpoint]||'학교');
+  progress.append(this.el('span','menu-eyebrow','현재 여정'),this.el('h4','',current));if(p.schoolReward)progress.append(this.el('p','',p.nationalEntered?(p.nationalRound===3?'대륙 대회 출전권 획득':`다음 상대 · ${P.nationalOpponents[p.nationalRound].name}`):p.provinceEntered?(p.provinceRound===3?'전국 대회 출전권 획득':`다음 상대 · ${P.provinceOpponents[p.provinceRound].name}`):p.cityEntered?(p.cityRound===3?'도 대회 출전권 획득':`다음 상대 · ${P.cityOpponents[p.cityRound].name}`):p.round===3?'다음 목표 · 시 대회':`다음 상대 · ${P.opponents[p.round].name}`));body.append(progress);
   const metrics=this.el('div','menu-metrics');for(const [label,value] of [['보유금',`${p.coins}원`],['선수',`Lv.${P.level(p)+1}`],['보유 딱지',`${owned.length}개`]]){const tile=this.el('div');tile.append(this.el('small','',label),this.el('strong','',value));metrics.append(tile)}body.append(metrics);
   body.append(this.el('p','save-note',G.storageOK?'획득·강화·진행은 자동 저장됩니다. 이어서 하기는 마지막 진행 지점부터 시작합니다.':'이 브라우저에서는 저장하지 못했습니다. 현재 플레이는 계속할 수 있습니다.'))
  },
@@ -50,6 +50,17 @@ window.GameMenu={
   if(G.state==='facility'){Village.hub().open(G.facility)}
   this.show('inventory');$('menu-message').textContent=`${P.items[id].name} 장착 완료`;sound('click')
  },
+ journal(body){
+  const p=G.profile,done=J.episodes.filter(e=>p.journey.stages[e.id]===2).length;
+  body.append(this.el('p','',`완료한 이야기 ${done} / ${J.episodes.length}`));
+  for(const [region,info] of Object.entries(J.regions)){
+   const section=this.el('section','journal-region');section.append(this.el('h4','',info.name));
+   for(const e of J.episodes.filter(e=>e.region===region)){
+    const n=p.journey.stages[e.id]||0,available=J.available(p,e),b=this.button(`${e.title} · ${n===2?'완료':available?`${n} / 2`:'아직 만나지 못함'}`,()=>{if(!this.canEquip()||G.hub!==region)return;unpause();Journeys.selected=e.id;Journeys.open()},'journey-entry');
+    b.disabled=!this.canEquip()||G.hub!==region||!available;section.append(b);
+   }body.append(section);
+  }
+ },
  player(body){
   const p=G.profile,s=P.stats(p),header=this.el('div','player-summary');header.append(this.el('span','player-avatar',''),this.el('h4','',`선수 Lv.${P.level(p)+1}`),this.el('p','',`타격 보너스 +${P.level(p)*2} · 집중 ${s.concentration}`));body.append(header);
   const meter=this.el('progress');meter.max=P.trainingLimit(p);meter.value=p.xp;meter.setAttribute('aria-label','선수 훈련 성장');body.append(meter,this.el('p','',p.xp>=P.trainingLimit(p)?'현재 훈련 숙련 완료':`훈련 ${p.xp}/${P.trainingLimit(p)} · 다음 성장까지 ${3-p.xp%3}회`));
@@ -61,10 +72,11 @@ window.GameMenu={
   const screen=this.button(document.fullscreenElement?'전체 화면 나가기':'전체 화면으로',async()=>{await $('fullscreen').onclick();if(G.paused&&this.view==='settings')this.show('settings')});screen.id='menu-fullscreen';body.append(soundButton,screen)
  },
  controls(body){
-  const list=this.el('dl','controls-list');for(const [label,key] of [['이동','방향키 / WASD'],['대화 · 시설 이용','E'],['대화 넘기기 · 딱지 치기','Space'],['딱지 접기','1 · 2 · 3 · 4'],['집중 / 뿌리 버티기 / 승부수','F / R / C'],['인벤토리','I'],['메뉴 / 뒤로','Esc'],['메뉴 선택 / 실행','방향키 · Tab / Enter']]){const row=this.el('div');row.append(this.el('dt','',label),this.el('dd','',key));list.append(row)}body.append(list)
+  const list=this.el('dl','controls-list');for(const [label,key] of [['이동','방향키 / WASD'],['대화 · 시설 이용','E'],['대화 넘기기 · 딱지 치기','Space'],['딱지 접기','1 · 2 · 3 · 4'],['집중 / 뿌리 버티기 / 승부수','F / R / C'],['이야기 수첩','J'],['인벤토리','I'],['메뉴 / 뒤로','Esc'],['메뉴 선택 / 실행','방향키 · Tab / Enter']]){const row=this.el('div');row.append(this.el('dt','',label),this.el('dd','',key));list.append(row)}body.append(list)
  },
  keys(event){
   if(event.altKey||event.ctrlKey||event.metaKey)return;
+  if(event.code==='KeyJ'&&G.state!=='title'){event.preventDefault();event.stopImmediatePropagation();if(event.repeat)return;if(!G.paused)pause('journal');else if(this.view==='journal')unpause();else this.show('journal');return}
   if(event.code==='KeyI'&&G.state!=='title'){
    event.preventDefault();event.stopImmediatePropagation();if(event.repeat)return;
    if(!G.paused)pause('inventory');else if(this.view==='inventory')unpause();else this.show('inventory');return

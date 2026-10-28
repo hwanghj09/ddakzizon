@@ -4,7 +4,7 @@ const artifacts=process.env.ARTIFACT_DIR||path.join(require('node:os').tmpdir(),
 const {chromium}=require('playwright');const assert=require('node:assert/strict'),P=require('../progression.js');
 (async()=>{const b=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||(fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});try{
  const p=await b.newPage({viewport:{width:1280,height:720}}),errors=[],requests=[];p.on('pageerror',e=>errors.push(e.message));p.on('response',r=>{if(r.url().includes('/hair/'))requests.push(r.status())});
- const saved=P.fresh();P.schoolReward(saved);P.award(saved,0);
+ const saved=require('./prepared-profile.cjs')(P.fresh());P.schoolReward(saved);P.award(saved,0);
  await p.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
  await p.evaluate(profile=>localStorage.setItem('ddakzizon.campaign.v3',JSON.stringify({version:3,checkpoint:'village',profile})),saved);await p.reload();await p.locator('#load-game').click();await p.waitForFunction(()=>G.state==='explore');
  const fast=async()=>p.evaluate(()=>{const real=update;update=dt=>real(dt*5);TtakjiRules.positionAt=()=>0;Math.random=()=>.5});await fast();

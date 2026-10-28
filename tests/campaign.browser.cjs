@@ -9,6 +9,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
  await p.waitForFunction(()=>G.state==='dialogue');
  const dialogues=async()=>{for(let i=0;i<100;i++){const state=await p.evaluate(()=>G.state);if(state==='dialogue'){await p.locator('#next').click();await p.waitForTimeout(30)}else if(state==='transition'){await p.waitForTimeout(450)}else return}throw Error('dialogue loop')};
  await dialogues();await p.waitForFunction(()=>G.scene==='village'&&G.state==='explore');
+ await p.evaluate(()=>{G.profile.journey.stages=Object.fromEntries(J.episodes.map(e=>[e.id,2]));checkpoint('village')}); // Combat regression starts after the story activities.
  assert.equal(await p.evaluate(()=>G.profile.coins),80);await p.screenshot({path:path.join(artifacts,'village-hub.png')});
  const visit=async(id)=>{const x=await p.evaluate(id=>Village.places.find(x=>x.id===id).x,id);await p.locator('#game').focus();const current=await p.evaluate(()=>G.hero.x);if(Math.abs(x-current)>10){const key=x>current?'ArrowRight':'ArrowLeft';await p.keyboard.down(key);await p.waitForFunction(({x,dir})=>dir>0?G.hero.x>=x-5:G.hero.x<=x+5,{x,dir:x>current?1:-1});await p.keyboard.up(key)}await p.keyboard.press('KeyE');await dialogues();await p.waitForFunction(()=>G.state==='facility');assert.equal(await p.evaluate(()=>G.facility),id)};
  const leave=async()=>{await p.locator('#facility-close').click()};
