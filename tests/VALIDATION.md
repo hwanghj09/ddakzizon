@@ -304,3 +304,10 @@ Verified in desktop Chromium at 1440×900 and 1024×600:
 
 The tests establish playable content and persistence, not a measured human
 completion-time estimate. Reading speed, accuracy and retry frequency vary.
+
+## v0.10 탐험 맵
+
+- 단위 테스트: 옛 챔피언 저장의 포스터/진행 보존, 새 위치·재료·안내 설정 저장, 잘못된 좌표/지역/재료 정규화.
+- `tests/exploration.browser.cjs`: 새 게임 첫 패배 → 운동장 출구 → 학교 앞 → 주민센터 → 광장 → 골목 → 집 → 접기/강화/연습 → 학교 재대결 → 포스터 → 접수원. 카메라 추적, 수평 이동, M 지도/일시정지, 상점 확인/취소, 보강, 무료/유료 연습 보상, 재접속 좌표, 구역 10개 렌더링, 정류장 복귀, 1024×600 메뉴 경계를 검증한다.
+- 기존 전투 회귀 테스트는 시설 진입 헬퍼를 직접 메뉴 호출로 바꿨다. 구형 한 화면의 건물 x 좌표를 향해 걷던 검증은 새 탐험 브라우저 테스트가 대체한다. 전투/재화/장비/재접속 단언은 유지한다.
+- 화면 산출물: `/tmp/ddakzizon-checks/map-{home,alley,square,center,lobby,schoolfront,yard,city,province,national}.png`, `map-menu.png`.

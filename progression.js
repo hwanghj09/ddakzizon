@@ -30,7 +30,8 @@
  const freshRefining=()=>Object.fromEntries(Object.keys(items).map(id=>[id,{active:'balanced',unlocked:['balanced']}]));
  const upgradeLimit=p=>p.nationalEntered?16:p.provinceEntered?12:p.cityEntered?8:5;
  const trainingLimit=p=>p.nationalEntered?60:p.provinceEntered?45:p.cityEntered?30:15;
- const fresh=()=>({coins:0,owned:['newspaper'],equipped:'newspaper',upgrades:{newspaper:0,colored_paper:0,hair:0},xp:0,journey:Journeys.fresh(),refining:freshRefining(),homeAllowance:false,homeUpgradeDone:false,homePracticeDone:false,round:0,cityEntered:false,cityRound:0,provinceEntered:false,provinceRound:0,nationalEntered:false,nationalRound:0,powerUnlocked:false,schoolReward:false,guardUnlocked:false,seen:{}});
+ const freshMap=()=>({zone:'yard',x:180,phase:'school',poster:false,guidance:true,visited:{},materials:{newspaper:0,colored_paper:0}});
+ const fresh=()=>({map:freshMap(),coins:0,owned:['newspaper'],equipped:'newspaper',upgrades:{newspaper:0,colored_paper:0,hair:0},xp:0,journey:Journeys.fresh(),refining:freshRefining(),homeAllowance:false,homeUpgradeDone:false,homePracticeDone:false,round:0,cityEntered:false,cityRound:0,provinceEntered:false,provinceRound:0,nationalEntered:false,nationalRound:0,powerUnlocked:false,schoolReward:false,guardUnlocked:false,seen:{}});
  const integer=(x,max)=>Number.isSafeInteger(x)?Math.max(0,Math.min(max,x)):0;
  function restore(raw){
   const p=fresh();if(!raw||typeof raw!=='object')return p;
@@ -41,6 +42,14 @@
   p.provinceEntered=p.cityRound===3&&raw.provinceEntered===true;p.provinceRound=p.provinceEntered?integer(raw.provinceRound,3):0;
   p.nationalEntered=p.provinceRound===3&&raw.nationalEntered===true;p.nationalRound=p.nationalEntered?integer(raw.nationalRound,3):0;
   p.journey=Journeys.restore(raw.journey,p);
+  const m=raw.map||{};const zones=['home','alley','square','center','lobby','schoolfront','yard','city','province','national'];
+  p.map.zone=zones.includes(m.zone)?m.zone:p.schoolReward?'square':'yard';
+  if(['city','province','national'].includes(p.map.zone)&&!p[p.map.zone+'Entered'])p.map.zone='square';
+  p.map.x=Number.isFinite(m.x)?Math.max(45,Math.min(2155,m.x)):180;
+  p.map.phase=['school','lost','rematch'].includes(m.phase)?m.phase:'school';p.map.poster=m.poster===true||(!raw.map&&p.schoolReward);p.map.guidance=m.guidance!==false;
+  for(const z of zones)if(m.visited?.[z]===true)p.map.visited[z]=true;
+  for(const id of ['newspaper','colored_paper'])p.map.materials[id]=integer(m.materials?.[id],999);
+
   p.equipped=p.owned.includes(raw.equipped)?raw.equipped:'newspaper';
   p.coins=integer(raw.coins,999999);p.xp=integer(raw.xp,trainingLimit(p));
   for(const id of p.owned)p.upgrades[id]=integer(raw.upgrades?.[id],upgradeLimit(p));
@@ -48,7 +57,7 @@
   p.homeUpgradeDone=raw.homeUpgradeDone===true&&p.upgrades.newspaper>=1;
   p.homeAllowance=raw.homeAllowance===true||p.homeUpgradeDone;
   p.homePracticeDone=raw.homePracticeDone===true&&p.homeUpgradeDone;
-  for(const id of ['house','training','press','cup','forge'])p.seen[id]=raw.seen?.[id]===true;
+  for(const id of ['house','training','press','cup','forge','mapControls'])p.seen[id]=raw.seen?.[id]===true;
   return p;
  }
  const level=p=>Math.min(trainingLimit(p)/3,Math.floor(p.xp/3));

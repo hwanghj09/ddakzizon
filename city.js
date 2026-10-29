@@ -6,7 +6,7 @@ const City={
   if(!G.profile.cityEntered){P.enterCity(G.profile);checkpoint('city_intro');transition(()=>this.intro())}
   else transition(()=>this.enter())
  },
- setup(){cancelScene();G.hub='city';G.scene='city';G.mode='city';G.stolen=false;G.flipPlayer=G.flipEnemy=0;G.hero={x:145,y:393,walk:0,facing:1};Village.hud()},
+ setup(){cancelScene();G.mapZone='city';G.camera=0;G.hub='city';G.scene='city';G.mode='city';G.stolen=false;G.flipPlayer=G.flipEnemy=0;G.hero={x:145,y:393,walk:0,facing:1};Village.hud()},
  intro(){
   if(G.profile.round!==3){Village.enter();return}
   P.enterCity(G.profile);this.setup();checkpoint('city_intro');
@@ -14,7 +14,7 @@ const City={
  },
  enter(){
   if(!G.profile.cityEntered||G.profile.round!==3){Village.enter();return}
-  this.setup();G.state='explore';panels('explore-ui');checkpoint('city');if(Journeys.resume())return;this.updateInteract();$('game').focus({preventScroll:true})
+  Exploration.enter('city',G.profile.map.zone==='city'?G.profile.map.x:140);if(Journeys.resume())return;this.updateInteract();$('game').focus({preventScroll:true})
  },
  nearest(){return this.places.find(p=>Math.hypot(G.hero.x-p.x,G.hero.y-365)<88)},
  updateInteract(){const place=this.nearest();coach(place?`${place.name} · E`:'다음 경기는 접수대에서!')},

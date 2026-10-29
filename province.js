@@ -7,7 +7,7 @@ const Province={
   if(!G.profile.provinceEntered){P.enterProvince(G.profile);checkpoint('province_intro');transition(()=>this.intro())}
   else transition(()=>this.enter())
  },
- setup(){cancelScene();G.hub='province';G.scene='province';G.mode='province';G.stolen=false;G.flipPlayer=G.flipEnemy=0;G.hero={x:145,y:393,walk:0,facing:1};Village.hud()},
+ setup(){cancelScene();G.mapZone='province';G.camera=0;G.hub='province';G.scene='province';G.mode='province';G.stolen=false;G.flipPlayer=G.flipEnemy=0;G.hero={x:145,y:393,walk:0,facing:1};Village.hud()},
  intro(){
   if(!this.eligible()){City.enter();return}
   P.enterProvince(G.profile);this.setup();checkpoint('province_intro');
@@ -15,7 +15,7 @@ const Province={
  },
  enter(){
   if(!this.eligible()||!G.profile.provinceEntered){City.enter();return}
-  this.setup();G.state='explore';panels('explore-ui');checkpoint('province');if(Journeys.resume())return;this.updateInteract();$('game').focus({preventScroll:true})
+  Exploration.enter('province',G.profile.map.zone==='province'?G.profile.map.x:140);if(Journeys.resume())return;this.updateInteract();$('game').focus({preventScroll:true})
  },
  nearest:City.nearest,
  updateInteract:City.updateInteract,

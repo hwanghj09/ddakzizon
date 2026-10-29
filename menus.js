@@ -4,19 +4,21 @@ window.GameMenu={
  view:'overview', selected:null,
  setInert(value){for(const child of $('game').children)if(child.id!=='pause-screen')child.inert=value},
  release(){this.setInert(false);this.selected=null},
- owned(){return !G.profile.schoolReward&&(G.stolen||G.checkpoint==='home')?[]:G.profile.owned},
+ owned(){return !G.profile.schoolReward&&(G.stolen||G.checkpoint==='home'||G.profile.map.phase==='lost'&&!G.profile.homeUpgradeDone)?[]:G.profile.owned},
  canEquip(){return G.profile.schoolReward&&['village','city','province','national'].includes(G.scene)&&['explore','facility'].includes(G.state)},
  icon(id,state='inventory'){const img=document.createElement('img');img.src=`assets/sprites/ttakji/${id}/ttakji_${id}_${state}.png`;img.alt='';return img},
  el(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el},
  button(text,action,className='menu-secondary'){const b=this.el('button',className,text);b.onclick=action;return b},
  show(view='overview'){
-  const names={journal:'이야기 수첩',overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
+  const names={map:'동네 지도',journal:'이야기 수첩',overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
   if(!names[view])return;this.view=view;$('menu-view-title').textContent=names[view];$('menu-message').textContent='';
   document.querySelectorAll('[data-menu]').forEach(b=>{const active=b.dataset.menu===view;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
   const body=$('menu-body');body.replaceChildren();this[view](body);
   (view==='inventory'?body.querySelector('.item-slot.selected'):document.querySelector(`[data-menu="${view}"]`))?.focus({preventScroll:true})
  },
+ map(body){Exploration.map(body)},
  overview(body){
+  if(!G.storageOK)body.append(this.button('자동 저장 다시 시도',()=>{checkpoint(G.checkpoint);this.show('overview')}));
   const p=G.profile,owned=this.owned(),card=this.el('div','equipped-summary');
   if(owned.length){card.append(this.icon(p.equipped));const copy=this.el('div');copy.append(this.el('span','menu-eyebrow','장착 딱지'),this.el('h4','',P.items[p.equipped].name),this.el('p','',`강화 +${p.upgrades[p.equipped]} · ${P.forms[P.formOf(p)].name}`));card.append(copy)}else card.append(this.el('p','','지금은 가진 딱지가 없다.'));
   body.append(card);const progress=this.el('div','menu-progress');
@@ -33,7 +35,7 @@ window.GameMenu={
   const layout=this.el('div','inventory-layout'),grid=this.el('div','item-grid');grid.setAttribute('role','group');grid.setAttribute('aria-label','보유 딱지');
   for(const id of owned){const item=P.items[id],b=this.button('',()=>this.select(id),'item-slot');b.dataset.item=id;b.setAttribute('aria-label',`${item.name} +${p.upgrades[id]}${id===p.equipped?' 장착 중':''}`);b.setAttribute('aria-pressed',String(id===this.selected));b.classList.toggle('selected',id===this.selected);b.append(this.icon(id),this.el('span','item-name',item.name),this.el('small','item-level',`+${p.upgrades[id]}`));if(id===p.equipped)b.append(this.el('span','equipped-badge','장착'));grid.append(b)}
   for(let i=owned.length;i<6;i++){const slot=this.el('div','item-slot vacant');slot.setAttribute('aria-hidden','true');grid.append(slot)}
-  const detail=this.el('div','item-detail');detail.id='item-detail';layout.append(grid,detail);body.append(layout);this.renderDetail()
+  const detail=this.el('div','item-detail');detail.id='item-detail';layout.append(grid,detail);body.append(layout);if(Object.values(p.map.materials).some(n=>n>0))body.append(this.el('p','',`보유 재료 · 신문지 ${p.map.materials.newspaper}장 / 색종이 ${p.map.materials.colored_paper}장`));this.renderDetail()
  },
  select(id){this.selected=id;document.querySelectorAll('[data-item]').forEach(b=>{b.classList.toggle('selected',b.dataset.item===id);b.setAttribute('aria-pressed',String(b.dataset.item===id))});this.renderDetail()},
  renderDetail(){
@@ -47,7 +49,7 @@ window.GameMenu={
   const id=this.selected;if(!G.paused||!this.canEquip()||!P.equip(G.profile,id))return;
   checkpoint(Village.hubCheckpoint());Village.hud();
   // Keep the facility underneath current if its preview depends on equipment.
-  if(G.state==='facility'){Village.hub().open(G.facility)}
+  if(G.state==='facility'){if(G.facility!=='map')Village.hub().open(G.facility)}
   this.show('inventory');$('menu-message').textContent=`${P.items[id].name} 장착 완료`;sound('click')
  },
  journal(body){
@@ -69,13 +71,14 @@ window.GameMenu={
  },
  settings(body){
   const soundButton=this.button('',()=>{toggleSound();this.show('settings')});soundButton.id='menu-sound';soundButton.setAttribute('aria-pressed',String(G.sound));soundButton.textContent=`게임 소리 · ${G.sound?'켜짐':'꺼짐'}`;
-  const screen=this.button(document.fullscreenElement?'전체 화면 나가기':'전체 화면으로',async()=>{await $('fullscreen').onclick();if(G.paused&&this.view==='settings')this.show('settings')});screen.id='menu-fullscreen';body.append(soundButton,screen)
+  const screen=this.button(document.fullscreenElement?'전체 화면 나가기':'전체 화면으로',async()=>{await $('fullscreen').onclick();if(G.paused&&this.view==='settings')this.show('settings')});screen.id='menu-fullscreen';body.append(soundButton,screen,this.button(`목적지 안내 · ${G.profile.map.guidance?'켜짐':'꺼짐'}`,()=>{G.profile.map.guidance=!G.profile.map.guidance;checkpoint(G.checkpoint);this.show('settings')}))
  },
  controls(body){
-  const list=this.el('dl','controls-list');for(const [label,key] of [['이동','방향키 / WASD'],['대화 · 시설 이용','E'],['대화 넘기기 · 딱지 치기','Space'],['딱지 접기','1 · 2 · 3 · 4'],['집중 / 뿌리 버티기 / 승부수','F / R / C'],['이야기 수첩','J'],['인벤토리','I'],['메뉴 / 뒤로','Esc'],['메뉴 선택 / 실행','방향키 · Tab / Enter']]){const row=this.el('div');row.append(this.el('dt','',label),this.el('dd','',key));list.append(row)}body.append(list)
+  const list=this.el('dl','controls-list');for(const [label,key] of [['이동','← → / A D'],['지도','M'],['대화 · 시설 이용','E'],['대화 넘기기 · 딱지 치기','Space'],['딱지 접기','1 · 2 · 3 · 4'],['집중 / 뿌리 버티기 / 승부수','F / R / C'],['이야기 수첩','J'],['인벤토리','I'],['메뉴 / 뒤로','Esc'],['메뉴 선택 / 실행','방향키 · Tab / Enter']]){const row=this.el('div');row.append(this.el('dt','',label),this.el('dd','',key));list.append(row)}body.append(list)
  },
  keys(event){
   if(event.altKey||event.ctrlKey||event.metaKey)return;
+  if(event.code==='KeyM'&&G.state!=='title'){event.preventDefault();event.stopImmediatePropagation();if(event.repeat)return;if(!G.paused)pause('map');else if(this.view==='map')unpause();else this.show('map');return}
   if(event.code==='KeyJ'&&G.state!=='title'){event.preventDefault();event.stopImmediatePropagation();if(event.repeat)return;if(!G.paused)pause('journal');else if(this.view==='journal')unpause();else this.show('journal');return}
   if(event.code==='KeyI'&&G.state!=='title'){
    event.preventDefault();event.stopImmediatePropagation();if(event.repeat)return;

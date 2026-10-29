@@ -34,3 +34,13 @@
 
 .journey-list{display:grid;gap:7px;margin-bottom:16px}.journey-entry{display:block;width:100%;padding:12px 14px;text-align:left;font-size:13px;background:#213a3e;border:1px solid #658171;color:var(--paper)}.journey-entry.selected{border-color:var(--gold);background:#3c4d42;color:var(--gold)}.journey-entry:disabled{opacity:.55}.journey-summary{color:#dcd5b2!important}.journey-steps{padding:0;list-style:none;display:grid;gap:10px}.journey-steps li{padding:12px 14px;font-size:12px;line-height:1.7;border-left:3px solid #597265;background:#1c3337}.journey-steps .current{border-color:var(--gold);color:var(--gold)}.journey-steps .done{border-color:var(--green);color:var(--green)}#journey-start{width:100%;justify-content:center;font-size:14px;padding:14px}#journey-start:disabled{opacity:.5}.journal-region{margin-bottom:20px}.journal-region .journey-entry{margin:6px 0}.journal-region h4{font-size:15px!important}
 @media(max-height:650px){.menu-sidebar nav{overflow-y:auto;min-height:0}.journey-entry{padding:9px 11px}.journey-steps li{padding:9px 11px}}
+
+/* Exploration keeps one concise objective; controls live on nearby objects. */
+#map-hud{position:absolute;left:3%;top:85px;display:flex;flex-direction:column;gap:7px;max-width:75%;pointer-events:none;text-shadow:0 2px 4px #173e38}
+#map-location{font-size:12px;letter-spacing:.12em;color:#f4dfa6}
+#map-objective{font-size:16px;color:#fff2d2}
+#map-direction{font-size:13px;color:#ffdb83}
+.map-route{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.map-node{flex:1 1 130px;padding:16px 12px;background:#23413f;border:1px solid #567369;border-radius:4px;font-size:14px}
+.map-node.current{border-color:#eac77e;background:#4c5944;color:#ffe8ae}
+.map-node small{display:block;margin-top:8px;font-size:11px;color:#abbfb0}

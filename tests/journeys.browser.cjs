@@ -2,7 +2,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
 const artifacts=process.env.ARTIFACT_DIR||path.join(require('node:os').tmpdir(),'ddakzizon-checks');fs.mkdirSync(artifacts,{recursive:true});
 (async()=>{const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||(fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});try{
  const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
- const profile=P.fresh();P.grantHomeAllowance(profile);P.upgradeAtHome(profile);P.finishHomePractice(profile,['GOOD','GOOD','GOOD']);P.schoolReward(profile);
+ const profile=P.fresh();P.grantHomeAllowance(profile);P.upgradeAtHome(profile);P.finishHomePractice(profile,['GOOD','GOOD','GOOD']);P.schoolReward(profile);profile.map.poster=true;
  await page.evaluate(profile=>localStorage.setItem('ddakzizon.campaign.v3',JSON.stringify({version:3,checkpoint:'village',profile})),profile);
  const fast=async()=>page.evaluate(()=>{const original=update;update=dt=>original(dt*(G.state==='explore'?1:8));TtakjiRules.positionAt=()=>.5;Math.random=()=>.5});
  const dialogue=async()=>{for(let i=0;i<100;i++){const s=await page.evaluate(()=>G.state);if(s==='dialogue')await page.locator('#next').click();else if(s==='transition')await page.waitForTimeout(50);else return}throw Error('Dialogue did not finish')};

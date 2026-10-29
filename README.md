@@ -423,3 +423,19 @@ play all 24 activities and all 12 tournament matches from an ordinary post-schoo
 profile, using earned coins/upgrades only. Timing and RNG are controlled and scene
 timers accelerated for reproducibility. Existing combat regression fixtures explicitly
 start after story preparation; the new full campaign test exercises the real gates.
+
+### v0.10 — 걸어서 이어지는 뒤집마을
+
+`docs/game-planning/06-village-exploration.md`를 기준으로 탐험 맵을 교체했다.
+집(1280) ↔ 골목(1800) ↔ 광장(2200) ↔ 주민센터(1800) ↔ 학교 앞(1400) ↔ 운동장(1600), 주민센터 안에는 별도 접수 로비(1280)가 있다.
+시·도·전국 로비도 각각 학교 체육관, 철제 압축 경기장, 대형 실내 체육관으로 교체했다. 전투장은 같은 지역의 관중·설비·현수막을 사용한다.
+
+- A/D 또는 좌우 방향키로 이동. E/Space로 가장 가까운 대상과 상호작용. 같은 거리에서는 NPC 우선. M은 지도, 목적지 안내는 설정에서 끌 수 있다.
+- 첫 패배 후 운동장에서 집으로 걸어가 접고 강화한다. 연습 뒤 집에서 학교로 돌아와 재대결하고, 학교 앞 포스터를 읽은 뒤 주민센터 로비에서 접수한다.
+- 기존 12개 이야기와 대회 진행, 능력치와 보상은 유지한다. 기존 저장에는 마을 좌표와 재료를 안전한 기본값으로 추가하고, 이미 학교를 완료한 옛 저장은 포스터 조건을 인정한다.
+- 잡화점 신문 10원 / 색종이 20원. 확인 후 1장 구매. 집 식탁에서 해당 재료 1장으로 보유 딱지를 1단계 보강(기존 강화 상한 적용). 초반 접기·재도전에는 구매가 필요 없다. 이 가격과 보강 조합은 기획의 미정 항목에 대한 초기 구현값이다.
+- 집/훈련장의 무료 연습은 능력치·상금 보상이 없다. 유료 훈련은 확인 후 30원, XP +3(상한 적용). 기존 이야기 과제와 훈련 대결은 별도 메뉴에서 이용한다.
+- 동네 제련소는 도 대회 진출 후 이용한다. 이미 사용하던 시 대회 공방의 제련은 유지한다. 융합기와 대륙 이후 대회는 미정/미구현으로 표시하며 이용 가능한 것처럼 열지 않는다.
+- 위치·방문 기록·포스터 확인·재료·안내 설정을 기존 v3 저장에 포함한다. NPC 대화, 현수막, 표창장·트로피가 진행에 따라 변한다.
+
+`exploration.js`의 구역 데이터가 출입구·폭·상호작용 좌표를 관리하고, `map-renderer.js`가 건물/바닥/전경을 분리해 그린다. 캐릭터와 배경은 기존 프로토타입의 도형 아트를 유지하며 딱지 PNG는 그대로 사용한다.

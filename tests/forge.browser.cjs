@@ -8,7 +8,8 @@ const artifacts=process.env.ARTIFACT_DIR||path.join(require('node:os').tmpdir(),
  delete profile.refining;
  await page.evaluate(profile=>localStorage.setItem('ddakzizon.campaign.v3',JSON.stringify({version:3,checkpoint:'city',profile})),profile);
  const resume=async()=>{await page.reload();await page.locator('#load-game').click();await page.waitForFunction(()=>G.scene==='city'&&G.state==='explore')};await resume();
- const walk=async(id)=>{const x=await page.evaluate(id=>City.places.find(p=>p.id===id).x,id),start=await page.evaluate(()=>G.hero.x);await page.locator('#game').focus();if(Math.abs(x-start)>10){const key=x>start?'ArrowRight':'ArrowLeft';await page.keyboard.down(key);await page.waitForFunction(({x,dir})=>dir>0?G.hero.x>=x-5:G.hero.x<=x+5,{x,dir:x>start?1:-1});await page.keyboard.up(key)}await page.keyboard.press('KeyE');await page.waitForFunction(()=>G.state==='facility')};
+ const walk=async(id)=>{await page.waitForFunction(()=>G.state==='explore');await page.evaluate(id=>City.open(id),id);await page.waitForFunction(()=>G.state==='facility')}; // Walking and entrances are covered in exploration.browser.cjs.
+
  const openForge=async()=>{await walk('press');await page.getByRole('button',{name:'제련소 · 형태 가공'}).click()};
  await openForge();await page.waitForFunction(()=>G.state==='dialogue');assert(await page.evaluate(()=>G.dialogue.some(line=>line[1].includes('90원'))));
  for(let i=0;i<20&&await page.evaluate(()=>G.state==='dialogue');i++)await page.locator('#next').click();

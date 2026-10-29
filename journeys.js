@@ -46,7 +46,7 @@ const Journeys={
   result(job.step===1?'또 하나의 이야기.':'조금 더 가까워졌다.',job.activity.title,'이야기 계속',()=>this.ending(e,job.step),[{value:`+${J.reward(e)}원`,label:'보상'},{value:'+1',label:'훈련'}])
  },
  ending(e,step){
-  cancelScene();G.hub=e.region;G.scene=e.region;G.mode=e.region;G.hero={x:420,y:393,walk:0,facing:1};Village.hud();
+  cancelScene();G.hub=e.region;G.scene=e.region;G.mode=e.region;G.mapZone=e.region==='village'?'square':e.region;G.camera=0;G.hero={x:420,y:440,walk:0,facing:1};Village.hud();
   say(e.steps[step].ending,()=>{G.profile.journey.pending=null;checkpoint(e.region);this.selected=e.id;this.open()})
  },
  resume(){const pending=G.profile.journey.pending;if(!pending)return false;const e=J.byId(pending.id);if(!e)return false;this.ending(e,pending.step);return true},

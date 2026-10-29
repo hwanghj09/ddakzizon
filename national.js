@@ -7,7 +7,7 @@ const National={
   if(!G.profile.nationalEntered){P.enterNational(G.profile);checkpoint('national_intro');transition(()=>this.intro())}
   else transition(()=>this.enter())
  },
- setup(){cancelScene();G.hub='national';G.scene='national';G.mode='national';G.stolen=false;G.flipPlayer=G.flipEnemy=0;G.hero={x:145,y:393,walk:0,facing:1};Village.hud()},
+ setup(){cancelScene();G.mapZone='national';G.camera=0;G.hub='national';G.scene='national';G.mode='national';G.stolen=false;G.flipPlayer=G.flipEnemy=0;G.hero={x:145,y:393,walk:0,facing:1};Village.hud()},
  intro(){
   if(!this.eligible()){Province.enter();return}
   P.enterNational(G.profile);this.setup();checkpoint('national_intro');
@@ -15,7 +15,7 @@ const National={
  },
  enter(){
   if(!this.eligible()||!G.profile.nationalEntered){Province.enter();return}
-  this.setup();G.state='explore';panels('explore-ui');checkpoint('national');if(Journeys.resume())return;this.updateInteract();$('game').focus({preventScroll:true})
+  Exploration.enter('national',G.profile.map.zone==='national'?G.profile.map.x:140);if(Journeys.resume())return;this.updateInteract();$('game').focus({preventScroll:true})
  },
  nearest:City.nearest,
  updateInteract:City.updateInteract,
