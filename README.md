@@ -424,6 +424,64 @@ profile, using earned coins/upgrades only. Timing and RNG are controlled and sce
 timers accelerated for reproducibility. Existing combat regression fixtures explicitly
 start after story preparation; the new full campaign test exercises the real gates.
 
+## Continent, world and planet — v1.0
+
+After the national title, the national cup desk opens the **continent** tournament,
+then **world** and **planet**. All three share one hub flow in `frontier.js`
+(transport, training, workshop, cup desk) with three rounds each, new opponent
+patterns, and story beats: the old boss returns to say "세계를 뒤집어보지 않을래",
+and the planet title ends on a `????` teaser for the next stage.
+
+- Growth caps: continent +20 / 75 training, world +24 / 90, planet +28 / 105.
+- **Fusion machine (융합기)**: from the continent workshop, 1500원 melts the
+  newspaper, colored-paper and hair ttakji into one fusion ttakji (HP 165, attack 34,
+  focus +1) that starts at the average of their compression levels. Sprites live in
+  `assets/sprites/ttakji/fusion/`.
+- **Worn-ttakji rules** (continent and above): attack falls toward 75% as HP drops
+  (`TtakjiRules.strength`), and below 30% HP any hit can flip a ttakji early, up to
+  a 50% chance for a PERFECT hit (`TtakjiRules.flipChance`). Earlier tiers keep
+  their original balance.
+
+Verification: `npm test` covers tier order, prizes, fusion and save validation;
+`node tests/frontier.browser.cjs` covers entry, reload, fusion, the worn rules and the
+`????` teaser.
+
+### Stories and achievements — v1.1
+
+- Nine new story chapters (18 activities) for the continent, world and planet,
+  gating each tournament round the same way as earlier tiers: a desert child with no
+  shared language, the ice master's apprentice, a match with Dad, stage fright, the
+  boss's apology, the hometown care package, zero gravity, a Martian kid who lost his
+  ttakji, and a hologram of the day it all started. 21 chapters / 42 activities total.
+- **도전 과제** menu tab: 19 achievements (tier titles, compression, collection, forms,
+  player level, stories, savings) that each pay coins once; the tab shows how many are
+  ready to claim.
+
+### Catalog ttakji — v1.2
+
+The sprite catalog in `assets/sprites/ttakji/generation.json` supplies all 42 new
+collectible ttakji: the requested 45 types plus fusion (46 playable types), defined in `progression.js`.
+
+- **Rival trophies (18)**: every city-to-planet tournament rival plays with a catalog
+  ttakji and hands it over the first time you beat them (L-folder, accordion folder,
+  cardboard, iron, rubber, copper, shuriken, encyclopedia, certificate, glass, quartz,
+  wood, fish and chips, semiconductor, diamond, slime, robot, uranium). The result card
+  shows the ttakji you won.
+- **딱지 가게 (24)**: a shop button in every workshop sells new ttakji as tiers open
+  (village: school papers, city/province: household, national: food, continent:
+  technology, world: diffuser and Hunminjeongeum), 60–7000원.
+  Special stock includes ragged (village), couple gum (city), piano (national),
+  Lego (continent), Saimdang (world), and magic carpet (planet).
+- Each item has its own HP, attack and focus bonus and starts at +0 compression.
+- Every playable type has separate base, flipped, inventory, and damaged sprites.
+  All 184 PNGs are 256×256 RGBA. The renderer switches battle states, while menus,
+  the HUD, workshops, shops, and trophy rewards use the same item IDs.
+  Base fallback remains available for a failed image request.
+- `npm test` checks catalog coverage, PNG headers, acquisition, upgrades, and save
+  restoration. `node tests/sprites.browser.cjs` decodes all 184 images and checks
+  purchase, inventory equipment, reload, and all 138 battle sprite transitions.
+- New achievements: 10 ttakji, every ttakji, and five shop purchases.
+
 ### v0.10 — 걸어서 이어지는 뒤집마을
 
 `docs/game-planning/06-village-exploration.md`를 기준으로 탐험 맵을 교체했다.
@@ -435,7 +493,7 @@ start after story preparation; the new full campaign test exercises the real gat
 - 기존 12개 이야기와 대회 진행, 능력치와 보상은 유지한다. 기존 저장에는 마을 좌표와 재료를 안전한 기본값으로 추가하고, 이미 학교를 완료한 옛 저장은 포스터 조건을 인정한다.
 - 잡화점 신문 10원 / 색종이 20원. 확인 후 1장 구매. 집 식탁에서 해당 재료 1장으로 보유 딱지를 1단계 보강(기존 강화 상한 적용). 초반 접기·재도전에는 구매가 필요 없다. 이 가격과 보강 조합은 기획의 미정 항목에 대한 초기 구현값이다.
 - 집/훈련장의 무료 연습은 능력치·상금 보상이 없다. 유료 훈련은 확인 후 30원, XP +3(상한 적용). 기존 이야기 과제와 훈련 대결은 별도 메뉴에서 이용한다.
-- 동네 제련소는 도 대회 진출 후 이용한다. 이미 사용하던 시 대회 공방의 제련은 유지한다. 융합기와 대륙 이후 대회는 미정/미구현으로 표시하며 이용 가능한 것처럼 열지 않는다.
+- 동네 제련소는 도 대회 진출 후 이용한다. 이미 사용하던 시 대회 공방의 제련은 유지한다. 전국 우승 뒤 대륙·세계·행성 대회로 이어지며, 대륙 공방부터 융합기를 이용할 수 있다.
 - 위치·방문 기록·포스터 확인·재료·안내 설정을 기존 v3 저장에 포함한다. NPC 대화, 현수막, 표창장·트로피가 진행에 따라 변한다.
 
 `exploration.js`의 구역 데이터가 출입구·폭·상호작용 좌표를 관리하고, `map-renderer.js`가 건물/바닥/전경을 분리해 그린다. 캐릭터와 배경은 기존 프로토타입의 도형 아트를 유지하며 딱지 PNG는 그대로 사용한다.

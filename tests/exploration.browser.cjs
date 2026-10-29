@@ -1,5 +1,5 @@
 const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs');
-(async()=>{const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});try{
+(async()=>{const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||(fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});try{
  const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(process.env.TEST_URL||'http://localhost:4173');
  const fast=()=>page.evaluate(()=>{const old=update;update=dt=>old(dt*(G.state==='explore'?1:10));R.positionAt=()=>.5;Math.random=()=>.5});await fast();
  const reach=async target=>{for(let i=0;i<300;i++){const s=await page.evaluate(()=>G.state);if(s===target)return;if(s==='dialogue')await page.locator('#next').click();else await page.waitForTimeout(25)}throw Error(`Expected ${target}, got ${await page.evaluate(()=>G.state)}`)};
