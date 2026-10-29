@@ -3,3 +3,5 @@ test('timing needle returns through both ends and center',()=>{assert.equal(R.po
 test('accurate timing produces stronger damage',()=>{assert.equal(R.judge(.5),'PERFECT');assert.equal(R.judge(.35),'GOOD');assert.equal(R.judge(.1),'BAD');assert.ok(R.damage('PERFECT')>R.damage('GOOD'));assert.ok(R.damage('GOOD')>R.damage('BAD'))});
 test('intro opponent survives even a perfect first hit',()=>assert.equal(R.hit(100,'PERFECT'),60));
 test('fair battle can be won and health never goes negative',()=>{let hp=100;for(let i=0;i<3;i++)hp=R.hit(hp,'PERFECT');assert.equal(hp,0);assert.equal(R.hit(4,'BAD'),0)});
+test('a worn ttakji hits softer but never below 75%',()=>{assert.equal(R.strength(100,100),1);assert.equal(R.strength(50,100),.875);assert.equal(R.strength(0,100),.75);assert.equal(R.strength(150,100),1)});
+test('flip chance only appears below 30% HP and grows with lower HP and better timing',()=>{assert.equal(R.flipChance(30,100,'PERFECT'),0);assert.equal(R.flipChance(0,100,'BAD'),1);assert(R.flipChance(10,100,'PERFECT')>R.flipChance(20,100,'PERFECT'));assert(R.flipChance(10,100,'PERFECT')>R.flipChance(10,100,'BAD'));assert(R.flipChance(1,100,'PERFECT')<=.5)});

@@ -36,6 +36,7 @@ const National={
    P.nationalOpponents.forEach((opponent,i)=>{const row=document.createElement('li');row.className=i<p.nationalRound?'won':i===p.nationalRound?'current':'';row.textContent=`${opponent.title} · ${opponent.name}  ${i<p.nationalRound?'승리':i===p.nationalRound?'대기':'예정'} · ${opponent.prize}원`;list.append(row)});content.append(list);
    if(p.nationalRound===3){
     paragraph('전국 챔피언 · 대륙 대회 출전권 획득');
+    button(p.continentEntered?'대륙 대회장으로 이동':'대륙 대회에 도전',()=>Continent.travel());
     button('우승 이야기 다시 보기',()=>this.rewardStory(false));
     button('전 챔피언과 연습 대결 · 보상 없음',()=>{checkpoint('national');G.opponent=P.nationalOpponents[2];transition(()=>battle('sparring'))})
    }else button(`${P.nationalOpponents[p.nationalRound].title}${J.canCompete(p,'national')?' 출전':' · 이야기 먼저'}`,()=>this.startTournament())

@@ -5,14 +5,15 @@ window.GameMenu={
  setInert(value){for(const child of $('game').children)if(child.id!=='pause-screen')child.inert=value},
  release(){this.setInert(false);this.selected=null},
  owned(){return !G.profile.schoolReward&&(G.stolen||G.checkpoint==='home'||G.profile.map.phase==='lost'&&!G.profile.homeUpgradeDone)?[]:G.profile.owned},
- canEquip(){return G.profile.schoolReward&&['village','city','province','national'].includes(G.scene)&&['explore','facility'].includes(G.state)},
- icon(id,state='inventory'){const img=document.createElement('img');img.src=`assets/sprites/ttakji/${id}/ttakji_${id}_${state}.png`;img.alt='';return img},
+ canEquip(){return G.profile.schoolReward&&['village','city','province','national','continent','world','planet'].includes(G.scene)&&['explore','facility'].includes(G.state)},
+ icon(id,state='inventory'){const img=spriteImg(document.createElement('img'),id,state);img.alt='';return img},
  el(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el},
  button(text,action,className='menu-secondary'){const b=this.el('button',className,text);b.onclick=action;return b},
  show(view='overview'){
-  const names={map:'동네 지도',journal:'이야기 수첩',overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
+  const names={map:'동네 지도',journal:'이야기 수첩',achievements:'도전 과제',overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
   if(!names[view])return;this.view=view;$('menu-view-title').textContent=names[view];$('menu-message').textContent='';
   document.querySelectorAll('[data-menu]').forEach(b=>{const active=b.dataset.menu===view;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  const ready=P.claimable(G.profile).length,tab=document.querySelector('[data-menu="achievements"]');if(tab)tab.textContent=ready?`도전 과제 · ${ready}`:'도전 과제';
   const body=$('menu-body');body.replaceChildren();this[view](body);
   (view==='inventory'?body.querySelector('.item-slot.selected'):document.querySelector(`[data-menu="${view}"]`))?.focus({preventScroll:true})
  },
@@ -22,8 +23,9 @@ window.GameMenu={
   const p=G.profile,owned=this.owned(),card=this.el('div','equipped-summary');
   if(owned.length){card.append(this.icon(p.equipped));const copy=this.el('div');copy.append(this.el('span','menu-eyebrow','장착 딱지'),this.el('h4','',P.items[p.equipped].name),this.el('p','',`강화 +${p.upgrades[p.equipped]} · ${P.forms[P.formOf(p)].name}`));card.append(copy)}else card.append(this.el('p','','지금은 가진 딱지가 없다.'));
   body.append(card);const progress=this.el('div','menu-progress');
-  const current=p.nationalEntered?(p.nationalRound===3?'전국 챔피언':`전국 대회 · ${P.nationalOpponents[p.nationalRound].title}`):p.provinceEntered?(p.provinceRound===3?'도 대회 챔피언':`도 대회 · ${P.provinceOpponents[p.provinceRound].title}`):p.cityEntered?(p.cityRound===3?'시 대회 챔피언':`시 대회 · ${P.cityOpponents[p.cityRound].title}`):p.schoolReward?(p.round===3?'마을 챔피언':`마을 대회 · ${P.opponents[p.round].title}`):({school:'학교에서 첫 대결',home:'새 딱지 접기',home_upgrade:'집에서 딱지 강화',practice:'타이밍 연습',rematch:'학교 재대결',complete:'마을 대회로'}[G.checkpoint]||'학교');
-  progress.append(this.el('span','menu-eyebrow','현재 여정'),this.el('h4','',current));if(p.schoolReward)progress.append(this.el('p','',p.nationalEntered?(p.nationalRound===3?'대륙 대회 출전권 획득':`다음 상대 · ${P.nationalOpponents[p.nationalRound].name}`):p.provinceEntered?(p.provinceRound===3?'전국 대회 출전권 획득':`다음 상대 · ${P.provinceOpponents[p.provinceRound].name}`):p.cityEntered?(p.cityRound===3?'도 대회 출전권 획득':`다음 상대 · ${P.cityOpponents[p.cityRound].name}`):p.round===3?'다음 목표 · 시 대회':`다음 상대 · ${P.opponents[p.round].name}`));body.append(progress);
+  const tier=['planet','world','continent'].map(id=>Tiers[id]).find(t=>p[`${t.id}Entered`]);
+  const current=tier?(tier.round()===3?`${tier.name.replace(' 대회','')} 챔피언`:`${tier.name} · ${tier.opponents()[tier.round()].title}`):p.nationalEntered?(p.nationalRound===3?'전국 챔피언':`전국 대회 · ${P.nationalOpponents[p.nationalRound].title}`):p.provinceEntered?(p.provinceRound===3?'도 대회 챔피언':`도 대회 · ${P.provinceOpponents[p.provinceRound].title}`):p.cityEntered?(p.cityRound===3?'시 대회 챔피언':`시 대회 · ${P.cityOpponents[p.cityRound].title}`):p.schoolReward?(p.round===3?'마을 챔피언':`마을 대회 · ${P.opponents[p.round].title}`):({school:'학교에서 첫 대결',home:'새 딱지 접기',home_upgrade:'집에서 딱지 강화',practice:'타이밍 연습',rematch:'학교 재대결',complete:'마을 대회로'}[G.checkpoint]||'학교');
+  progress.append(this.el('span','menu-eyebrow','현재 여정'),this.el('h4','',current));if(p.schoolReward)progress.append(this.el('p','',tier?(tier.round()===3?`${tier.name} 우승 · ${tier.id==='planet'?'다음 무대 ????':'다음 대회 출전권 획득'}`:`다음 상대 · ${tier.opponents()[tier.round()].name}`):p.nationalEntered?(p.nationalRound===3?'대륙 대회 출전권 획득':`다음 상대 · ${P.nationalOpponents[p.nationalRound].name}`):p.provinceEntered?(p.provinceRound===3?'전국 대회 출전권 획득':`다음 상대 · ${P.provinceOpponents[p.provinceRound].name}`):p.cityEntered?(p.cityRound===3?'도 대회 출전권 획득':`다음 상대 · ${P.cityOpponents[p.cityRound].name}`):p.round===3?'다음 목표 · 시 대회':`다음 상대 · ${P.opponents[p.round].name}`));body.append(progress);
   const metrics=this.el('div','menu-metrics');for(const [label,value] of [['보유금',`${p.coins}원`],['선수',`Lv.${P.level(p)+1}`],['보유 딱지',`${owned.length}개`]]){const tile=this.el('div');tile.append(this.el('small','',label),this.el('strong','',value));metrics.append(tile)}body.append(metrics);
   body.append(this.el('p','save-note',G.storageOK?'획득·강화·진행은 자동 저장됩니다. 이어서 하기는 마지막 진행 지점부터 시작합니다.':'이 브라우저에서는 저장하지 못했습니다. 현재 플레이는 계속할 수 있습니다.'))
  },
@@ -61,6 +63,16 @@ window.GameMenu={
     const n=p.journey.stages[e.id]||0,available=J.available(p,e),b=this.button(`${e.title} · ${n===2?'완료':available?`${n} / 2`:'아직 만나지 못함'}`,()=>{if(!this.canEquip()||G.hub!==region)return;unpause();Journeys.selected=e.id;Journeys.open()},'journey-entry');
     b.disabled=!this.canEquip()||G.hub!==region||!available;section.append(b);
    }body.append(section);
+  }
+ },
+ achievements(body){
+  const p=G.profile,done=P.achievements.filter(a=>p.claimed[a.id]).length;
+  body.append(this.el('p','',`달성 ${done} / ${P.achievements.length} · 조건을 채우면 보상을 받을 수 있다.`));
+  for(const a of P.achievements){
+   const claimed=!!p.claimed[a.id],ready=!claimed&&a.check(p),card=this.el('div',`skill-card${claimed||ready?'':' locked'}`),head=this.el('h4','',a.title);
+   head.append(this.el('span','menu-eyebrow',claimed?'완료':`${a.reward}원`));card.append(head,this.el('p','',a.description));
+   if(ready){const b=this.button(`보상 받기 · ${a.reward}원`,()=>{if(P.claim(G.profile,a.id)){checkpoint(G.checkpoint);if(G.profile.schoolReward)Village.hud();sound('win');this.show('achievements');$('menu-message').textContent=`${a.title} · ${a.reward}원 획득`}},'menu-primary');b.dataset.achievement=a.id;card.append(b)}
+   body.append(card)
   }
  },
  player(body){

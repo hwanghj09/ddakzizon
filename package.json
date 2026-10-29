@@ -6,8 +6,8 @@
   "scripts": {
     "start": "python3 -m http.server 4173 --bind 0.0.0.0",
     "test": "node --test tests/*.test.js",
-    "check": "node --check game.js && node --check world.js && node --check rules.js && node --check progression.js && node --check village.js && node --check menus.js && node --check city.js && node --check school.js && node --check forge.js && node --check province.js && node --check national.js && node --check journey-data.js && node --check journeys.js && node --check exploration.js && node --check map-renderer.js",
-    "test:browser": "node tests/school.browser.cjs && node tests/campaign.browser.cjs && node tests/campaign-edges.browser.cjs && node tests/menus.browser.cjs && node tests/city.browser.cjs && node tests/city-edges.browser.cjs && node tests/forge.browser.cjs && node tests/province.browser.cjs && node tests/national.browser.cjs && node tests/journeys.browser.cjs && node tests/exploration.browser.cjs"
+    "check": "node --check game.js && node --check world.js && node --check rules.js && node --check progression.js && node --check village.js && node --check menus.js && node --check city.js && node --check school.js && node --check forge.js && node --check province.js && node --check national.js && node --check frontier.js && node --check journey-data.js && node --check journeys.js && node --check exploration.js && node --check map-renderer.js",
+    "test:browser": "node tests/audio.browser.cjs && node tests/school.browser.cjs && node tests/campaign.browser.cjs && node tests/campaign-edges.browser.cjs && node tests/menus.browser.cjs && node tests/city.browser.cjs && node tests/city-edges.browser.cjs && node tests/forge.browser.cjs && node tests/province.browser.cjs && node tests/national.browser.cjs && node tests/frontier.browser.cjs && node tests/journeys.browser.cjs && node tests/exploration.browser.cjs && node tests/sprites.browser.cjs"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

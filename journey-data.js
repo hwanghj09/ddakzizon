@@ -1,6 +1,6 @@
 /* Story chapters and save rules shared by the game and Node tests. */
 (function(root){
- const regions={village:{name:'마을',field:'round'},city:{name:'시 대회',field:'cityRound'},province:{name:'도 대회',field:'provinceRound'},national:{name:'전국 대회',field:'nationalRound'}};
+ const regions={village:{name:'마을',field:'round'},city:{name:'시 대회',field:'cityRound'},province:{name:'도 대회',field:'provinceRound'},national:{name:'전국 대회',field:'nationalRound'},continent:{name:'대륙 대회',field:'continentRound'},world:{name:'세계 대회',field:'worldRound'},planet:{name:'행성 대회',field:'planetRound'}};
  const drill=(title,good,perfect,lines,ending)=>({title,type:'drill',good,perfect,lines,ending});
  const duel=(title,name,hp,attack,kind,material,goal,lines,ending)=>({title,type:'duel',opponent:{name,hp,attack,kind,material},goal,lines,ending});
  const episodes=[
@@ -40,6 +40,33 @@
   {id:'national_2',region:'national',round:2,title:'한 장에 담긴 사람들',summary:'전국 결승 전날, 지금까지 만난 사람들이 연습장에 모인다.',steps:[
    duel('아저씨의 원정 응원','탈모 아저씨',360,38,'uncle','hair','guard',[['탈모 아저씨','네 결승 보려고 기차 타고 왔다.'],['나','딸한테 전화는 했어요?'],['탈모 아저씨','같이 왔지. 창피하지 않게 R로 내 강타 한번 버텨봐.']],[['탈모 아저씨','어떤 딱지를 들고 나가든 네 손이 치는 거다.'],['나','그래도 이 딱지 받을 때 약속은 기억해요.']]),
    duel('마지막 연습 파트너','대장',390,39,'national_champion','colored_paper',null,[['대장','전국 챔피언 흉내 좀 내봤어. 방어, 보통, 정타, 빈틈.'],['아빠','이번엔 내가 응원할 차례지?'],['부하','나도 왔어! 학교 애들한테 다 말해놨다!'],['나','그건 좀 부담되는데… 좋아. 마지막으로 한 판.']],[['대장','오늘은 여기까지. 결승은 네가 직접 끝내.'],['나','처음엔 잃은 딱지 찾으려고 시작했는데.'],['아빠','지금은 같이 칠 사람이 이렇게 많아졌네.'],['나','응. 내일 이 사람들 앞에서 제대로 쳐볼게.']])]},
+  {id:'continent_0',region:'continent',round:0,title:'말이 안 통해도',summary:'통역사가 자리를 비운 사이, 말이 안 통하는 사막 마을 아이와 딱지를 친다.',steps:[
+   drill('손짓으로 박자 맞추기',4,1,[['통역사','잠깐 접수 서류 좀 내고 올게요. 금방 와요!'],['사막 아이','(딱지를 내밀며 손뼉을 세 번 친다)'],['나','박자를 맞추자는 거구나. 다섯 번 중 네 번 GOOD, 정타 하나.']],[['사막 아이','(엄지를 치켜든다)'],['나','말은 몰라도 딱 소리는 똑같네.']]),
+   duel('말 대신 딱 소리','사막 아이',460,46,'gust','colored_paper','focus',[['사막 아이','(바람 소리를 흉내 내며 홀수 손가락을 펼친다)'],['나','홀수 턴엔 세게 친다는 거지? 그럼 나는 F로 집중해서 맞받아칠게.'],['아빠','대륙에서도 결국 하는 건 똑같구나.']],[['통역사','다녀왔어요! …벌써 친구가 됐네요?'],['사막 아이','(자기 딱지 모서리를 접어 보이며 웃는다)'],['나','다음엔 네 나라 접는 법도 알려줘.']])]},
+  {id:'continent_1',region:'continent',round:1,title:'빙판 위의 연습',summary:'빙판 장인의 제자가 미끄러운 바닥에서 버티는 법을 알려주겠다고 한다.',steps:[
+   drill('미끄러운 바닥에서 치기',4,2,[['빙판 제자','스승님은 얼음 위에서 연습하셨어. 바닥이 미끄러우면 손목만 믿어야 해.'],['나','발이 자꾸 밀리는데?'],['빙판 제자','그러니까 더 정확하게. 다섯 번 중 네 번 GOOD, 정타 둘.']],[['빙판 제자','오, 넘어지지는 않았네.'],['나','넘어질 뻔한 건 세 번이었어.']]),
+   duel('얼음을 깨는 한 방','빙판 제자',520,49,'glacier','newspaper','guard',[['빙판 제자','나도 스승님처럼 두 턴은 막고 세 번째에 열려.'],['빙판 제자','하지만 내가 칠 땐 아플 거야. R로 버텨봐.'],['나','버티고, 깨고. 좋아.']],[['빙판 제자','스승님한테 결승에서 이길 방법은 안 알려줄 거야.'],['나','그럼 직접 찾아야지.'],['빙판 제자','…세 번째 턴. 이건 혼잣말이야.']])]},
+  {id:'continent_2',region:'continent',round:2,title:'아빠의 딱지',summary:'결승 전날 밤, 아빠가 오래된 딱지 한 장을 꺼낸다.',steps:[
+   drill('아빠의 옛날 박자',4,2,[['아빠','이거 기억나? …아니, 넌 모르지. 아빠가 너만 할 때 쓰던 거야.'],['나','아빠도 딱지 쳤어?'],['아빠','동네에서 제일 못 쳤지. 그래서 박자부터 다시 배웠어. 같이 쳐볼래?']],[['아빠','너 손목 쓰는 게 나랑 똑같네.'],['나','그럼 나도 처음엔 못 쳤던 거 유전이었구나.']]),
+   duel('아빠와 한 판','아빠',560,52,'neighbor','newspaper','power',[['아빠','오늘은 봐주지 마. 아빠도 진짜로 할게.'],['나','진짜로? 그럼 C로 승부수 걸게.'],['아빠','좋아. 이긴 사람이 내일 아침 차리기다.']],[['아빠','졌다. 내일 아침은 내가 할게.'],['나','아빠, 그때 왜 딱지 그만뒀어?'],['아빠','같이 칠 사람이 없었거든. 지금은 있네.']])]},
+  {id:'world_0',region:'world',round:0,title:'세계의 관중 앞에서',summary:'수만 명의 함성에 손이 떨린다. 무대 위 쇼맨이 긴장을 푸는 법을 알려준다.',steps:[
+   drill('함성 속에서 집중',4,2,[['나','관중 소리 때문에 바늘이 안 보여…'],['무대 위 쇼맨','관중을 무시하지 마. 박자로 써. 함성이 커질 때 쳐봐.'],['무대 위 쇼맨','다섯 번 중 네 번 GOOD, 정타 둘이면 무대 체질이야.']],[['무대 위 쇼맨','봐, 이제 함성이 너 편이잖아.'],['나','심장은 아직 쿵쾅거리는데.']]),
+   duel('리허설 무대','무대 위 쇼맨',620,56,'showman','colored_paper','focus',[['무대 위 쇼맨','리허설이니까 마음껏 해. 대신 쇼는 진짜로 한다!'],['무대 위 쇼맨','인사, 쇼타임, 박수. 세 박자 기억하지?'],['나','F로 집중해서 박수 칠 틈을 노릴게.']],[['무대 위 쇼맨','브라보! 본선에서도 그렇게만 해.'],['나','다음엔 내가 박수 받을 차례야.']])]},
+  {id:'world_1',region:'world',round:1,title:'대장의 진심',summary:'예선에서 떨어진 대장이 처음으로 속마음을 꺼낸다.',steps:[
+   drill('대장과 박자 맞추기',4,2,[['대장','솔직히 말해도 돼? 그때 운동장에서 네 딱지 뺏은 거, 부하들 앞이라 그랬어.'],['나','알아. 이제 괜찮아.'],['대장','그럼 같이 쳐. 내가 박자 셀게. 다섯 번 중 네 번 GOOD, 정타 둘.']],[['대장','너 박자, 내가 알던 것보다 훨씬 빨라졌다.'],['나','네가 뒤집어놓은 덕분이지.']]),
+   duel('이번엔 친구로서','대장',700,58,'boss','colored_paper',null,[['대장','시 대회 결승은 대회였잖아. 이번엔 그냥 친구로 한 판.'],['나','딱지 거는 거 아니지?'],['대장','안 걸어. 대신 지는 사람이 세계 챔피언 분석 노트 다 쓰기.']],[['대장','졌다. 노트는 내가 쓸게.'],['나','같이 쓰자. 세계 챔피언은 둘이 봐도 어려울 테니까.'],['대장','…고마워.']])]},
+  {id:'world_2',region:'world',round:2,title:'모두의 딱지',summary:'결승 전날, 고향 사람들이 접어 보낸 딱지 꾸러미가 도착한다.',steps:[
+   drill('응원 딱지로 연습',5,2,[['부하','택배 왔다! 학교 애들이 한 장씩 접어서 보냈어.'],['유치원 친구','마을 사람들 것도 있어. 앞집 아저씨는 세 장이나 보냈더라.'],['나','하나씩 다 쳐볼게. 다섯 번 모두 GOOD 이상, 정타 둘.']],[['부하','다 뒤집었네. 보낸 애들이 좋아하겠다.'],['나','한 장도 허투루 안 칠 거야.']]),
+   duel('세계 챔피언의 그림자','종이 건축가',760,60,'architect','newspaper','power',[['종이 건축가','세계 챔피언 연습 상대는 늘 나였어. 그 리듬을 보여줄게.'],['종이 건축가','방어할 땐 PERFECT만 뚫려. 승부수를 아껴 둬.'],['나','C를 언제 쓸지, 이번에 정해둘게.']],[['종이 건축가','이 정도면 결승도 재미있겠어.'],['대장','노트에 다 적었다. 이제 가서 뒤집어.'],['나','응. 모두의 딱지로.']])]},
+  {id:'planet_0',region:'planet',round:0,title:'무중력 적응',summary:'중력이 약한 행성에서는 딱지가 붕 떠서 내려오지 않는다.',steps:[
+   drill('붕 뜨는 딱지 잡기',4,2,[['우주 접수원','지구인, 여기선 딱지가 천천히 떨어진다. 조급하면 진다.'],['나','바늘도 왠지 느리게 보이는데…'],['대장','오히려 좋아. 가운데 올 때까지 기다려. 네 번 GOOD, 정타 둘.']],[['대장','떠다니는 딱지 처음 봤다.'],['나','나도. 그래도 뒤집히긴 하네.']]),
+   duel('달 기지 훈련생','달 기지 훈련생',820,62,'lunar','colored_paper','guard',[['달 기지 훈련생','우리 선배처럼 나도 거의 매 턴 PERFECT로 친다!'],['달 기지 훈련생','세 번째 턴엔 산소를 채워야 하지만.'],['나','두 턴은 R로 버티고 세 번째에 친다.']],[['달 기지 훈련생','지구인, 생각보다 단단하다.'],['나','납작하게 눌러서 그래.']])]},
+  {id:'planet_1',region:'planet',round:1,title:'잃어버린 딱지',summary:'딱지를 잃고 우는 화성 아이를 만난다. 어디서 본 장면이다.',steps:[
+   drill('화성 아이에게 시범',4,3,[['화성 아이','(삐빅) 큰 애들한테 지고 딱지를 뺏겼어.'],['나','…나도 그랬어. 아주 옛날에, 지구 운동장에서.'],['나','먼저 치는 법 보여줄게. 네 번 GOOD, 정타 셋.']],[['화성 아이','(안테나가 빛난다) 다시 해보고 싶어!'],['나','그 마음이면 충분해.']]),
+   duel('되찾으러 가는 길','화성 대표',880,64,'martian','hair','focus',[['화성 대표','그 아이 딱지? 이겨서 가져간 거다. 돌려받고 싶으면 이겨.'],['나','좋아. 대신 이기면 딱지는 그 애한테 돌려줘.'],['나','F로 집중해서, 그때 내가 못 한 걸 해볼게.']],[['화성 대표','…돌려주지. 약속은 약속이다.'],['화성 아이','고마워, 지구인!'],['나','다음엔 네가 누군가한테 돌려줘.']])]},
+  {id:'planet_2',region:'planet',round:2,title:'처음 그 운동장',summary:'결승 전날, 은하 연맹이 기억 속 운동장을 홀로그램으로 띄워준다.',steps:[
+   drill('기억 속 운동장',5,3,[['우주 접수원','결승 전 마지막 의식이다. 가장 오래된 기억을 떠올려라.'],['나','…학교 운동장이네. 대장이랑 부하들이 있던.'],['부하','(홀로그램) 그때 그 박자 아직 기억해? 다섯 번 GOOD, 정타 셋.']],[['나','그날 진 것도, 울었던 것도 다 기억나.'],['대장','그래서 여기까지 온 거잖아.']]),
+   duel('그날의 나','그날의 나',940,66,'rival','newspaper','power',[['그날의 나','(홀로그램) 한 판만 더 하자!'],['나','…나잖아. 그날 졌던.'],['그날의 나','지면 딱지 주는 거다?'],['나','안 줘. 대신 C로 제대로 쳐서 보여줄게. 네가 어떻게 되는지.']],[['그날의 나','(웃으며 사라진다)'],['나','그날 뒤집힌 건 내 딱지가 아니라 인생이었어. 좋은 쪽으로.'],['대장','자, 결승이다. 우주를 뒤집으러 가자.']])]},
  ];
  const byId=id=>episodes.find(e=>e.id===id);
  const available=(p,e)=>!!e&&(e.region==='village'?p.schoolReward:p[`${e.region}Entered`])&&p[regions[e.region].field]>=e.round;
@@ -48,7 +75,7 @@
  const current=(p,region)=>episodes.find(e=>e.region===region&&e.round===p[regions[region].field]);
  const canCompete=(p,region)=>{const e=current(p,region);return !e||(p.journey.stages[e.id]===2&&!p.journey.pending)};
  function complete(p,id,step,cap){const e=byId(id);if(!available(p,e)||p.journey.pending||(p.journey.stages[id]||0)!==step||!Number.isInteger(step)||step<0||step>=2)return false;p.journey.stages[id]=step+1;p.journey.pending={id,step};p.coins=Math.min(999999,p.coins+reward(e));p.xp=Math.min(cap,p.xp+1);return true}
- const reward=e=>({village:10,city:20,province:35,national:50})[e.region];
+ const reward=e=>({village:10,city:20,province:35,national:50,continent:70,world:90,planet:120})[e.region];
  const passed=(activity,grades,used={})=>activity.type==='drill'?grades.length===5&&grades.filter(g=>g==='GOOD'||g==='PERFECT').length>=activity.good&&grades.filter(g=>g==='PERFECT').length>=activity.perfect:!activity.goal||used[activity.goal]===true;
  const api={regions,episodes,byId,available,fresh,restore,current,canCompete,complete,reward,passed};if(typeof module!=='undefined')module.exports=api;else root.TtakjiJourneys=api;
 })(globalThis);

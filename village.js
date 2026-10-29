@@ -2,12 +2,12 @@
 const P=TtakjiProgression;
 const Village={
  places:[{id:'house',name:'우리 집',x:145},{id:'training',name:'연습장',x:365},{id:'press',name:'딱지 압축기',x:585},{id:'cup',name:'마을 대회',x:805}],
- isBattle(){return ['tournament','city_tournament','province_tournament','national_tournament','sparring','training','story_battle','story_training'].includes(G.mode)},
- hub(){return G.hub==='national'?National:G.hub==='province'?Province:G.hub==='city'?City:this},
- hubCheckpoint(){return ['city','province','national'].includes(G.hub)?G.hub:'village'},
- hubLabel(){return G.hub==='national'?'전국 대회장으로':G.hub==='province'?'도 대회장으로':G.hub==='city'?'시 대회장으로':'마을로 돌아가기'},
+ isBattle(){return ['tournament','city_tournament','province_tournament','national_tournament','continent_tournament','world_tournament','planet_tournament','sparring','training','story_battle','story_training'].includes(G.mode)},
+ hub(){return Tiers[G.hub]||(G.hub==='national'?National:G.hub==='province'?Province:G.hub==='city'?City:this)},
+ hubCheckpoint(){return ['city','province','national','continent','world','planet'].includes(G.hub)?G.hub:'village'},
+ hubLabel(){return Tiers[G.hub]?`${Tiers[G.hub].name}장으로`:G.hub==='national'?'전국 대회장으로':G.hub==='province'?'도 대회장으로':G.hub==='city'?'시 대회장으로':'마을로 돌아가기'},
  returnHub(){this.hub().enter()},
- hud(){const p=G.profile;setInventory(`${P.items[p.equipped].name} +${p.upgrades[p.equipped]} · ${p.coins}원`,false,false);$('inventory').classList.add('campaign-item');$('inventory').style.setProperty('--item-icon',`url('assets/sprites/ttakji/${p.equipped}/ttakji_${p.equipped}_inventory.png')`)},
+ hud(){const p=G.profile;setInventory(`${P.items[p.equipped].name} +${p.upgrades[p.equipped]} · ${p.coins}원`,false,false);$('inventory').classList.add('campaign-item');$('inventory').style.setProperty('--item-icon',`url('${window.World?.spriteReady(p.equipped,'inventory')===false?spriteSrc(p.equipped,'base'):spriteSrc(p.equipped)}')`)},
  epilogue(){
   cancelScene();G.scene='school';P.schoolReward(G.profile);checkpoint('complete');this.hud();
   say([['민수','알았어, 네가 이겼어. 내 색종이 딱지도 가져가.'],['나','이제 도윤이랑 붙을 거야.'],['민수','도윤이는 어제 이사 갔어. 벤치가 비어 있잖아.'],['민수','대신 학교 밖 게시판 한번 봐. 마을 대회가 열린대.'],['나','승부가 끝난 건 아니야. 더 큰 데서 만나면 되지.']],()=>transition(()=>Exploration.enter('schoolfront',850)))
@@ -23,24 +23,31 @@ const Village={
  },
  open(id){
   if(id==='stories'){Journeys.open();return}if(id==='forge'){Forge.open();return}
-  G.state='facility';G.facility=id;G.keys.clear();panels('facility');this.hud();const p=G.profile,stats=P.stats(p),content=$('facility-content');content.replaceChildren();$('facility-title').textContent=this.hub().places.find(x=>x.id===id)?.name||'딱지 준비';$('facility-wallet').textContent=`${p.coins}원`;
+  G.state='facility';G.facility=id;G.keys.clear();panels('facility');this.hud();const p=G.profile,stats=P.stats(p),content=$('facility-content');content.replaceChildren();$('facility-title').textContent=this.hub().places.find(x=>x.id===id)?.name||'딱지 가게';$('facility-wallet').textContent=`${p.coins}원`;
   const paragraph=text=>{const el=document.createElement('p');el.textContent=text;content.append(el)};
   const button=(label,action,disabled=false)=>{const b=document.createElement('button');b.className='facility-choice';b.textContent=label;b.disabled=disabled;b.onclick=()=>{if(!G.paused&&G.state==='facility')action()};content.append(b);return b};
   if(id==='house'){
    paragraph(`선수 Lv.${P.level(p)+1} · 타격 +${P.level(p)*2} · 집중 ${stats.concentration} · 훈련 ${p.xp}/${P.trainingLimit(p)}`);
-   for(const item of p.owned){const s=P.stats(p,item);const b=button(`${P.items[item].name} +${p.upgrades[item]} · 공격 ${s.attack} / 내구 ${s.hp}${item===p.equipped?' · 장착 중':''}`,()=>{P.equip(p,item);checkpoint(this.hubCheckpoint());this.open(id)});b.classList.toggle('selected',item===p.equipped);const img=document.createElement('img');img.src=`assets/sprites/ttakji/${item}/ttakji_${item}_inventory.png`;img.alt='';b.prepend(img)}
+   for(const item of p.owned){const s=P.stats(p,item);const b=button(`${P.items[item].name} +${p.upgrades[item]} · 공격 ${s.attack} / 내구 ${s.hp}${item===p.equipped?' · 장착 중':''}`,()=>{P.equip(p,item);checkpoint(this.hubCheckpoint());this.open(id)});b.classList.toggle('selected',item===p.equipped);const img=spriteImg(document.createElement('img'),item);img.alt='';b.prepend(img)}
    paragraph(P.items[p.equipped].description);if(p.guardUnlocked)paragraph('배운 기술 · 집중 / 뿌리 버티기');
   }else if(id==='press'){
-   const price=P.cost(p);const img=document.createElement('img');img.className='press-preview';img.src=`assets/sprites/ttakji/${p.equipped}/ttakji_${p.equipped}_base.png`;img.alt=P.items[p.equipped].name;content.append(img);
+   const price=P.cost(p);const img=document.createElement('img');img.className='press-preview';img.src=spriteSrc(p.equipped,'base');img.alt=P.items[p.equipped].name;content.append(img);
    paragraph(`${P.items[p.equipped].name} +${p.upgrades[p.equipped]} · ${P.forms[P.formOf(p)].name}`);
    paragraph(price===null?`공격 ${stats.attack} · 내구 ${stats.hp} · 최대 강화`:`공격 ${stats.attack} → ${stats.attack+3} · 내구 ${stats.hp} → ${stats.hp+10}`);
    button(price===null?'최대 강화 완료':`압축하기 · ${price}원${p.coins<price?' · 잔액 부족':''}`,()=>{if(P.upgrade(p)){sound('fold');checkpoint(this.hubCheckpoint());this.open(id);toast('더 납작하고 단단해졌다!')}},price===null||p.coins<price);
-   if(['city','province','national'].includes(G.hub))button('제련소 · 형태 가공',()=>Forge.visit());
+   if(['city','province','national','continent','world','planet'].includes(G.hub))button('제련소 · 형태 가공',()=>Forge.visit());
+   button(`딱지 가게 · 새 딱지 ${P.shopStock(p).length}종`,()=>this.open('shop'));
+   if(p.continentEntered&&!p.owned.includes('fusion'))button(P.canFuse(p)?`융합기 · 세 딱지를 하나로 · ${P.fusionCost}원${p.coins<P.fusionCost?' · 잔액 부족':''}`:'융합기 · 신문지, 색종이, 머리카락 딱지가 모두 필요',()=>{if(P.fuse(p)){P.equip(p,'fusion');sound('perfect');checkpoint(this.hubCheckpoint());this.open(id);toast('융합 딱지 완성! 바로 장착했다.')}},!P.canFuse(p)||p.coins<P.fusionCost);
+  }else if(id==='shop'){
+   paragraph('대회를 올라갈수록 새 딱지가 들어온다. 산 딱지는 +0부터 다시 압축해야 한다.');
+   const items=P.shopStock(p);if(!items.length)paragraph('지금 살 수 있는 딱지는 모두 모았다. 다음 대회에 가면 새 물건이 들어온다.');
+   for(const item of items){const it=P.items[item],price=it.source.price;const b=button(`${it.name} · 공격 ${it.attack} / 내구 ${it.hp}${it.focus?` / 집중 +${it.focus}`:''} · ${price}원`,()=>{if(P.buy(p,item)){sound('perfect');checkpoint(this.hubCheckpoint());this.open('shop');toast(`${it.name} 획득! 집이나 인벤토리에서 장착하자.`)}},p.coins<price);b.dataset.item=item;const img=spriteImg(document.createElement('img'),item);img.alt='';b.prepend(img)}
+   button('공방으로 돌아가기',()=>this.open('press'));
   }else if(id==='training'){
    paragraph(`선수 Lv.${P.level(p)+1} · 훈련 ${p.xp}/${P.trainingLimit(p)}`);
    paragraph(p.xp===P.trainingLimit(p)?'현재 훈련 숙련 완료 · 타이밍 연습과 5원 보상은 계속 받을 수 있다.':`다음 성장까지 ${3-p.xp%3}회 · 타격 +2 / 집중 +1`);
    button('타이밍 훈련 · 3번 치기',()=>{checkpoint(this.hubCheckpoint());G.practice=[];transition(()=>battle('training'))});
-   button('연습 대결 · 보상 없음',()=>{checkpoint(this.hubCheckpoint());G.opponent=G.hub==='national'?P.nationalOpponents[Math.min(p.nationalRound,2)]:G.hub==='province'?P.provinceOpponents[Math.min(p.provinceRound,2)]:G.hub==='city'?P.cityOpponents[Math.min(p.cityRound,2)]:P.opponents[p.guardUnlocked?2:0];transition(()=>battle('sparring'))});
+   button('연습 대결 · 보상 없음',()=>{checkpoint(this.hubCheckpoint());G.opponent=Tiers[G.hub]?Tiers[G.hub].opponents()[Math.min(Tiers[G.hub].round(),2)]:G.hub==='national'?P.nationalOpponents[Math.min(p.nationalRound,2)]:G.hub==='province'?P.provinceOpponents[Math.min(p.provinceRound,2)]:G.hub==='city'?P.cityOpponents[Math.min(p.cityRound,2)]:P.opponents[p.guardUnlocked?2:0];transition(()=>battle('sparring'))});
   }else{
    const list=document.createElement('ol');list.className='bracket';for(let i=0;i<3;i++){const o=P.opponents[i],row=document.createElement('li');row.className=i<p.round?'won':i===p.round?'current':'';row.textContent=`${o.title} · ${o.name}  ${i<p.round?'승리':i===p.round?'대기':'예정'} · ${o.prize}원`;list.append(row)}content.append(list);
    if(p.round===3){paragraph('마을 챔피언 · 머리카락 딱지와 뿌리 버티기 획득');button(p.cityEntered?'시 대회장으로 이동':'시 대회에 도전',()=>City.travel());button('아저씨에게 기술 다시 듣기',()=>this.rewardStory(false))}
@@ -71,14 +78,19 @@ const Village={
  playerDamage(grade){
   const intent=P.intent(G.opponent.kind,G.round),defending=G.mode!=='training'&&intent.defending&&!(intent.pierce&&grade==='PERFECT');
   if(G.storyJob&&G.powered)G.storyUsed.power=true;
-  const damage=P.damage(R.damage(grade),P.stats(G.profile).attack*P.wager(grade,G.powered)*P.openingMultiplier(intent),defending);G.powered=false;return damage
+  const damage=P.damage(R.damage(grade),P.stats(G.profile).attack*this.strength(G.hp,G.maxHp)*P.wager(grade,G.powered)*P.openingMultiplier(intent),defending);G.powered=false;return damage
  },
  enemyGrade(){const intent=P.intent(G.opponent.kind,G.round);if(intent.perfect)return 'PERFECT';if(intent.weak)return 'BAD';const n=Math.random();return n<.25?'BAD':n<.8?'GOOD':'PERFECT'},
- enemyDamage(grade){const damage=P.damage(R.damage(grade),G.opponent.attack,G.guarding);G.guarding=false;return damage},
+ enemyDamage(grade){const damage=P.damage(R.damage(grade),G.opponent.attack*this.strength(G.enemyHp,G.enemyMax),G.guarding);G.guarding=false;return damage},
+ // Worn-ttakji rules start at the continent tier, where the coach introduces them.
+ worn(){return !!Tiers[G.hub]&&this.isBattle()&&G.mode!=='training'},
+ strength(hp,max){return this.worn()?R.strength(hp,max):1},
+ earlyFlip(hp,max,grade){return this.worn()&&hp>0&&Math.random()<R.flipChance(hp,max,grade)},
  trainingComplete(){if(G.mapPractice){G.mapPractice=false;checkpoint(this.hubCheckpoint());result('손목을 풀었다.','무료 연습 · 재화와 능력치는 그대로다.','돌아가기',()=>transition(()=>this.returnHub()));return}const before=P.level(G.profile);P.train(G.profile,G.practice);checkpoint(this.hubCheckpoint());this.hud();result('손에 감이 붙었다.',P.level(G.profile)>before?'타격 +2 · 집중 +1':'세 번 더, 조금 더 정확하게.',this.hubLabel(),()=>transition(()=>this.returnHub()),[{value:'+5원',label:'훈련 보상'},{value:`Lv.${P.level(G.profile)+1}`,label:'선수'}])},
  finish(win){
   if(['story_battle','story_training'].includes(G.mode)){Journeys.finish(win);return}
   if(G.mode==='national_tournament'){National.finish(win);return}
+  if(Tiers[G.mode.replace('_tournament','')]&&G.mode.endsWith('_tournament')){Tiers[G.mode.replace('_tournament','')].finish(win);return}
   if(G.mode==='province_tournament'){Province.finish(win);return}
   if(G.mode==='city_tournament'){City.finish(win);return}
   G.animation=null;if(G.mode==='sparring'){result(win?'연습도 실전처럼.':'한 번 더 연습하자.','상금 없는 연습 대결',this.hubLabel(),()=>transition(()=>this.returnHub()));return}

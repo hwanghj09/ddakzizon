@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),J=require('../journey-data.js'),P=require('../progression.js');
-test('twelve chapters supply twenty-four playable activities with usable objectives',()=>{
- assert.equal(J.episodes.length,12);assert.equal(new Set(J.episodes.map(e=>e.id)).size,12);let count=0;
- for(const e of J.episodes){assert.equal(e.steps.length,2);for(const a of e.steps){count++;assert(a.lines.length>=3);assert(a.ending.length>=2);assert(['drill','duel'].includes(a.type));if(a.type==='duel'){assert(a.opponent.hp>0);assert(P.items[a.opponent.material])}else{assert(a.good<=5);assert(a.perfect<=a.good)}}}assert.equal(count,24);
+test('twenty-one chapters supply forty-two playable activities with usable objectives',()=>{
+ assert.equal(J.episodes.length,21);assert.equal(new Set(J.episodes.map(e=>e.id)).size,21);let count=0;
+ for(const e of J.episodes){assert.equal(e.steps.length,2);for(const a of e.steps){count++;assert(a.lines.length>=3);assert(a.ending.length>=2);assert(['drill','duel'].includes(a.type));if(a.type==='duel'){assert(a.opponent.hp>0);assert(P.items[a.opponent.material])}else{assert(a.good<=5);assert(a.perfect<=a.good)}}}assert.equal(count,42);
 });
 test('chapters gate the next match and do not unlock a future region or round',()=>{
  const p=P.fresh();assert.equal(J.available(p,J.byId('village_0')),false);P.schoolReward(p);assert(J.available(p,J.byId('village_0')));assert.equal(J.available(p,J.byId('village_1')),false);assert.equal(J.available(p,J.byId('city_0')),false);assert.equal(J.canCompete(p,'village'),false);

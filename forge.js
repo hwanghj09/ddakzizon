@@ -1,7 +1,7 @@
 'use strict';
 const Forge={
  selected:'balanced',item:null,
- available(){return (['city','province','national'].includes(G.scene)&&G.scene===G.hub&&G.profile.cityEntered)||(G.scene==='village'&&G.profile.provinceEntered)},
+ available(){return (['city','province','national','continent','world','planet'].includes(G.scene)&&G.scene===G.hub&&G.profile.cityEntered)||(G.scene==='village'&&G.profile.provinceEntered)},
  visit(){
   if(!this.available()||G.paused||G.state!=='facility')return;
   this.item=null;
@@ -16,7 +16,7 @@ const Forge={
   $('facility-title').textContent='딱지 제련소';$('facility-wallet').textContent=`${p.coins}원`;
   const content=$('facility-content');content.replaceChildren();
   const el=(tag,cls,text)=>{const node=document.createElement(tag);node.className=cls;if(text!==undefined)node.textContent=text;return node};
-  const summary=el('div','forge-summary'),image=el('img','');image.src=`assets/sprites/ttakji/${id}/ttakji_${id}_base.png`;image.alt='';
+  const summary=el('div','forge-summary'),image=el('img','');image.src=spriteSrc(id,'base');image.alt='';
   const copy=el('div','');copy.append(el('h3','',`${P.items[id].name} +${p.upgrades[id]}`),el('p','',`현재 · ${P.forms[current].name}`));summary.append(image,copy);content.append(summary);
   const choices=el('div','forge-forms');choices.setAttribute('role','group');choices.setAttribute('aria-label','제련 형태');
   for(const [form,data] of Object.entries(P.forms)){

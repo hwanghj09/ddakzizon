@@ -42,15 +42,15 @@ const artifacts=process.env.ARTIFACT_DIR||path.join(require('node:os').tmpdir(),
    assert(await page.evaluate(region=>J.canCompete(G.profile,region),region));await prepare();await page.evaluate(()=>Village.hub().open('cup'));await page.getByRole('button',{name:/ 출전$/}).click();await dialogue();await page.waitForFunction(()=>G.state==='ready');await finishFight();assert.equal(await page.evaluate(field=>G.profile[field],J.regions[region].field),e.round+1,`${region} tournament remains winnable`);
    await page.locator('#continue').click();await dialogue();await page.waitForFunction(()=>G.state==='explore');
   }
-  if(region!=='national'){
-   await page.evaluate(()=>Village.hub().open('cup'));const next={village:'시',city:'도',province:'전국'}[region];await page.getByRole('button',{name:`${next} 대회에 도전`,exact:true}).click();await dialogue();await page.waitForFunction(()=>G.state==='explore');
+  if(region!=='planet'){
+   await page.evaluate(()=>Village.hub().open('cup'));const next={village:'시',city:'도',province:'전국',national:'대륙',continent:'세계',world:'행성'}[region];await page.getByRole('button',{name:`${next} 대회에 도전`,exact:true}).click();await dialogue();await page.waitForFunction(()=>G.state==='explore');
   }
  }
- assert.equal(activities,24);assert.equal(await page.evaluate(()=>Object.values(G.profile.journey.stages).filter(n=>n===2).length),12);assert.equal(await page.evaluate(()=>G.profile.nationalRound),3);
+ assert.equal(activities,42);assert.equal(await page.evaluate(()=>Object.values(G.profile.journey.stages).filter(n=>n===2).length),21);assert.equal(await page.evaluate(()=>G.profile.planetRound),3);
  // Story replay does not pay again; journal fits a smaller PC screen.
  const saved=await page.evaluate(()=>({coins:G.profile.coins,xp:G.profile.xp}));await page.evaluate(()=>National.open('stories'));await page.locator('#journey-start').click();await dialogue();assert.deepEqual(await page.evaluate(()=>({coins:G.profile.coins,xp:G.profile.xp})),saved);
  await page.setViewportSize({width:1024,height:600});await page.keyboard.press('KeyJ');const box=await page.locator('.game-menu').boundingBox();assert(box.x>=0&&box.y>=0&&box.x+box.width<=1024&&box.y+box.height<=600);await page.screenshot({path:path.join(artifacts,'journey-complete.png')});await page.keyboard.press('KeyJ');
- await resume();assert.equal(await page.evaluate(()=>G.profile.nationalRound),3);assert.equal(await page.evaluate(()=>Object.values(G.profile.journey.stages).filter(n=>n===2).length),12);
+ await resume();assert.equal(await page.evaluate(()=>G.profile.planetRound),3);assert.equal(await page.evaluate(()=>Object.values(G.profile.journey.stages).filter(n=>n===2).length),21);
  await page.keyboard.press('Escape');await page.locator('#return-title').click();await page.locator('#new-game').click();assert.equal(await page.evaluate(()=>Object.keys(G.profile.journey.stages).length),0);
- assert.deepEqual(errors,[]);console.log('PASS all 24 story activities and 12 tournament matches using earned upgrades; accuracy/skill failures, gating, pending reward reload, pause, journal, replay and reset');
+ assert.deepEqual(errors,[]);console.log('PASS all 42 story activities and 21 tournament matches using earned upgrades; accuracy/skill failures, gating, pending reward reload, pause, journal, replay and reset');
  }finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});
