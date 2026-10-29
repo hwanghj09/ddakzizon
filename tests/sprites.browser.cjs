@@ -19,7 +19,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
  // Observe the real canvas drawing each battle state for every material.
  for(const id of ids){for(const state of ['base','damaged','flipped']){
   await page.evaluate(({id,state})=>{cancelScene();G.hub='planet';G.mode='planet_tournament';G.scene='battle';G.state='ready';G.profile.equipped=id;G.opponent={...P.planetOpponents[0],material:id};G.hp=G.maxHp=100;G.enemyHp=G.enemyMax=100;G.now=Math.max(2000,G.now);G.flipPlayer=G.flipEnemy=0;G.stolen=false;if(state==='damaged'){G.hp=60;G.enemyHp=60}if(state==='flipped'){G.flipPlayer=G.flipEnemy=G.now-850}spriteDraws.clear()}, {id,state});
-  await page.waitForFunction(({id,state})=>spriteDraws.has('/assets/sprites/ttakji/'+id+'/ttakji_'+id+'_'+state+'.png'),{id,state});
+  await page.waitForFunction(({id,state})=>[...spriteDraws].some(src=>src.endsWith('/assets/sprites/ttakji/'+id+'/ttakji_'+id+'_'+state+'.png')),{id,state});
  }}
  await page.screenshot({path:path.join(dir,'catalog-battle.png')});assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);console.log('PASS 46 playable types / 184 decoded images, shop purchase, every inventory preview/equip, reload and 138 canvas battle states without missing requests');
 }finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});
