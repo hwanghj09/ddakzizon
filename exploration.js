@@ -26,7 +26,7 @@ const Exploration={
  save(){if(this.active()){G.profile.map.zone=G.mapZone;G.profile.map.x=Math.round(G.hero.x)}checkpoint(G.profile.schoolReward?Village.hubCheckpoint():'exploration')},
  move(zone,x){note(220,.09,'triangle',.025);transition(()=>this.enter(zone,x))},
  update(dt){const d=this.data(),dx=(G.keys.has('right')?1:0)-(G.keys.has('left')?1:0);if(dx){G.hero.x=Math.max(25,Math.min(d.width-25,G.hero.x+dx*220*dt/1000));G.hero.facing=dx;G.hero.walk+=dt;if(Math.floor(G.hero.walk/350)!==Math.floor((G.hero.walk-dt)/350))note(95,.035,'triangle',.018)}else G.hero.walk=0;G.hero.y=440;
-  const camera=Math.max(0,Math.min(d.width-960,G.hero.x-480));G.camera+=(camera-G.camera)*(1-Math.exp(-dt/110));
+  const view=window.World?.viewWidth?.()||960,camera=Math.max(0,Math.min(d.width-view,G.hero.x-view/2));G.camera+=(camera-G.camera)*(1-Math.exp(-dt/110));
   if(G.hero.x<=28&&dx<0&&d.left){this.move(d.left,this.zones[d.left].width-90);return}if(G.hero.x>=d.width-28&&dx>0&&d.right){this.move(d.right,90);return}
   if(!dx&&G.profile.map.x!==Math.round(G.hero.x))this.save();this.updateInteract();
  },

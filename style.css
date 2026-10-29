@@ -246,3 +246,101 @@ h1>span{color:var(--gold)}.title-dot{color:var(--red)!important}
 .map-node{flex:1 1 130px;padding:16px 12px;background:#23413f;border:1px solid #567369;border-radius:4px;font-size:14px}
 .map-node.current{border-color:#eac77e;background:#4c5944;color:#ffe8ae}
 .map-node small{display:block;margin-top:8px;font-size:11px;color:#abbfb0}
+
+/* Short playable story. Shared campaign screens keep their original layout. */
+.version-note{font-size:14px;color:var(--cream);margin:20px 0 0}
+.title-screen{overflow-y:auto;overscroll-behavior:contain}
+.title-copy{padding-bottom:24px}
+.title-menu{margin-top:22px}
+.campaign-start{font-size:13px;opacity:.85}
+#skip-dialogue{display:none}
+.minimum-mode #skip-dialogue{display:block;background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:8px 10px;font-size:12px;min-height:44px}
+.minimum-mode #focus,.minimum-mode #guard,.minimum-mode #power,
+.minimum-mode [data-menu="journal"],.minimum-mode [data-menu="achievements"],.minimum-mode [data-menu="player"]{display:none!important}
+.minimum-mode .normal-zone{position:absolute;inset:0 15%;background:#8ca9ba}
+.minimum-mode .good-zone{inset:0 30%}
+.minimum-mode .perfect-zone{inset:0 43%}
+#timing-guide{font-size:12px;margin:6px 0 12px;text-align:center}
+#timing-guide span{font-weight:900}
+#minimum-help{position:absolute;left:3%;bottom:14px;color:var(--cream);font-size:12px;text-shadow:0 2px 3px var(--ink);z-index:3;pointer-events:none}
+#minimum-touch{display:none;position:absolute;left:4%;right:4%;bottom:max(22px,env(safe-area-inset-bottom));justify-content:space-between;z-index:4;pointer-events:none}
+#minimum-touch>div{display:flex;gap:12px}
+#minimum-touch button{pointer-events:auto;min-width:62px;min-height:58px;background:var(--paper);border:3px solid var(--ink);border-radius:14px;box-shadow:0 4px 0 var(--ink);font-size:17px;touch-action:none;user-select:none}
+#touch-interact{padding:8px 16px;background:var(--gold)!important}
+.minimum-mode .result{max-height:85%;overflow:auto}
+.minimum-mode .map-node{color:var(--cream)}
+@media(pointer:coarse),(max-width:700px){
+ .minimum-mode #minimum-touch:not([hidden]){display:flex}
+ .minimum-mode #minimum-help{bottom:94px;max-width:90%;font-size:11px}
+ .minimum-mode #minimum-help:empty{display:none}
+}
+@media(max-width:700px){
+ .title-copy{top:8%;left:8%;right:8%}
+ .title-copy h1{font-size:100px}
+ .title-menu{width:min(310px,100%);gap:10px}
+ .title-menu .menu-primary{font-size:17px;padding:14px 18px}
+ .title-menu .menu-secondary{padding:12px 14px;font-size:13px}
+ .minimum-mode #hud{padding:12px}
+ .minimum-mode .top-actions{gap:6px;align-items:center}
+ .minimum-mode .top-actions>span{font-size:11px;padding:7px 6px;max-width:none;margin:0;white-space:nowrap;gap:4px}
+ .minimum-mode .top-actions button{flex:none}
+ .minimum-mode #inventory::before{width:24px;height:24px}
+ .minimum-mode #fullscreen{display:none}
+ .minimum-mode #map-hud{top:78px;max-width:94%;left:4%}
+ .minimum-mode #map-objective{font-size:14px}
+ .minimum-mode .dialogue{bottom:max(22px,env(safe-area-inset-bottom));left:4%;right:4%;padding:18px 16px 12px;min-height:180px}
+ .minimum-mode .portrait{display:none}
+ .minimum-mode .speaker-row{margin-top:-32px;gap:8px}
+ .minimum-mode #line{font-size:16px;line-height:1.6;margin:12px 0;overflow-wrap:anywhere}
+ .minimum-mode #next{min-width:76px;min-height:44px;justify-content:flex-end}
+ .minimum-mode .health-card{top:80px;width:43%;padding:8px 10px;transform:none}
+ .minimum-mode .health-card.player{left:4%}
+ .minimum-mode .health-card.opponent{right:4%}
+ .minimum-mode .health-card>span{font-size:14px;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+ .minimum-mode .health-card strong{font-size:12px}
+ .minimum-mode #round-label{top:217px;font-size:11px;padding:5px 10px}
+ .minimum-mode .combat-panel{bottom:25px;width:92%;max-width:92%;padding:14px}
+ .minimum-mode .combat-panel:has(#timing:not([hidden])){padding-top:12px}
+ .minimum-mode .actions button{min-height:54px}
+ .minimum-mode .gauge{height:28px}
+ .minimum-mode .strike{min-height:48px}
+ .minimum-mode .result{width:92%;padding:24px 18px;max-height:80%}
+ .minimum-mode .result h2{font-size:28px}
+ .minimum-mode #result-stats{flex-wrap:wrap}
+ .minimum-mode .facility{width:92%;padding:20px 16px;max-height:78%;top:52%}
+ .minimum-mode .facility h2{font-size:21px}
+ .minimum-mode .facility header{gap:8px;align-items:flex-start;flex-direction:column}
+ .minimum-mode .game-menu{display:grid;grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);width:94vw;height:92svh}
+ .minimum-mode .menu-sidebar{padding:12px;border-right:0;border-bottom:3px solid var(--ink);min-height:0;gap:8px}
+ .minimum-mode .menu-sidebar h2{display:none}
+ .minimum-mode .menu-sidebar nav{display:flex;flex-direction:row;overflow:auto;gap:6px}
+ .minimum-mode .menu-sidebar nav button{flex:none;min-height:44px;padding:8px 10px;font-size:12px}
+ .minimum-mode .menu-sidebar-bottom{display:flex;gap:8px;padding-top:0;margin-top:0}
+ .minimum-mode .menu-sidebar-bottom button{flex:1;justify-content:center;font-size:12px;min-height:44px;padding:8px}
+ .minimum-mode .menu-main{padding:14px 16px;min-height:0;overflow-y:auto}
+ .minimum-mode .menu-header{padding-bottom:8px;margin-bottom:10px;gap:8px}
+ .minimum-mode #menu-view-title{font-size:18px}
+ .minimum-mode .map-node{flex-basis:110px}
+ .minimum-mode .equipped-summary{gap:12px;padding:14px}
+ .minimum-mode .equipped-summary img{width:72px;height:72px}
+ .minimum-mode .equipped-summary h4{font-size:16px!important;word-break:keep-all;line-height:1.6}
+}
+@media(max-width:360px){.minimum-mode .top-actions>span{font-size:10px}}
+.minimum-mode .toast{top:154px;max-width:92%;text-align:center}
+@media(max-height:500px){
+ .title-copy{top:3%}
+ .title-copy h1{font-size:64px;margin-top:8px}
+ .title-copy>p{margin:10px 0}
+ .title-menu{flex-direction:row;flex-wrap:wrap;width:min(740px,85vw);margin-top:12px;gap:8px}
+ .title-menu button{font-size:12px!important;padding:10px 12px!important;min-height:44px}
+ .minimum-mode .dialogue{min-height:125px;bottom:4%}
+ .minimum-mode .dialogue #line{font-size:14px}
+ .minimum-mode .health-card{top:66px;padding:6px 10px}
+ .minimum-mode #round-label{top:70px}
+ .minimum-mode .combat-panel{bottom:12px;padding:8px 12px;max-width:68%}
+ .minimum-mode #map-hud{top:74px;gap:3px}
+ .minimum-mode #map-location{font-size:10px}
+ .minimum-mode #map-objective{font-size:13px}
+ .minimum-mode #minimum-touch button{min-height:46px;min-width:55px}
+ .minimum-mode #minimum-help{bottom:78px}
+}

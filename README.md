@@ -1,5 +1,53 @@
 # ddakzizon
 
+## 최소 플레이 버전 v0.11
+
+[최소 구현 문서](docs/game-planning/07-minimum-playable-version.md)를 기준으로,
+타이틀의 **처음부터 시작**에서 아래 흐름을 플레이할 수 있습니다.
+
+학교 첫 경기와 이야기상 패배 → 직접 걸어서 귀가 → 식탁에서 신문지 딱지 접기·자동 장착 →
+집 표적에 한 번 연습 → 학교 재대결 → 학교 앞 포스터 → 주민센터 접수·임시 대진표·완료 안내.
+
+```sh
+npm start
+```
+
+브라우저에서 `http://localhost:4173`을 엽니다. 별도 빌드나 서버 API는 필요하지 않습니다.
+게임 실행에 npm 의존성은 필요하지 않으며, `npm ci`는 개발용 브라우저 테스트 도구를 설치합니다.
+
+- PC: 좌우 방향키 / A, D 이동 · E 상호작용 · Space 공격과 게이지 정지.
+- 모바일: 좌우 버튼을 길게 눌러 이동하고, 상호작용·공격·내려치기 버튼을 터치합니다.
+- 모바일 세로 화면은 탐험 지도를 더 가깝게 보여 줍니다. 화면을 회전해도 카메라가 현재 위치를 유지합니다.
+- I 인벤토리 · M 지도 · Esc 메뉴. 대화는 다음 버튼이나 Space로 넘기거나 건너뛸 수 있습니다.
+- 첫 경기는 시작 전에 이야기상 패배임을 알립니다. 재대결은 실제 승패를 적용하며,
+  패배하면 즉시 재도전하거나 집에서 연습할 수 있습니다.
+- 연습은 빗나가도 완료됩니다. 결과 화면에서 반복하거나 끝낼 수 있습니다.
+- 주요 사건과 멈춘 위치를 자동 저장합니다. **이어서 하기**로 복귀합니다.
+  브라우저 저장이 차단된 경우 안내를 표시하고 현재 세션은 계속 플레이할 수 있습니다.
+- 상점·압축·강화·제련·융합·훈련·접수 이후 경기는 이 짧은 버전에서 준비 중으로 표시합니다.
+
+`minimum-rules.js`에 문서의 임시 전투 수치, 4단계 타이밍 판정, 피해·뒤집기 계산식,
+진행 단계와 대진표를 모았습니다. `minimum.js`는 기존 맵·렌더러·대화·시계를 재사용해
+짧은 여정을 연결합니다. 확정된 밸런스나 최종 아트를 의미하지 않습니다.
+
+기존 긴 캠페인은 **기존 전체 캠페인 시작 / 전체 캠페인 이어하기**에서 계속 이용할 수 있습니다.
+저장 키는 짧은 버전 `ddakzizon.minimum.v1`, 기존 캠페인 `ddakzizon.campaign.v3`로 분리됩니다.
+
+개발 검증(별도 터미널에서 `npm start` 실행):
+
+```sh
+npm ci
+npm run check
+npm test
+npm run test:minimum
+npm run test:browser
+```
+
+브라우저 테스트는 로컬 Chromium이 있으면 사용하고, 없으면 `npx playwright install chromium`으로
+설치할 수 있습니다. `BROWSER_EXECUTABLE`, `TEST_URL`, `ARTIFACT_DIR`로 실행 환경을 바꿀 수 있습니다.
+`npm run test:browser`에는 기존 캠페인과 새 최소 버전의 검증이 모두 포함됩니다.
+구체적인 검증 범위와 한계는 [검증 기록](tests/VALIDATION.md#최소-플레이-버전-v011)을 참고하세요.
+
 ## Ttakji sprite skill
 
 The repository includes a reusable Codex/Agent Skill:
@@ -24,7 +72,7 @@ Use $ttakji-sprite-artist to write four prompts for a metal ttakji. Do not gener
 
 The skill contains instructions and prompts. Generated newspaper PNG assets are available in `assets/sprites/ttakji/newspaper/`.
 
-## Play — school through national championship
+## Legacy campaign — school through national championship
 
 Open `index.html` in a modern browser, or run `npm start` and visit
 `http://localhost:4173`. No install, build, external fonts, or network connection

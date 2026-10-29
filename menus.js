@@ -10,6 +10,7 @@ window.GameMenu={
  el(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el},
  button(text,action,className='menu-secondary'){const b=this.el('button',className,text);b.onclick=action;return b},
  show(view='overview'){
+  if(window.Minimum?.active){Minimum.menu(view);return}
   const names={map:'동네 지도',journal:'이야기 수첩',achievements:'도전 과제',overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
   if(!names[view])return;this.view=view;$('menu-view-title').textContent=names[view];$('menu-message').textContent='';
   document.querySelectorAll('[data-menu]').forEach(b=>{const active=b.dataset.menu===view;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});

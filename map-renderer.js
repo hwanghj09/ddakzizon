@@ -68,7 +68,7 @@ const MapRenderer={
   }
   if(z.left){sign('← '+Exploration.zones[z.left].name,130,463,200);r(125,498,6,40,'#455f54')}if(z.right){sign(Exploration.zones[z.right].name+' →',w-140,463,210);r(w-145,498,6,40,'#455f54')}
   actor(G.hero.x,440,'hero',G.hero.walk,1,G.hero.facing);
-  const nearest=G.state==='explore'?Exploration.nearest():null;if(nearest){const x=Math.max(camera+170,Math.min(camera+790,nearest.x));sign(G.coach,x,235,Math.max(240,G.coach.length*10+24),'#1c3a3bef')}
+  const nearest=G.state==='explore'?Exploration.nearest():null;if(nearest){const view=window.World?.viewWidth?.()||960,x=Math.max(camera+170,Math.min(camera+view-170,nearest.x));sign(G.coach,x,235,Math.max(240,G.coach.length*10+24),'#1c3a3bef')}
   ctx.restore();
   // Foreground curb remains separate from the walkable lane.
   r(0,578,960,22,indoor?'#5b6659':'#435e55');r(0,578,960,3,'#91a18b');

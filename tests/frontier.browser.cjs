@@ -1,6 +1,6 @@
-const {chromium}=require('playwright'),assert=require('node:assert');
+const {chromium}=require('playwright'),assert=require('node:assert'),fs=require('node:fs');
 (async()=>{
- const browser=await chromium.launch(),p=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
+ const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||(fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']}),p=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
  const drain=async()=>{for(let i=0;i<60;i++){const s=await p.evaluate(()=>{if(G.state==='dialogue'){next();next()}return G.state});if(!['dialogue','transition'].includes(s))return s;await p.waitForTimeout(150)}};
  // A national champion save: the continent opens from the national cup desk.
  await p.evaluate(()=>{const q=P.fresh();P.schoolReward(q);for(let i=0;i<3;i++)P.award(q,i);P.enterCity(q);for(let i=0;i<3;i++)P.awardCity(q,i);P.enterProvince(q);for(let i=0;i<3;i++)P.awardProvince(q,i);P.enterNational(q);for(let i=0;i<3;i++)P.awardNational(q,i);q.coins=1600;q.upgrades={newspaper:12,colored_paper:9,hair:16,fusion:0};localStorage.setItem('ddakzizon.campaign.v3',JSON.stringify({version:3,checkpoint:'national',profile:q}))});
