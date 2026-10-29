@@ -70,4 +70,3 @@
 - 4상태 비교표: [1](../../concepts/ttakji/individual-sprites-check-01.png) · [2](../../concepts/ttakji/individual-sprites-check-02.png) · [3](../../concepts/ttakji/individual-sprites-check-03.png) · [4](../../concepts/ttakji/individual-sprites-check-04.png) · [5](../../concepts/ttakji/individual-sprites-check-05.png) · [6](../../concepts/ttakji/individual-sprites-check-06.png) · [7](../../concepts/ttakji/individual-sprites-check-07.png) · [8](../../concepts/ttakji/individual-sprites-check-08.png)
 
 전체 45종을 게임 아이템으로 등록했습니다. 기존 융합 딱지까지 46종을 사용할 수 있으며, 상점·대회 보상으로 획득해 장착·강화할 수 있습니다. 인벤토리·전투 상태 전환과 저장 복원은 `tests/sprites.browser.cjs`, 파일 규격과 전체 획득 경로는 `tests/sprites.test.js`로 검증합니다.
-

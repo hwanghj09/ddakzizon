@@ -23,4 +23,3 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
  }}
  await page.screenshot({path:path.join(dir,'catalog-battle.png')});assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);console.log('PASS 46 playable types / 184 decoded images, shop purchase, every inventory preview/equip, reload and 138 canvas battle states without missing requests');
 }finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});
-

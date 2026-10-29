@@ -25,4 +25,3 @@ test('special shop items respect progress and cannot be restored before their sh
  assert(locked.owned.includes('ragged'));for(const id of ['couple_gum','piano','lego','saimdang','magic_carpet']){assert(!locked.owned.includes(id));assert.equal(P.buy(locked,id),false);}
  assert.equal(locked.equipped,'newspaper');
 });
-
