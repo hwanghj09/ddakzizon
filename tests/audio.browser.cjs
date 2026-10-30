@@ -47,7 +47,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   await page.locator('#resume').click();await page.waitForFunction(()=>G.audio.state==='running');
   await page.locator('#sound').click();await page.waitForFunction(()=>G.audio.state==='suspended');
   await page.reload();assert.equal(await page.evaluate(()=>G.sound),false);
-  await page.locator('#new-game').click();assert.equal(await page.evaluate(()=>G.audio),null);
+  await page.locator('#new-game').click();assert.equal(await page.evaluate(()=>G.audio),null);await page.locator('#name-confirm').click();
   await page.waitForFunction(()=>!document.getElementById('hud').hidden);
   await page.locator('#sound').click();await page.waitForFunction(()=>G.audio?.state==='running');
   const fallback=await browser.newPage();fallback.on('pageerror',e=>errors.push(e.message));

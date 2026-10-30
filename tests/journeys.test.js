@@ -3,9 +3,10 @@ test('twenty-one chapters supply forty-two playable activities with usable objec
  assert.equal(J.episodes.length,21);assert.equal(new Set(J.episodes.map(e=>e.id)).size,21);let count=0;
  for(const e of J.episodes){assert.equal(e.steps.length,2);for(const a of e.steps){count++;assert(a.lines.length>=3);assert(a.ending.length>=2);assert(['drill','duel'].includes(a.type));if(a.type==='duel'){assert(a.opponent.hp>0);assert(P.items[a.opponent.material])}else{assert(a.good<=5);assert(a.perfect<=a.good)}}}assert.equal(count,42);
 });
-test('chapters gate the next match and do not unlock a future region or round',()=>{
- const p=P.fresh();assert.equal(J.available(p,J.byId('village_0')),false);P.schoolReward(p);assert(J.available(p,J.byId('village_0')));assert.equal(J.available(p,J.byId('village_1')),false);assert.equal(J.available(p,J.byId('city_0')),false);assert.equal(J.canCompete(p,'village'),false);
- assert.equal(J.complete(p,'village_0',1,15),false);assert.equal(J.complete(p,'city_0',0,15),false);assert(J.complete(p,'village_0',0,15));assert.equal(J.canCompete(p,'village'),false);p.journey.pending=null;assert(J.complete(p,'village_0',1,15));assert.equal(J.canCompete(p,'village'),false);p.journey.pending=null;assert(J.canCompete(p,'village'));P.award(p,0);assert.equal(J.canCompete(p,'village'),false);
+test('chapters are optional: they never gate a tournament match and do not unlock a future region or round',()=>{
+ const p=P.fresh();assert.equal(J.available(p,J.byId('village_0')),false);P.schoolReward(p);assert(J.available(p,J.byId('village_0')));assert.equal(J.available(p,J.byId('village_1')),false);assert.equal(J.available(p,J.byId('city_0')),false);assert.equal('canCompete' in J,false);
+ assert.equal(J.complete(p,'village_0',1,15),false);assert.equal(J.complete(p,'city_0',0,15),false);
+ p.map.poster=true;assert(P.enterVillage(p));assert.equal(p.journey.stages.village_0||0,0);assert(P.award(p,0),'The first match pays without any chapter');assert(J.available(p,J.byId('village_1')),'Later chapters still open with progress');assert(J.complete(p,'village_0',0,15));
 });
 test('rewards and pending endings survive reload once without repeating an encounter',()=>{
  let p=P.fresh();P.schoolReward(p);assert(J.complete(p,'village_0',0,15));assert.equal(p.coins,90);assert.equal(p.xp,1);assert.equal(J.complete(p,'village_0',0,15),false);assert.equal(J.complete(p,'village_0',1,15),false);
@@ -17,5 +18,5 @@ test('legacy migration keeps tournament wins and makes new stories playable with
 });
 test('drills require accuracy and duels require the promised skill',()=>{
  const drill=J.byId('village_2').steps[0];assert.equal(J.passed(drill,['GOOD','GOOD','GOOD','BAD','BAD']),false);assert(J.passed(drill,['PERFECT','GOOD','GOOD','BAD','BAD']));assert.equal(J.passed(drill,['PERFECT']),false);
- const duel=J.byId('city_1').steps[0];assert.equal(J.passed(duel,[],{}),false);assert(J.passed(duel,[],{power:true}));
+ const duel=J.byId('city_1').steps[0];assert.equal(J.passed(duel,[],{}),false);assert(J.passed(duel,[],{smash:true}));assert.equal(duel.goal,'smash');assert.equal(J.byId('city_0').steps[0].goal,'precise');assert.equal(J.byId('village_0').steps[1].goal,null);assert(J.episodes.flatMap(e=>e.steps).every(a=>!a.goal||['precise','smash','press'].includes(a.goal)));
 });

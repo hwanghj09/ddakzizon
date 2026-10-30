@@ -1,45 +1,37 @@
-const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),P=require('../progression.js');
-const artifacts=process.env.ARTIFACT_DIR||path.join(require('node:os').tmpdir(),'ddakzizon-checks');fs.mkdirSync(artifacts,{recursive:true});
-(async()=>{const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||(fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});try{
- const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
- const profile=require('./prepared-profile.cjs')(P.fresh());P.schoolReward(profile);for(let i=0;i<3;i++)P.award(profile,i);P.enterCity(profile);for(let i=0;i<3;i++)P.awardCity(profile,i);P.enterProvince(profile);for(let i=0;i<3;i++)P.awardProvince(profile,i);P.equip(profile,'hair');for(let i=0;i<7;i++)P.upgrade(profile);profile.xp=9;delete profile.nationalEntered;delete profile.nationalRound;
- const seed=async(profile,checkpoint)=>{await page.evaluate(({profile,checkpoint})=>localStorage.setItem('ddakzizon.campaign.v3',JSON.stringify({version:3,checkpoint,profile})),{profile,checkpoint});await page.reload();await page.locator('#load-game').click()};
- const fast=async()=>page.evaluate(()=>{const original=update;update=dt=>original(dt*(G.state==='explore'?1:6));TtakjiRules.positionAt=()=>.5;Math.random=()=>.5});
- const dialogue=async()=>{for(let i=0;i<100;i++){const state=await page.evaluate(()=>G.state);if(state==='dialogue')await page.locator('#next').click();else if(state==='transition')await page.waitForTimeout(60);else return}throw Error('Unfinished dialogue')};
- const visit=async(id)=>{await page.waitForFunction(()=>G.state==='explore');await page.evaluate(id=>Village.hub().open(id),id);await page.waitForFunction(()=>G.state==='facility')}; // Walking and entrances are covered in exploration.browser.cjs.
-
- const attack=async(grade='PERFECT')=>{await page.evaluate(grade=>{TtakjiRules.positionAt=()=>grade==='PERFECT'?.5:grade==='GOOD'?.35:0},grade);await page.locator('#attack').click();await page.locator('#strike').click();await page.waitForFunction(()=>['ready','result'].includes(G.state))};
- await seed(profile,'province');await page.waitForFunction(()=>G.state==='explore');await fast();await visit('cup');await page.getByRole('button',{name:'전국 대회에 도전',exact:true}).click();await page.waitForFunction(()=>G.state==='dialogue');assert.equal(await page.evaluate(()=>G.checkpoint),'national_intro');
- await page.reload();await page.locator('#load-game').click();await page.waitForFunction(()=>G.state==='dialogue');await dialogue();await page.waitForFunction(()=>G.scene==='national'&&G.state==='explore');await fast();assert.equal(await page.evaluate(()=>P.upgradeLimit(G.profile)),16);assert.equal(await page.evaluate(()=>P.trainingLimit(G.profile)),60);await page.screenshot({path:path.join(artifacts,'national-hub.png')});
- await visit('press');await page.getByRole('button',{name:/압축하기/}).click();assert.equal(await page.evaluate(()=>G.profile.upgrades.hair),8);await page.getByRole('button',{name:'제련소 · 형태 가공'}).click();await dialogue();await page.locator('[data-form="striker"]').click();await page.locator('#forge-apply').click();assert.equal(await page.evaluate(()=>G.checkpoint),'national');
- await page.keyboard.press('KeyI');await page.locator('[data-item="newspaper"]').click();await page.locator('#equip-item').click();await page.locator('[data-item="hair"]').click();await page.locator('#equip-item').click();await page.keyboard.press('KeyI');assert((await page.locator('#facility-content').textContent()).includes('머리카락'));await page.keyboard.press('KeyE');
- await visit('training');await page.getByRole('button',{name:'타이밍 훈련 · 3번 치기'}).click();await page.waitForFunction(()=>G.state==='ready');for(let i=0;i<3;i++)await attack();await page.locator('#continue').click();await page.waitForFunction(()=>G.scene==='national'&&G.state==='explore');assert.equal(await page.evaluate(()=>G.profile.coins),495);
- for(let round=0;round<3;round++){
-  await visit('cup');await page.getByRole('button',{name:/출전/}).click();await dialogue();await page.waitForFunction(()=>G.state==='ready');assert.equal(await page.evaluate(()=>G.maxHp),185);
-  if(round===2)await page.screenshot({path:path.join(artifacts,'national-final-battle.png')});
-  for(let turn=1;turn<=12&&await page.evaluate(()=>G.state!=='result');turn++){
-   await page.locator('#game').focus();const openingTurn=[2,3,4][round];
-   if(turn===openingTurn){assert((await page.evaluate(()=>G.coach)).includes('1.5배'));await page.keyboard.press('KeyF');await page.keyboard.press('KeyC');if(round===0)await page.screenshot({path:path.join(artifacts,'national-opening.png')})}
-   if(turn===[2,1,3][round])await page.keyboard.press('KeyR');
-   const hpBefore=await page.evaluate(()=>G.hp),damageBefore=await page.evaluate(()=>G.stats.damage);await attack(round!==1&&turn===1?'GOOD':'PERFECT');
-   if(round===0&&turn===1){assert.equal(await page.evaluate(()=>G.enemyMax-G.enemyHp),40);assert.equal(await page.evaluate(()=>G.hp),164);assert((await page.evaluate(()=>G.coach)).includes('PERFECT'))}
-   if(turn===openingTurn)assert.equal(await page.evaluate(()=>G.stats.damage)-damageBefore,297,'Opening stacks with a precise wager before rounding');
-   if(round===0&&turn===2)assert.equal(hpBefore-await page.evaluate(()=>G.hp),42,'Guard halves the exposed strong counter');
-   if(round===2&&turn===3)assert.equal(hpBefore-await page.evaluate(()=>G.hp),48,'Guard halves the champion PERFECT');
-  }
-  assert.equal(await page.evaluate(()=>G.profile.nationalRound),round+1);assert.equal(await page.evaluate(()=>G.profile.provinceRound),3);
-  if(round===2){assert.equal(await page.evaluate(()=>G.checkpoint),'national_reward');const coins=await page.evaluate(()=>G.profile.coins);await page.reload();await page.locator('#load-game').click();await page.waitForFunction(()=>G.state==='dialogue');await dialogue();assert.equal(await page.evaluate(()=>G.profile.coins),coins);await fast()}
-  else {await page.locator('#continue').click();await page.waitForFunction(()=>G.state==='explore')}
-  if(round===0){await visit('bus');await page.getByRole('button',{name:'도 대회장으로 돌아가기'}).click();await page.waitForFunction(()=>G.scene==='province'&&G.state==='explore');await visit('cup');await page.getByRole('button',{name:'전국 대회장으로 이동'}).click();await page.waitForFunction(()=>G.scene==='national'&&G.state==='explore');assert.equal(await page.evaluate(()=>G.profile.nationalRound),1)}
- }
- assert.equal(await page.evaluate(()=>G.profile.coins),2045);await page.keyboard.press('Escape');assert((await page.locator('#menu-body').textContent()).includes('전국 챔피언'));assert((await page.locator('#menu-body').textContent()).includes('대륙 대회 출전권'));await page.locator('#resume').click();
- await visit('cup');await page.getByRole('button',{name:'전 챔피언과 연습 대결 · 보상 없음'}).click();await page.waitForFunction(()=>G.state==='ready');await page.keyboard.press('KeyI');assert(await page.locator('#equip-item').isDisabled());await page.keyboard.press('KeyI');await page.keyboard.press('Escape');await page.locator('#return-title').click();assert.equal(await page.evaluate(()=>G.tasks.length),0);
- // A weak build really loses; earlier wins and the wallet survive retry/reload.
- const weak=P.restore({...profile,nationalEntered:true,nationalRound:1,equipped:'colored_paper',xp:0,coins:77});await seed(weak,'national');await page.waitForFunction(()=>G.state==='explore');await fast();await visit('cup');await page.getByRole('button',{name:/출전/}).click();await dialogue();await page.waitForFunction(()=>G.state==='ready');await attack('BAD');await attack('BAD');assert.equal(await page.evaluate(()=>G.state),'result');assert.equal(await page.evaluate(()=>G.hp),0);assert.equal(await page.evaluate(()=>G.profile.nationalRound),1);assert.equal(await page.evaluate(()=>G.profile.coins),77);
- await page.locator('#continue').click();await page.waitForFunction(()=>G.state==='explore');await visit('cup');await page.getByRole('button',{name:/출전/}).click();await dialogue();await page.waitForFunction(()=>G.state==='ready');await page.locator('#attack').click();await page.locator('#strike').click();await page.keyboard.press('Escape');await page.locator('#return-title').click();assert.equal(await page.evaluate(()=>G.tasks.length),0);
- await page.reload();await page.locator('#load-game').click();await page.waitForFunction(()=>G.state==='explore');assert.equal(await page.evaluate(()=>G.hub),'national');assert.equal(await page.evaluate(()=>G.profile.nationalRound),1);assert.equal(await page.evaluate(()=>G.profile.coins),77);
- // Tampered/old incomplete province profiles cannot enter the next tournament.
- await seed({...profile,provinceRound:2,nationalEntered:true,nationalRound:3},'national');await page.waitForFunction(()=>G.state==='explore');assert.equal(await page.evaluate(()=>G.scene),'province');await page.evaluate(()=>National.travel());assert.equal(await page.evaluate(()=>G.scene),'province');
- await page.keyboard.press('Escape');await page.locator('#return-title').click();await page.locator('#new-game').click();assert.equal(await page.evaluate(()=>G.profile.nationalEntered),false);assert.equal(await page.evaluate(()=>G.profile.nationalRound),0);
- assert.deepEqual(errors,[]);console.log('PASS national entry/migration, introduction reload, keyboard facilities, refining/inventory, training, three fair rounds, opening multiplier and patterns, skills, travel, final reward reload, loss/retry/cancellation, gate and reset');
- }finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});
+const assert=require('node:assert/strict'),{launch,champion}=require('./stage-helpers.cjs');
+(async()=>{const h=await launch(),{page}=h;try{
+ const profile=champion('province',{upgrades:10,xp:36});await h.seed(profile,'province');await h.until(()=>G.state==='explore');await h.fast();
+ await h.visit('cup');await page.locator('#tournament-next').click();let lines=await h.dialogue();assert(lines.some(l=>l.includes('무료 수리')));assert.equal(await page.evaluate(()=>G.checkpoint),'national');
+ await h.until(()=>G.scene==='national'&&G.state==='explore');await h.fast();assert.equal(await page.evaluate(()=>P.upgradeLimit(G.profile)),16);await h.shot('national-hub.png');
+ // 공인 딱지: optional and free. Matches can start without it; taking it is one button and it is never equipped for you.
+ await h.visit('cup');assert(await page.locator('#take-official').isVisible());assert.equal(await page.evaluate(()=>G.profile.owned.includes('official')),false);
+ let board=await h.bracket();assert(board.includes('공인 딱지 선수 vs 도윤 · 예정'),'도윤\'s match is not decided yet');
+ const coins=await page.evaluate(()=>G.profile.coins),equipped=await page.evaluate(()=>G.profile.equipped);
+ await page.locator('#take-official').click();await h.dialogue();await h.until(()=>G.facility==='bracket');assert(await page.evaluate(()=>G.profile.owned.includes('official')));assert.equal(await page.evaluate(()=>G.profile.coins),coins,'Free');assert.equal(await page.evaluate(()=>G.profile.equipped),equipped,'Never forced on');assert.equal(await page.locator('#take-official').count(),0);
+ // Round 1: tape player heals; after the win 도윤 loses to the 공인 딱지 선수 in a separate scene and the bracket shows it.
+ await page.locator('#tournament-prep').click();await page.locator('#match-start').click();lines=await h.dialogue();assert(lines.some(l=>l.startsWith('테이프 딱지 선수')));await h.until(()=>G.state==='ready');
+ await page.evaluate(()=>{G.enemyHp=Math.round(G.enemyMax*.45)});await h.attack('BAD');await h.until(()=>G.state==='ready');assert.equal(await page.evaluate(()=>G.foeHeals),1,'Heals below half');
+ await h.win();lines=await h.dialogue();assert(lines.some(l=>l.includes('내가 익숙한 방식을 끝까지 믿지 못했어')));
+ await h.until(()=>G.state==='result');await page.locator('#continue').click();await h.until(()=>G.facility==='bracket');board=await h.bracket();assert(board.includes('공인 딱지 선수 vs 도윤 → 공인 딱지 선수 승'));
+ assert((await page.locator('#next-opponent').textContent()).includes('공인 딱지 선수'));
+ // Round 2 and the final: 이규격's ruler gag; his moves are not announced.
+ await page.locator('#tournament-prep').click();await page.locator('#match-start').click();await h.dialogue();await h.win();await h.until(()=>G.state==='result');await page.locator('#continue').click();await h.until(()=>G.facility==='bracket');
+ await page.locator('#tournament-prep').click();await page.locator('#match-start').click();lines=await h.dialogue();
+ for(const t of ['접힌 선이 정확히 일치하지 않습니다','허용 오차 이내입니다','오차를 허용한다고요?','백지훈'])assert(lines.some(l=>l.includes(t)),t);
+ await h.until(()=>G.state==='ready');assert((await page.evaluate(()=>G.coach)).includes('다음 수를 알 수 없다'),'이규격 hides his next move');await h.shot('national-final-battle.png');
+ await h.win();assert.equal(await page.evaluate(()=>G.checkpoint),'national_reward');assert((await page.locator('#result-stats').textContent()).includes('융합기 해금'));
+ await page.locator('#continue').click();lines=await h.dialogue();assert(lines.some(l=>l.includes('틀린 접기인 줄 알았는데, 다른 접기였군요')));
+ await h.until(()=>G.scene==='national'&&G.state==='explore');assert(await page.evaluate(()=>P.fusionOpen(G.profile)));assert.equal(await page.evaluate(()=>G.profile.nationalRound),3);
+ // Fusion machine opens after the national title (spec 05 §2-3) and keeps the average compression.
+ await page.evaluate(()=>{G.profile.coins=5000});await h.visit('press');await page.getByRole('button',{name:'융합기',exact:true}).click();await page.getByRole('button',{name:/세 딱지를 하나로/}).click();
+ assert(await page.evaluate(()=>G.profile.owned.includes('fusion')&&G.profile.equipped==='fusion'));
+ // A weak build loses fairly and keeps earlier wins and the wallet.
+ const weak=h.P.restore({...JSON.parse(JSON.stringify(profile)),nationalEntered:true,nationalRound:1,equipped:'colored_paper',xp:0,coins:77});await h.seed(weak,'national');await h.until(()=>G.state==='explore');await h.fast();
+ await h.visit('cup');await page.locator('#tournament-prep').click();await page.locator('#match-start').click();await h.dialogue();await h.lose();await h.dialogue();
+ assert.equal(await page.evaluate(()=>G.profile.nationalRound),1);assert.equal(await page.evaluate(()=>G.profile.coins),77);
+ await page.locator('#result-secondary').click();await h.until(()=>G.facility==='prep');await page.locator('#facility-close').click();
+ await h.reload();await h.until(()=>G.state==='explore');assert.equal(await page.evaluate(()=>G.hub),'national');
+ // Tampered/incomplete province saves cannot enter.
+ await h.seed({...profile,provinceRound:2,nationalEntered:true,nationalRound:3},'national');await h.until(()=>G.state==='explore');assert.equal(await page.evaluate(()=>G.scene),'province');await page.evaluate(()=>National.travel());assert.equal(await page.evaluate(()=>G.scene),'province');
+ assert.deepEqual(h.errors,[]);console.log('PASS national: entry, optional free 공인 딱지, tape heals, 도윤\'s separate loss reflected in the bracket, ruler gag and hidden moves, award and fusion unlock, weak-build loss/retry/reload, gate');
+}finally{await h.close()}})().catch(e=>{console.error(e);process.exit(1)});

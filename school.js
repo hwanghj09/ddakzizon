@@ -1,46 +1,49 @@
 'use strict';
-/* The school loop teaches the same paid upgrade rules used in later hubs. */
+/* Tutorial (spec 04 §4, 06 §5): fold at the home table, practise on an eraser, then the real school rematch.
+   Folding and practice never change stats; the finished ttakji is the same basic newspaper ttakji. */
 const School={
- usesGrowth(){return G.profile.homeUpgradeDone&&['practice','rematch'].includes(G.mode)},
- hud(){setInventory(`신문지 딱지 +${G.profile.upgrades.newspaper} · ${G.profile.coins}원`)},
- homeUpgrade(){
-  cancelScene();G.scene='home';G.mode='home_upgrade';G.fold=4;G.foldAt=G.now-500;G.stolen=false;
-  P.grantHomeAllowance(G.profile);checkpoint('home_upgrade');this.hud();
-  if(G.profile.homeUpgradeDone){this.workbench();return}
-  say([['아빠','딱지 잃었다며? 접기만 해서는 또 쉽게 뒤집힐 수 있어.'],['아빠','보강지를 넣고 이 압축기로 눌러보자. 재료비 40원은 아빠가 줄게.'],['아빠','지금 능력치랑 강화 후 능력치를 보고, 보강하고 압축하기를 골라봐.']],()=>this.workbench())
- },
- workbench(){
-  G.state='home-upgrade';panels('home-workbench');this.hud();this.renderWorkbench();
-  (G.profile.homeUpgradeDone?$('home-practice'):$('home-compress')).focus({preventScroll:true})
- },
- renderWorkbench(){
-  const p=G.profile,done=p.homeUpgradeDone,s=P.stats(p,'newspaper'),before=done?{attack:s.attack-3,hp:s.hp-10}:s,after=done?s:{attack:s.attack+3,hp:s.hp+10};
-  $('home-item-name').textContent=`신문지 딱지 +${p.upgrades.newspaper}`;
-  const preview=$('home-stat-preview');preview.replaceChildren();
-  for(const [label,key] of [['공격력','attack'],['내구도','hp']]){const row=document.createElement('div'),name=document.createElement('span'),value=document.createElement('strong');name.textContent=label;value.textContent=`${before[key]} → ${after[key]}`;row.append(name,value);preview.append(row)}
-  $('home-wallet').textContent=`보유 ${p.coins}원${done?'':` · 재료비 ${P.cost(p)}원`}`;
-  $('home-compress').hidden=done;$('home-compress').disabled=G.state==='home-pressing'||p.coins<P.cost(p);
-  $('home-practice').hidden=!done||G.state==='home-pressing';
-  $('home-upgrade-note').textContent=G.state==='home-pressing'?'꾹… 더 단단하게.':done?'강화 완료 · 같은 타이밍에도 더 강하게 친다.':'보강지를 넣고 납작하게 눌러보자.'
- },
- compress(){
-  if(G.paused||G.state!=='home-upgrade'||!P.upgradeAtHome(G.profile))return;
-  G.state='home-pressing';G.homePressAt=G.now;checkpoint('home_upgrade');sound('fold');this.hud();this.renderWorkbench();
-  after(1200,()=>{sound('perfect');this.workbench()})
- },
- startPractice(){
-  if(G.paused||G.state!=='home-upgrade'||!G.profile.homeUpgradeDone)return;
-  checkpoint('practice');transition(practice)
- },
- configureBattle(){
-  const s=P.stats(G.profile,'newspaper');G.hp=G.maxHp=s.hp;G.focusAvailable=true;
-  document.querySelector('.health-card.player small').textContent=`신문지 딱지 +${G.profile.upgrades.newspaper}`;this.hud()
- },
- practiceIntro(){
-  say([['아빠','자, 강화한 딱지로 세 번만 쳐보자.'],['아빠','F로 집중하면 다음 타이밍 게이지가 천천히 움직여. 한 경기에 한 번 쓸 수 있어.'],['아빠','집중한 다음 스페이스로 들고, 가운데서 한 번 더!']],()=>{panels('battle-hud','combat-controls');ready()})
- },
  offerPractice(){
-  const button=$('result-secondary');button.hidden=false;button.textContent='집에서 더 연습하기';button.onclick=()=>{if(G.paused||G.state!=='result')return;checkpoint('practice');transition(practice)}
+  const button=$('result-secondary');button.hidden=false;button.textContent='집에서 연습';button.onclick=()=>{if(G.paused||G.state!=='result')return;G.state='transition';checkpoint('practice');transition(practice)}
  }
 };
-$('home-compress').onclick=()=>School.compress();$('home-practice').onclick=()=>School.startPractice();
+const foldHints=['왼쪽 위 모서리를 안으로 접자.','오른쪽 아래를 겹쳐 단단하게.','오른쪽 위 모서리를 중앙으로.','마지막 모서리를 틈에 끼워 넣자.','됐다.'];
+function home(){
+ cancelScene();checkpoint('home');G.scene='home';G.mode='folding';G.fold=0;G.foldTry=0;G.foldMiss=0;G.foldAt=G.now;G.stolen=false;G.animation=null;panels();setInventory('◇ 신문지 한 장',false);
+ story('tutorial_fold',()=>{G.state='folding';panels('fold-controls');renderFold()})
+}
+// Every corner button stays usable: a wrong corner still folds (slightly off) so the tutorial can always continue.
+function renderFold(missed=false){
+ $('fold-hint').textContent=missed&&G.fold<4?`조금 어긋났다. 괜찮아, 계속 접자. · ${foldHints[G.fold]}`:foldHints[G.fold];
+ document.querySelectorAll('[data-fold]').forEach((b,i)=>{b.disabled=G.fold>=4;b.classList.toggle('ready',i===G.fold);b.classList.toggle('done',i<G.fold)})
+}
+function foldCorner(index){
+ if(G.state!=='folding'||!Number.isInteger(index)||index<0||index>3||G.fold>=4)return;
+ const missed=index!==G.fold;if(missed)G.foldMiss++;
+ G.state='folding-busy';G.fold++;G.foldAt=G.now;sound('fold');renderFold(missed);
+ after(450,()=>{
+  if(G.fold<4){G.state='folding';document.querySelector(`[data-fold="${G.fold}"]`)?.focus({preventScroll:true});return}
+  // The first attempt always comes out crooked (story beat); the second attempt finishes the ttakji.
+  if(G.foldTry===0){G.foldTry=1;say(TtakjiStory.scenes.tutorial_crooked.lines,()=>{G.fold=0;G.foldAt=G.now;G.state='folding';panels('fold-controls');renderFold();$('game').focus({preventScroll:true})},false,true);return}
+  finishFold()
+ })
+}
+function finishFold(){
+ const p=G.profile;if(!p.schoolReward&&P.phases.indexOf(p.map.phase)<P.phases.indexOf('folded'))p.map.phase='folded';
+ setInventory('◇ 신문지 딱지 × 1');checkpoint('practice');sound('perfect');
+ result('다시, 한 장.','접는 솜씨와 상관없이 같은 신문지 딱지다. 이제 지우개 표적으로 연습해 보자.','연습하기 →',()=>transition(practice),[{value:'신문지 딱지',label:'완성'},{value:G.foldMiss?`${G.foldMiss}번 어긋남`:'반듯하게',label:'두 번째 접기'}])
+}
+function practice(){cancelScene();G.practice=[];G.fold=4;setInventory('◇ 신문지 딱지 × 1');battle('practice')}
+function practiceIntro(){const go=()=>{panels('battle-hud','combat-controls');ready()};if(G.profile.story.seen.tutorial_practice){go();return}story('tutorial_practice',go)}
+// One attack with one gauge stop is the only required lesson; after it the rematch opens even if practice is abandoned.
+function practiceHit(sock){
+ const p=G.profile;if(!p.schoolReward&&P.phases.indexOf(p.map.phase)<P.phases.indexOf('rematch')){p.map.phase='rematch';checkpoint('rematch')}
+ const next=()=>{if(G.practice.length<3){ready();return}flipDemo()};
+ if(sock){after(900,()=>story('practice_sock',()=>{panels('battle-hud','combat-controls');checkpoint(G.checkpoint);next()}));return}
+ after(1250,next)
+}
+function flipDemo(){G.flipEnemy=G.now;sound('flip');sound('win');impact('뒤집기!','PERFECT');after(1100,()=>say(TtakjiStory.scenes.practice_flip.lines,practiceComplete))}
+function practiceComplete(){
+ G.animation=null;const counts=g=>G.practice.filter(x=>x===g).length;if(!G.profile.schoolReward)checkpoint('rematch');sound('perfect');
+ result('이제, 다시 한 판.','연습은 집 연습 표적에서 언제든 다시 할 수 있다. 능력치는 그대로, 손만 익숙해졌다.','학교로 가기 →',()=>transition(()=>Exploration.enter('home',720)),[{value:counts('PERFECT')+counts('GOOD'),label:'좋음 이상'},{value:counts('BAD'),label:'빗나감'},{value:'뒤집기 성공',label:'마무리'}]);
+ const again=$('result-secondary');again.hidden=false;again.textContent='한 번 더 연습';again.onclick=()=>{if(G.paused||G.state!=='result')return;G.state='transition';transition(practice)}
+}

@@ -1,7 +1,8 @@
 'use strict';
 const Forge={
  selected:'balanced',item:null,
- available(){return (['city','province','national','continent','world','planet'].includes(G.scene)&&G.scene===G.hub&&G.profile.cityEntered)||(G.scene==='village'&&G.profile.provinceEntered)},
+ // The refinery opens after the province title (spec 05 §2-3); before that the square shows a 공사 중 sign.
+ available(){return P.refineryOpen(G.profile)&&((['city','province','national','continent','world','planet'].includes(G.scene)&&G.scene===G.hub)||G.scene==='village')},
  visit(){
   if(!this.available()||G.paused||G.state!=='facility')return;
   this.item=null;

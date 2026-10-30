@@ -1,32 +1,48 @@
-const {chromium}=require('playwright'),assert=require('node:assert');
-(async()=>{
- const browser=await chromium.launch(),p=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
- const drain=async()=>{for(let i=0;i<60;i++){const s=await p.evaluate(()=>{if(G.state==='dialogue'){next();next()}return G.state});if(!['dialogue','transition'].includes(s))return s;await p.waitForTimeout(150)}};
- // A national champion save: the continent opens from the national cup desk.
- await p.evaluate(()=>{const q=P.fresh();P.schoolReward(q);for(let i=0;i<3;i++)P.award(q,i);P.enterCity(q);for(let i=0;i<3;i++)P.awardCity(q,i);P.enterProvince(q);for(let i=0;i<3;i++)P.awardProvince(q,i);P.enterNational(q);for(let i=0;i<3;i++)P.awardNational(q,i);q.coins=1600;q.upgrades={newspaper:12,colored_paper:9,hair:16,fusion:0};localStorage.setItem('ddakzizon.campaign.v3',JSON.stringify({version:3,checkpoint:'national',profile:q}))});
- await p.reload();await p.locator('#load-game').click();await drain();
- await p.evaluate(()=>National.open('cup'));await p.locator('.facility-choice',{hasText:'대륙 대회에 도전'}).click();await p.waitForTimeout(600);
- assert.equal(await p.evaluate(()=>G.checkpoint),'continent_intro');await drain();
- assert.deepEqual(await p.evaluate(()=>[G.scene,G.hub,G.profile.continentEntered,P.upgradeLimit(G.profile)]),['continent','continent',true,20]);
- // Fusion: costs 1500, keeps the average compression, equips the result.
- await p.evaluate(()=>Village.open('press'));await p.locator('.facility-choice',{hasText:'융합기'}).click();
- assert.deepEqual(await p.evaluate(()=>[G.profile.coins,G.profile.equipped,G.profile.upgrades.fusion]),[100,'fusion',12]);
- // Reload keeps the tier and the fused ttakji.
- await p.reload();await p.locator('#load-game').click();await drain();
- assert.deepEqual(await p.evaluate(()=>[G.scene,G.profile.owned.includes('fusion')]),['continent',true]);
- // Worn rules: a low-HP opponent can be flipped early; full-HP attacks are unchanged.
- await p.evaluate(()=>Continent.open('cup'));assert(await p.locator('.facility-choice',{hasText:'이야기 먼저'}).count());
- await p.evaluate(()=>{G.profile.journey.stages.continent_0=2;Continent.open('cup')});await p.locator('.facility-choice',{hasText:'8강 출전'}).click();await drain();await p.waitForTimeout(500);
- assert.equal(await p.evaluate(()=>G.mode),'continent_tournament');
- assert.equal(await p.evaluate(()=>Village.strength(G.hp,G.maxHp)),1);
- assert(await p.evaluate(()=>Village.strength(G.hp/2,G.maxHp))<1);
- assert.equal(await p.evaluate(()=>{const r=Math.random;Math.random=()=>0;const f=Village.earlyFlip(10,G.enemyMax,'PERFECT');Math.random=r;return f}),true);
- assert.equal(await p.evaluate(()=>Village.earlyFlip(G.enemyMax,G.enemyMax,'PERFECT')),false);
- // Winning all three rounds of each tier leads to the next one and finally the ???? teaser.
- await p.evaluate(()=>{for(const id of ['continent','world','planet']){P.enterTier(G.profile,id);for(let r=0;r<3;r++)P.awardTier(G.profile,id,r)}Planet.enter()});await drain();
- await p.evaluate(()=>Planet.open('cup'));assert(await p.locator('#facility-content').innerText().then(t=>t.includes('????')));
- // Achievements: the menu tab shows ready rewards and pays each one once.
- await p.keyboard.press('Escape');await p.locator('[data-menu="achievements"]').click();const coins=await p.evaluate(()=>G.profile.coins);
- await p.locator('[data-achievement="planet"]').click();assert.equal(await p.evaluate(()=>G.profile.coins),coins+3000);assert.equal(await p.locator('[data-achievement="planet"]').count(),0);
- assert.deepEqual(errors,[]);await browser.close();console.log('PASS continent entry and reload, fusion machine, worn-ttakji flip and attack rules, world and planet unlocks, ???? teaser, achievements');
-})().catch(e=>{console.error(e);process.exit(1)});
+const assert=require('node:assert/strict'),{launch,champion}=require('./stage-helpers.cjs');
+(async()=>{const h=await launch(),{page}=h;try{
+ const has=(lines,t)=>assert(lines.some(l=>l.includes(t)),t);
+ const next=async()=>{await page.locator('#tournament-prep').click();await page.locator('#match-start').click();return h.dialogue()};
+ // Each stage raises the caps; the test player trains and compresses to them (deterministic wins need a full build).
+ const train=()=>page.evaluate(()=>{const p=G.profile;p.upgrades[p.equipped]=P.upgradeLimit(p);p.xp=P.trainingLimit(p)});
+ const toBracket=async()=>{await h.until(()=>G.state==='result');await page.locator('#continue').click();await h.until(()=>G.facility==='bracket')};
+ // National champion → continent. Intro: 도윤 on the same national team and the translator gag.
+ const profile=champion('national',{item:'fusion',upgrades:14,xp:57});await h.seed(profile,'national');await h.until(()=>G.state==='explore');await h.fast();
+ await h.visit('cup');await page.locator('#tournament-next').click();let lines=await h.dialogue();has(lines,'절대 뒤집어지지 않은 감자');has(lines,'절대 뒤집히지 않는 자');has(lines,'같은 국가 대표');
+ await h.until(()=>G.scene==='continent'&&G.state==='explore');await h.fast();await train();assert.equal(await page.evaluate(()=>P.upgradeLimit(G.profile)),20);await h.shot('continent-hub.png');
+ // Free practice match before the real one: the real opponent's data, no reward, no record.
+ await h.visit('cup');const coins=await page.evaluate(()=>G.profile.coins);await page.locator('#tournament-practice').click();await h.until(()=>G.state==='ready');
+ assert.equal(await page.evaluate(()=>[G.mode,G.opponent.name].join()),'sparring,마리');await h.win();assert.equal(await page.evaluate(()=>[G.profile.coins,G.profile.continentRound].join()),`${coins},0`);
+ await page.locator('#continue').click();await h.until(()=>G.scene==='continent'&&G.state==='explore');await h.fast();
+ // R1 마리, then 도윤 is knocked out elsewhere and helps prepare; the bracket shows it after the scene.
+ await h.visit('cup');assert((await h.bracket()).includes('절대 뒤집히지 않는 자 vs 도윤 · 예정'));lines=await next();has(lines,'식빵 무늬');await h.win();lines=await h.dialogue();has(lines,'네 준비를 도울게');
+ await toBracket();assert((await h.bracket()).includes('절대 뒤집히지 않는 자 vs 도윤 → 절대 뒤집히지 않는 자 승'));
+ // R2 리오: flip rolls apply — a high roll never flips a healthy opponent, a low roll can flip before HP 0.
+ lines=await next();has(lines,'구리색');await h.attack();assert.equal(await page.evaluate(()=>G.flipEnemy),0);assert(await page.evaluate(()=>G.enemyHp>0&&G.enemyHp<G.enemyMax));
+ await page.evaluate(()=>{Math.random=()=>0});await h.attack('BAD');await h.until(()=>G.flipEnemy>0);assert(await page.evaluate(()=>G.enemyHp>0),'Flipped before HP 0 (안정성 4)');await toBracket();await h.fast();
+ // Final 아라 and the award: exchange folds, then the new-standard announcement.
+ lines=await next();has(lines,'접는 방향이 반대');await h.win();await page.locator('#continue').click();lines=await h.dialogue();has(lines,'서로의 접는 법을 바꿔');has(lines,'지정 소재와 형태만');has(lines,'안전 규정');
+ await h.until(()=>G.scene==='continent'&&G.state==='explore');await h.fast();
+ // World: the regulation arc. Equipment stays usable throughout.
+ const equipped=await page.evaluate(()=>G.profile.equipped);await h.visit('cup');await page.locator('#tournament-next').click();lines=await h.dialogue();has(lines,'그럼 내 딱지도 이제 못 쓰는 거야?');has(lines,'처음 널 만났을 때');has(lines,'낡은 첫 딱지');
+ await h.until(()=>G.scene==='world'&&G.state==='explore');await h.fast();await train();await h.shot('world-hub.png');
+ await h.visit('cup');lines=await next();has(lines,'투명 종이');await h.win();lines=await h.dialogue();has(lines,'위험한 재료');await toBracket();
+ lines=await next();has(lines,'공인 딱지만 십 년');await h.win();lines=await h.dialogue();has(lines,'시범 경기와 선수 대표 회의');has(lines,'자동으로 바뀌지는 않습니다');await toBracket();
+ lines=await next();has(lines,'그렇게 구겨진 걸로 여기까지 왔다고?');has(lines,'구겨진 게 아니라 역사가 접힌 거야.');await h.until(()=>G.state==='ready');assert.equal(await page.evaluate(()=>G.profile.equipped),equipped,'Nothing became unusable');
+ await h.win();await page.locator('#continue').click();lines=await h.dialogue();for(const t of ['오늘은 다음 수를 모르겠더라. 오랜만이야.','시험 운영','내가 쟤랑 학교에서 딱지 쳤어!','이겼어?','그건 중요한 게 아니야.','행성 딱지 교류전 초대장','그래서 내가 도 대회에서 잘하라고 했잖아.','도 다음이 행성이에요?'])has(lines,t);
+ await h.until(()=>G.scene==='world'&&G.state==='explore');await h.fast();
+ // Planet: exchange match with the same rules; 반짝's fast gauge respects the 느리게 setting.
+ await h.visit('cup');await page.locator('#tournament-next').click();lines=await h.dialogue();has(lines,'정복전이 아니라 교류전');await h.until(()=>G.scene==='planet'&&G.state==='explore');await h.fast();await train();await h.shot('planet-hub.png');
+ await h.visit('cup');lines=await next();has(lines,'그건 삼각형인데?');has(lines,'우리 행성에서는 딱지가 먼저 생겼다.');await h.win();lines=await h.dialogue();has(lines,'접는 법을 교환');await toBracket();
+ await page.locator('#tournament-prep').click();assert((await page.locator('#facility-content').textContent()).includes('게이지가 평소보다 빠르다'));await page.locator('#match-start').click();await h.dialogue();await h.until(()=>G.state==='ready');
+ await page.locator('#attack').click();assert.equal(await page.evaluate(()=>G.gaugeDuration),1200,'Normal 1500 ms × 0.8');await page.locator('#strike').click();await h.until(()=>['ready','result'].includes(G.state));
+ await page.evaluate(()=>{G.settings.gaugeSpeed='slow'});await page.locator('#attack').click();assert.equal(await page.evaluate(()=>G.gaugeDuration),2200,'느리게 stays slow');await page.locator('#strike').click();
+ await h.win();await toBracket();await page.evaluate(()=>{G.settings.gaugeSpeed='normal'});
+ lines=await next();has(lines,'모두 내 기술을 따라 했다');await h.win();assert.equal(await page.evaluate(()=>G.checkpoint),'planet_reward');
+ await page.locator('#continue').click();lines=await h.dialogue();has(lines,'다시 한 장만.');
+ // The planet title leads into the ending (covered in ending.browser.cjs).
+ assert.equal(await page.evaluate(()=>[G.checkpoint,G.mapZone].join()),'ending,yard');assert.equal(await page.evaluate(()=>P.titles(G.profile).length),7);
+ // Achievements pay once.
+ await page.evaluate(()=>{G.state='explore';panels('explore-ui')});await page.keyboard.press('Escape');await page.locator('[data-menu="achievements"]').click();const before=await page.evaluate(()=>G.profile.coins);
+ await page.locator('[data-achievement="planet"]').click();assert.equal(await page.evaluate(()=>G.profile.coins),before+3000);assert.equal(await page.locator('[data-achievement="planet"]').count(),0);
+ assert.deepEqual(h.errors,[]);console.log('PASS continent/world/planet: intros and gags, free practice match, 도윤 knocked out and helping, flip rolls, folds exchange, new-standard and regulation arc with equipment kept, 반짝 gauge vs setting, planet title into the ending, achievements');
+}finally{await h.close()}})().catch(e=>{console.error(e);process.exit(1)});

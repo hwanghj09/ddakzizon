@@ -1,45 +1,39 @@
-const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),P=require('../progression.js');
-const artifacts=process.env.ARTIFACT_DIR||path.join(require('node:os').tmpdir(),'ddakzizon-checks');fs.mkdirSync(artifacts,{recursive:true});
-(async()=>{const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||(fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});try{
- const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
- const profile=require('./prepared-profile.cjs')(P.fresh());P.schoolReward(profile);for(let i=0;i<3;i++)P.award(profile,i);P.enterCity(profile);for(let i=0;i<3;i++)P.awardCity(profile,i);P.equip(profile,'hair');for(let i=0;i<4;i++)P.upgrade(profile);profile.xp=6;delete profile.provinceEntered;delete profile.provinceRound;
- const seed=async(profile,checkpoint)=>{await page.evaluate(({profile,checkpoint})=>localStorage.setItem('ddakzizon.campaign.v3',JSON.stringify({version:3,checkpoint,profile})),{profile,checkpoint});await page.reload();await page.locator('#load-game').click()};
- const fast=async()=>page.evaluate(()=>{const original=update;update=dt=>original(dt*(G.state==='explore'?1:6));TtakjiRules.positionAt=()=>.5;Math.random=()=>.5});
- const dialogue=async()=>{for(let i=0;i<100;i++){const state=await page.evaluate(()=>G.state);if(state==='dialogue')await page.locator('#next').click();else if(state==='transition')await page.waitForTimeout(60);else return}throw Error('Unfinished dialogue')};
- const visit=async(id)=>{await page.waitForFunction(()=>G.state==='explore');await page.evaluate(id=>Village.hub().open(id),id);await page.waitForFunction(()=>G.state==='facility')}; // Walking and entrances are covered in exploration.browser.cjs.
-
- const attack=async(grade='PERFECT')=>{await page.evaluate(grade=>{TtakjiRules.positionAt=()=>grade==='PERFECT'?.5:grade==='GOOD'?.35:0},grade);await page.locator('#attack').click();await page.locator('#strike').click();await page.waitForFunction(()=>['ready','result'].includes(G.state))};
- await seed(profile,'city');await page.waitForFunction(()=>G.state==='explore');await fast();await visit('cup');await page.getByRole('button',{name:'도 대회에 도전',exact:true}).click();await page.waitForFunction(()=>G.state==='dialogue');assert.equal(await page.evaluate(()=>G.checkpoint),'province_intro');
- await page.reload();await page.locator('#load-game').click();await page.waitForFunction(()=>G.state==='dialogue');await dialogue();await page.waitForFunction(()=>G.scene==='province'&&G.state==='explore');await fast();assert.equal(await page.evaluate(()=>P.upgradeLimit(G.profile)),12);assert.equal(await page.evaluate(()=>P.trainingLimit(G.profile)),45);await page.screenshot({path:path.join(artifacts,'province-hub.png')});
- await visit('press');await page.getByRole('button',{name:/압축하기/}).click();assert.equal(await page.evaluate(()=>G.profile.upgrades.hair),5);await page.getByRole('button',{name:'제련소 · 형태 가공'}).click();await dialogue();await page.locator('[data-form="striker"]').click();await page.locator('#forge-apply').click();assert.equal(await page.evaluate(()=>G.checkpoint),'province');
- await page.keyboard.press('KeyI');await page.locator('[data-item="newspaper"]').click();await page.locator('#equip-item').click();await page.locator('[data-item="hair"]').click();await page.locator('#equip-item').click();await page.keyboard.press('KeyI');assert((await page.locator('#facility-content').textContent()).includes('머리카락'));await page.keyboard.press('KeyE');
- await visit('training');await page.getByRole('button',{name:'타이밍 훈련 · 3번 치기'}).click();await page.waitForFunction(()=>G.state==='ready');for(let i=0;i<3;i++)await attack();await page.locator('#continue').click();await page.waitForFunction(()=>G.scene==='province'&&G.state==='explore');assert.equal(await page.evaluate(()=>G.profile.coins),215);
- for(let round=0;round<3;round++){
-  await visit('cup');await page.getByRole('button',{name:/출전/}).click();await dialogue();await page.waitForFunction(()=>G.state==='ready');assert.equal(await page.evaluate(()=>G.maxHp),155);
-  if(round===2)await page.screenshot({path:path.join(artifacts,'province-final-battle.png')});
-  for(let turn=1;turn<=12&&await page.evaluate(()=>G.state!=='result');turn++){
-   await page.locator('#game').focus();if(turn===2){await page.keyboard.press('KeyF');await page.keyboard.press('KeyC')}
-   if((round===1&&turn===1)||(round!==1&&turn===2))await page.keyboard.press('KeyR');
-   const hpBefore=await page.evaluate(()=>G.hp);await attack(round!==1&&turn===1?'GOOD':'PERFECT');
-   if(round===0&&turn===1)assert.equal(await page.evaluate(()=>G.enemyMax-G.enemyHp),33,'Wall halves GOOD');
-   if(round===0&&turn===2)assert.equal(await page.evaluate(()=>G.enemyMax-G.enemyHp),198,'PERFECT wager pierces wall');
-   if(round===1&&turn===1){assert.equal(await page.evaluate(()=>G.hp),119);assert((await page.evaluate(()=>G.coach)).includes('BAD'))}
-   if(round===1&&turn===2)assert.equal(hpBefore-await page.evaluate(()=>G.hp),18,'Announced weak counter is BAD');
-   if(round===2&&turn===2)assert.equal(hpBefore-await page.evaluate(()=>G.hp),40,'Guard halves the champion strong counter');
-  }
-  assert.equal(await page.evaluate(()=>G.profile.provinceRound),round+1);assert.equal(await page.evaluate(()=>G.profile.cityRound),3);
-  if(round===2){assert.equal(await page.evaluate(()=>G.checkpoint),'province_reward');const coins=await page.evaluate(()=>G.profile.coins);await page.reload();await page.locator('#load-game').click();await page.waitForFunction(()=>G.state==='dialogue');await dialogue();assert.equal(await page.evaluate(()=>G.profile.coins),coins);await fast()}
-  else {await page.locator('#continue').click();await page.waitForFunction(()=>G.state==='explore')}
-  if(round===0){await visit('bus');await page.getByRole('button',{name:'시 대회장으로 돌아가기'}).click();await page.waitForFunction(()=>G.scene==='city'&&G.state==='explore');await visit('cup');await page.getByRole('button',{name:'도 대회장으로 이동'}).click();await page.waitForFunction(()=>G.scene==='province'&&G.state==='explore');assert.equal(await page.evaluate(()=>G.profile.provinceRound),1)}
- }
- assert.equal(await page.evaluate(()=>G.profile.coins),1155);await page.keyboard.press('Escape');assert((await page.locator('#menu-body').textContent()).includes('도 대회 챔피언'));assert((await page.locator('#menu-body').textContent()).includes('전국 대회 출전권'));await page.locator('#resume').click();
- await visit('cup');await page.getByRole('button',{name:'전 챔피언과 연습 대결 · 보상 없음'}).click();await page.waitForFunction(()=>G.state==='ready');await page.keyboard.press('KeyI');assert(await page.locator('#equip-item').isDisabled());await page.keyboard.press('KeyI');await page.keyboard.press('Escape');await page.locator('#return-title').click();assert.equal(await page.evaluate(()=>G.tasks.length),0);
- // A weak build really loses; earlier wins and the wallet survive retry/reload.
- const weak=P.restore({...profile,provinceEntered:true,provinceRound:1,equipped:'colored_paper',xp:0,coins:77});await seed(weak,'province');await page.waitForFunction(()=>G.state==='explore');await fast();await visit('cup');await page.getByRole('button',{name:/출전/}).click();await dialogue();await page.waitForFunction(()=>G.state==='ready');await attack('BAD');await attack('BAD');assert.equal(await page.evaluate(()=>G.state),'result');assert.equal(await page.evaluate(()=>G.hp),0);assert.equal(await page.evaluate(()=>G.profile.provinceRound),1);assert.equal(await page.evaluate(()=>G.profile.coins),77);
- await page.locator('#continue').click();await page.waitForFunction(()=>G.state==='explore');await visit('cup');await page.getByRole('button',{name:/출전/}).click();await dialogue();await page.waitForFunction(()=>G.state==='ready');await page.locator('#attack').click();await page.locator('#strike').click();await page.keyboard.press('Escape');await page.locator('#return-title').click();assert.equal(await page.evaluate(()=>G.tasks.length),0);
- await page.reload();await page.locator('#load-game').click();await page.waitForFunction(()=>G.state==='explore');assert.equal(await page.evaluate(()=>G.hub),'province');assert.equal(await page.evaluate(()=>G.profile.provinceRound),1);assert.equal(await page.evaluate(()=>G.profile.coins),77);
- // Tampered/old incomplete city profiles cannot enter the next tournament.
- await seed({...profile,cityRound:2,provinceEntered:true,provinceRound:3},'province');await page.waitForFunction(()=>G.state==='explore');assert.equal(await page.evaluate(()=>G.scene),'city');await page.evaluate(()=>Province.travel());assert.equal(await page.evaluate(()=>G.scene),'city');
- await page.keyboard.press('Escape');await page.locator('#return-title').click();await page.locator('#new-game').click();assert.equal(await page.evaluate(()=>G.profile.provinceEntered),false);assert.equal(await page.evaluate(()=>G.profile.provinceRound),0);
- assert.deepEqual(errors,[]);console.log('PASS province entry/migration, introduction reload, keyboard facilities, refining/inventory, training, three fair rounds and patterns, skills, travel, final reward reload, loss/retry/cancellation, gate and reset');
- }finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});
+const assert=require('node:assert/strict'),{launch,champion}=require('./stage-helpers.cjs');
+(async()=>{const h=await launch(),{page,P}=h;try{
+ // City champion → 도 대회 from the city bracket. The intro is checkpointed and survives a reload.
+ const profile=champion('city',{upgrades:6,xp:24});await h.seed(profile,'city');await h.until(()=>G.state==='explore');await h.fast();
+ await h.visit('cup');await page.locator('#tournament-next').click();await h.until(()=>G.state==='dialogue');assert.equal(await page.evaluate(()=>G.checkpoint),'province_intro');
+ await h.reload();await h.until(()=>G.state==='dialogue');let lines=await h.dialogue();assert(lines.some(l=>l.includes('압축 챔피언십')));
+ await h.until(()=>G.scene==='province'&&G.state==='explore');await h.fast();assert.equal(await page.evaluate(()=>P.upgradeLimit(G.profile)),12);await h.shot('province-hub.png');
+ // Common bracket: next opponent with a hint, the other entrants, prep with the 공격형 / 방어형 choice (nothing forced).
+ await h.visit('cup');assert.equal(await page.evaluate(()=>G.facility),'bracket');assert((await page.locator('#next-opponent').textContent()).includes('상자왕'));assert((await h.bracket()).includes('두께왕 민철'));
+ await page.locator('#tournament-prep').click();await h.until(()=>G.facility==='prep');assert(await page.locator('#prep-choice').isVisible());
+ const before=await page.evaluate(()=>G.profile.equipped);const defense=page.locator('#prep-choice button[data-form="defense"]');
+ if(!await defense.isDisabled()){await defense.click();assert.notEqual(await page.evaluate(()=>G.profile.equipped),before,'One tap equips the 방어형 pick');await page.evaluate(id=>{P.equip(G.profile,id);Tournament.refresh()},before)}
+ // Round 1: 박태풍's letter comes first, once. 상자왕 teaches 꾹 눌러 펴기 after the win.
+ await page.locator('#match-start').click();lines=await h.dialogue();assert(lines.some(l=>l.includes('(편지)')),'Letter before the first match');assert(lines.some(l=>l.startsWith('상자왕')));
+ await h.until(()=>G.state==='ready');assert((await page.evaluate(()=>G.coach)).includes('방어'),'상자왕 guards on odd turns');assert.equal(await page.evaluate(()=>G.foe.defense),22);
+ await h.win();assert.equal(await page.evaluate(()=>G.profile.provinceRound),1);assert((await page.locator('#result-stats').textContent()).includes('꾹 눌러 펴기'));
+ assert.equal(await page.evaluate(()=>G.checkpoint),'province_skill');await page.locator('#continue').click();lines=await h.dialogue();assert(lines.some(l=>l.includes('F를 누르면 꾹 눌러 펴기')));
+ await h.until(()=>G.facility==='bracket');assert.deepEqual(await page.evaluate(()=>G.profile.skills),['precise','smash','press']);assert((await h.bracket()).includes('승리'));
+ // Round 2: 최단단 — floor dent and weighing gag, then the 'strong ≠ thick' lesson.
+ await page.locator('#tournament-prep').click();await page.locator('#match-start').click();lines=await h.dialogue();assert(lines.some(l=>l.includes('내 딱지는 절대 안 뒤집힌다!')));assert(lines.some(l=>l.includes('무게부터 재겠습니다')));assert(!lines.some(l=>l.includes('(편지)')),'The letter never repeats');
+ await h.until(()=>G.state==='ready');assert.equal(await page.evaluate(()=>G.foe.stability),0);await h.win();lines=await h.dialogue();assert(lines.some(l=>l.includes('무조건 두껍거나 무거운 딱지는 아니다')));
+ await h.until(()=>G.state==='result');await page.locator('#continue').click();await h.until(()=>G.facility==='bracket');
+ // Final: a loss keeps progress and wallet and offers retry/prep; then the win and the award story (reload-safe).
+ await page.locator('#tournament-prep').click();await page.locator('#match-start').click();lines=await h.dialogue();assert(lines.some(l=>l.includes('네 손은 얼마나 믿어')));
+ const coins=await page.evaluate(()=>G.profile.coins);await h.lose();lines=await h.dialogue();assert(lines.some(l=>l.includes('타이밍은 딱지가')));
+ assert.equal(await page.evaluate(()=>G.profile.provinceRound),2);assert.equal(await page.evaluate(()=>G.profile.coins),coins);assert.equal(await page.locator('#continue').textContent(),'재도전 →');assert(await page.locator('#result-secondary').isVisible());
+ await page.locator('#continue').click();await h.until(()=>['ready','dialogue'].includes(G.state));assert.equal(await h.state(),'ready','Retry skips the seen intro');
+ await h.win();assert.equal(await page.evaluate(()=>G.checkpoint),'province_reward');assert.equal(await page.evaluate(()=>G.profile.coins),coins+600);
+ await h.reload();await h.until(()=>G.state==='dialogue');lines=await h.dialogue();for(const t of ['좋은 딱지를 믿는 만큼 네 손도 믿어','잘했다. TV에 내 머리 정수리만 나왔다.'])assert(lines.some(l=>l.includes(t)),t);
+ await h.until(()=>G.scene==='province'&&G.state==='explore');assert.equal(await page.evaluate(()=>G.profile.coins),coins+600,'Reload never pays twice');assert(await page.evaluate(()=>P.refineryOpen(G.profile)));
+ // After the title: free replays for the smaller repeat prize, the next stage, the menu line.
+ await h.fast();await h.visit('cup');assert.equal(await page.locator('[data-replay]').count(),3);assert((await page.locator('#tournament-next').textContent()).includes('전국 대회에 도전'));
+ const wallet=await page.evaluate(()=>G.profile.coins);await page.locator('[data-replay="0"]').click();await page.locator('#match-start').click();await h.until(()=>G.state==='ready');await h.win();
+ assert.equal(await page.locator('#result-title').textContent(),'자유 경기 승리!');assert.equal(await page.evaluate(()=>G.profile.coins),wallet+40);await page.locator('#continue').click();await h.until(()=>G.facility==='bracket');
+ await page.keyboard.press('Escape');await page.keyboard.press('Escape');const menu=await page.locator('#menu-body').textContent();assert(menu.includes('도 대회 챔피언'));assert(menu.includes('전국 대회 출전권'));await page.locator('#resume').click();
+ // Tampered/incomplete city saves cannot enter; a new game starts clean.
+ await h.seed({...profile,cityRound:2,provinceEntered:true,provinceRound:3},'province');await h.until(()=>G.state==='explore');assert.equal(await page.evaluate(()=>G.scene),'city');await page.evaluate(()=>Province.travel());assert.equal(await page.evaluate(()=>G.scene),'city');
+ assert.deepEqual(h.errors,[]);console.log('PASS province: entry and intro reload, common bracket with entrants, 공격형/방어형 prep choice, letter once, 꾹 눌러 펴기 lesson, 최단단 gag and lesson, fair loss/retry, award reload without double pay, refinery, free replay, menu, gate');
+}finally{await h.close()}})().catch(e=>{console.error(e);process.exit(1)});

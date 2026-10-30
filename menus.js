@@ -4,13 +4,13 @@ window.GameMenu={
  view:'overview', selected:null,
  setInert(value){for(const child of $('game').children)if(child.id!=='pause-screen')child.inert=value},
  release(){this.setInert(false);this.selected=null},
- owned(){return !G.profile.schoolReward&&(G.stolen||G.checkpoint==='home'||G.profile.map.phase==='lost'&&!G.profile.homeUpgradeDone)?[]:G.profile.owned},
- canEquip(){return G.profile.schoolReward&&['village','city','province','national','continent','world','planet'].includes(G.scene)&&['explore','facility'].includes(G.state)},
+ owned(){return !G.profile.schoolReward&&(G.stolen||G.checkpoint==='home'||G.profile.map.phase==='lost')?[]:G.profile.owned},
+ canEquip(){return G.profile.schoolReward&&['village',...P.stageIds].includes(G.scene)&&['explore','facility'].includes(G.state)},
  icon(id,state='inventory'){const img=spriteImg(document.createElement('img'),id,state);img.alt='';return img},
  el(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el},
  button(text,action,className='menu-secondary'){const b=this.el('button',className,text);b.onclick=action;return b},
  show(view='overview'){
-  const names={map:'동네 지도',journal:'이야기 수첩',achievements:'도전 과제',overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
+  const names={map:'동네 지도',journal:'이야기 수첩',story:'이야기 다시 보기',achievements:'도전 과제',overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
   if(!names[view])return;this.view=view;$('menu-view-title').textContent=names[view];$('menu-message').textContent='';
   document.querySelectorAll('[data-menu]').forEach(b=>{const active=b.dataset.menu===view;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
   const ready=P.claimable(G.profile).length,tab=document.querySelector('[data-menu="achievements"]');if(tab)tab.textContent=ready?`도전 과제 · ${ready}`:'도전 과제';
@@ -23,10 +23,12 @@ window.GameMenu={
   const p=G.profile,owned=this.owned(),card=this.el('div','equipped-summary');
   if(owned.length){card.append(this.icon(p.equipped));const copy=this.el('div');copy.append(this.el('span','menu-eyebrow','장착 딱지'),this.el('h4','',P.items[p.equipped].name),this.el('p','',`강화 +${p.upgrades[p.equipped]} · ${P.forms[P.formOf(p)].name}`));card.append(copy)}else card.append(this.el('p','','지금은 가진 딱지가 없다.'));
   body.append(card);const progress=this.el('div','menu-progress');
-  const tier=['planet','world','continent'].map(id=>Tiers[id]).find(t=>p[`${t.id}Entered`]);
-  const current=tier?(tier.round()===3?`${tier.name.replace(' 대회','')} 챔피언`:`${tier.name} · ${tier.opponents()[tier.round()].title}`):p.nationalEntered?(p.nationalRound===3?'전국 챔피언':`전국 대회 · ${P.nationalOpponents[p.nationalRound].title}`):p.provinceEntered?(p.provinceRound===3?'도 대회 챔피언':`도 대회 · ${P.provinceOpponents[p.provinceRound].title}`):p.cityEntered?(p.cityRound===3?'시 대회 챔피언':`시 대회 · ${P.cityOpponents[p.cityRound].title}`):p.schoolReward?(p.round===3?'마을 챔피언':`마을 대회 · ${P.opponents[p.round].title}`):({school:'학교에서 첫 대결',home:'새 딱지 접기',home_upgrade:'집에서 딱지 강화',practice:'타이밍 연습',rematch:'학교 재대결',complete:'마을 대회로'}[G.checkpoint]||'학교');
-  progress.append(this.el('span','menu-eyebrow','현재 여정'),this.el('h4','',current));if(p.schoolReward)progress.append(this.el('p','',tier?(tier.round()===3?`${tier.name} 우승 · ${tier.id==='planet'?'다음 무대 ????':'다음 대회 출전권 획득'}`:`다음 상대 · ${tier.opponents()[tier.round()].name}`):p.nationalEntered?(p.nationalRound===3?'대륙 대회 출전권 획득':`다음 상대 · ${P.nationalOpponents[p.nationalRound].name}`):p.provinceEntered?(p.provinceRound===3?'전국 대회 출전권 획득':`다음 상대 · ${P.provinceOpponents[p.provinceRound].name}`):p.cityEntered?(p.cityRound===3?'도 대회 출전권 획득':`다음 상대 · ${P.cityOpponents[p.cityRound].name}`):p.round===3?'다음 목표 · 시 대회':`다음 상대 · ${P.opponents[p.round].name}`));body.append(progress);
-  const metrics=this.el('div','menu-metrics');for(const [label,value] of [['보유금',`${p.coins}원`],['선수',`Lv.${P.level(p)+1}`],['보유 딱지',`${owned.length}개`]]){const tile=this.el('div');tile.append(this.el('small','',label),this.el('strong','',value));metrics.append(tile)}body.append(metrics);
+  // The latest entered tournament decides the current journey line.
+  const t=[...P.tournaments].reverse().find(x=>x.entered(p)),round=t?p[t.field]:0,won=t&&round===t.opponents.length,next=t&&P.tournaments[P.tournaments.indexOf(t)+1];
+  const current=t?(won?Tournament.stages[t.id].champion:`${t.stage} · ${t.opponents[round].title}`):p.schoolReward?`마을 대회 · ${P.opponents[0].title}`:({school:'학교에서 첫 대결',lost:'집으로 돌아가기',folded:'지우개 표적 연습',rematch:'학교 재대결'}[p.map.phase]||'학교');
+  progress.append(this.el('span','menu-eyebrow','현재 여정'),this.el('h4','',current));
+  if(p.schoolReward)progress.append(this.el('p','',!t?'다음 상대 · 앞집 아저씨':!won?`다음 상대 · ${t.opponents[round].name}`:t.id==='village'?'다음 목표 · 시 대회':next?`${next.stage} 출전권 획득`:p.story.ending?'자유 경기 · 다음 무대 ????':'운동장으로 돌아가자'));body.append(progress);
+  const metrics=this.el('div','menu-metrics');for(const [label,value] of [['보유금',`${p.coins}원`],['선수',`${heroName()} · Lv.${P.level(p)+1}`],['보유 딱지',`${owned.length}개`]]){const tile=this.el('div');tile.append(this.el('small','',label),this.el('strong','',value));metrics.append(tile)}body.append(metrics);
   body.append(this.el('p','save-note',G.storageOK?'획득·강화·진행은 자동 저장됩니다. 이어서 하기는 마지막 진행 지점부터 시작합니다.':'이 브라우저에서는 저장하지 못했습니다. 현재 플레이는 계속할 수 있습니다.'))
  },
  inventory(body){
@@ -37,13 +39,15 @@ window.GameMenu={
   const layout=this.el('div','inventory-layout'),grid=this.el('div','item-grid');grid.setAttribute('role','group');grid.setAttribute('aria-label','보유 딱지');
   for(const id of owned){const item=P.items[id],b=this.button('',()=>this.select(id),'item-slot');b.dataset.item=id;b.setAttribute('aria-label',`${item.name} +${p.upgrades[id]}${id===p.equipped?' 장착 중':''}`);b.setAttribute('aria-pressed',String(id===this.selected));b.classList.toggle('selected',id===this.selected);b.append(this.icon(id),this.el('span','item-name',item.name),this.el('small','item-level',`+${p.upgrades[id]}`));if(id===p.equipped)b.append(this.el('span','equipped-badge','장착'));grid.append(b)}
   for(let i=owned.length;i<6;i++){const slot=this.el('div','item-slot vacant');slot.setAttribute('aria-hidden','true');grid.append(slot)}
-  const detail=this.el('div','item-detail');detail.id='item-detail';layout.append(grid,detail);body.append(layout);if(Object.values(p.map.materials).some(n=>n>0))body.append(this.el('p','',`보유 재료 · 신문지 ${p.map.materials.newspaper}장 / 색종이 ${p.map.materials.colored_paper}장`));this.renderDetail()
+  const detail=this.el('div','item-detail');detail.id='item-detail';layout.append(grid,detail);
+  // Keepsakes and materials sit above the collection so the sticky detail panel stays in view at the bottom of a long list.
+  if(Object.values(p.map.materials).some(n=>n>0))body.append(this.el('p','',`보유 재료 · 신문지 ${p.map.materials.newspaper}장 / 색종이 ${p.map.materials.colored_paper}장`));this.keepsakes(body);body.append(layout);this.renderDetail()
  },
  select(id){this.selected=id;document.querySelectorAll('[data-item]').forEach(b=>{b.classList.toggle('selected',b.dataset.item===id);b.setAttribute('aria-pressed',String(b.dataset.item===id))});this.renderDetail()},
  renderDetail(){
   const id=this.selected,p=G.profile,item=P.items[id],stats=P.stats(p,id),equipped=P.stats(p),detail=$('item-detail');detail.replaceChildren();
   const art=this.icon(id,'base');art.className='item-art';detail.append(art,this.el('h4','',item.name),this.el('span','menu-eyebrow',`강화 +${p.upgrades[id]} / ${P.upgradeLimit(p)} · ${P.forms[P.formOf(p,id)].name}`),this.el('p','item-description',item.description));
-  const list=this.el('dl','item-stats');for(const [key,label] of [['attack','공격력'],['hp','최대 내구도'],['concentration','집중']]){const row=this.el('div'),value=this.el('dd','',String(stats[key])),delta=stats[key]-equipped[key];row.append(this.el('dt','',label));if(id!==p.equipped&&delta!==0)value.append(this.el('span',delta>0?'stat-up':'stat-down',` ${delta>0?'+':''}${delta}`));row.append(value);list.append(row)}detail.append(list);
+  const list=this.el('dl','item-stats');for(const [key,label] of [['attack','공격력'],['defense','방어력'],['stability','안정성'],['hp','최대 내구도'],['concentration','집중력']]){const row=this.el('div'),value=this.el('dd','',String(stats[key])),delta=stats[key]-equipped[key];row.append(this.el('dt','',label));if(id!==p.equipped&&delta!==0)value.append(this.el('span',delta>0?'stat-up':'stat-down',` ${delta>0?'+':''}${delta}`));row.append(value);list.append(row)}detail.append(list);
   const can=this.canEquip();const b=this.button(id===p.equipped?'장착 중':can?'이 딱지 장착':'경기 밖에서 장착 가능',()=>this.equip(),'menu-primary');b.id='equip-item';b.disabled=id===p.equipped||!can;detail.append(b);
   if(!can)detail.append(this.el('p','item-restriction',G.scene==='battle'?'경기 중에는 딱지를 바꿀 수 없다.':'마을이나 대회장에서 딱지를 바꿀 수 있다.'))
  },
@@ -51,7 +55,7 @@ window.GameMenu={
   const id=this.selected;if(!G.paused||!this.canEquip()||!P.equip(G.profile,id))return;
   checkpoint(Village.hubCheckpoint());Village.hud();
   // Keep the facility underneath current if its preview depends on equipment.
-  if(G.state==='facility'){if(G.facility!=='map')Village.hub().open(G.facility)}
+  if(G.state==='facility'){if(['bracket','prep'].includes(G.facility))Tournament.refresh();else if(!['map','select'].includes(G.facility))Village.hub().open(G.facility)}
   this.show('inventory');$('menu-message').textContent=`${P.items[id].name} 장착 완료`;sound('click')
  },
  journal(body){
@@ -76,17 +80,25 @@ window.GameMenu={
   }
  },
  player(body){
-  const p=G.profile,s=P.stats(p),header=this.el('div','player-summary');header.append(this.el('span','player-avatar',''),this.el('h4','',`선수 Lv.${P.level(p)+1}`),this.el('p','',`타격 보너스 +${P.level(p)*2} · 집중 ${s.concentration}`));body.append(header);
+  const p=G.profile,s=P.stats(p),header=this.el('div','player-summary');header.append(this.el('span','player-avatar',''),this.el('h4','',`${heroName()} · 선수 Lv.${P.level(p)+1}`),this.el('p','',`힘 ${s.strength} · 집중력 ${s.concentration} · 타이밍 구간 +${Math.round((R.zones(s.concentration).normal/R.zones(0).normal-1)*100)}%`));body.append(header);
   const meter=this.el('progress');meter.max=P.trainingLimit(p);meter.value=p.xp;meter.setAttribute('aria-label','선수 훈련 성장');body.append(meter,this.el('p','',p.xp>=P.trainingLimit(p)?'현재 훈련 숙련 완료':`훈련 ${p.xp}/${P.trainingLimit(p)} · 다음 성장까지 ${3-p.xp%3}회`));
-  const focusUnlocked=p.schoolReward||(p.homeUpgradeDone&&G.checkpoint==='practice')||['rematch','complete','village','village_reward'].includes(G.checkpoint);
-  for(const [name,key,unlocked,desc,unlock] of [['집중','F',focusUnlocked,'한 경기 한 번, 다음 타이밍 게이지가 느려진다.','학교 연습 후 습득'],['뿌리 버티기','R',p.guardUnlocked,'한 경기 한 번, 다음에 받는 피해를 절반으로 줄인다.','마을 대회 우승 후 습득'],['승부수','C',p.powerUnlocked,'다음 공격 GOOD 이상은 1.5배, BAD는 절반. 한 경기 한 번.','시 대회 첫 승리 후 습득']]){const card=this.el('div',`skill-card${unlocked?'':' locked'}`);const title=this.el('h4','',name);title.append(this.el('kbd','',unlocked?key:'잠김'));card.append(title,this.el('p','',unlocked?desc:unlock));body.append(card)}
+  for(const [id,desc,unlock] of [['precise','피해 0.8배, 이번 타격의 뒤집기 확률 +15%p. 쿨타임 3턴.','마을 대회 우승 시 박태풍에게 배움'],['smash','피해 1.4배, 타이밍 구간이 좁아진다. 쿨타임 3턴.','시 대회 첫 승리 후 코치에게 배움'],['press','최대 내구도의 15% 회복. 공격과 뒤집기 판정 없음. 경기당 1회.','도 대회 첫 승리 후 상자왕에게 배움']]){const unlocked=P.hasSkill(p,id),card=this.el('div',`skill-card${unlocked?'':' locked'}`),title=this.el('h4','',R.skills[id].name);title.append(this.el('kbd','',unlocked?R.skills[id].key:'잠김'));card.append(title,this.el('p','',unlocked?desc:unlock));body.append(card)}
+ },
+ // Story keepsakes are not ttakji: the newspaper scrap and the 표창장 (until it is folded into a ttakji).
+ keepsakes(body){const k=G.profile.keepsakes,list=[k.scrap&&['신문 조각','첫 패배 때 주운 같은 신문의 남은 조각. 집 식탁 위에 있다.'],k.award&&['표창장','마을 대회 우승 표창장. 집 식탁에서 표창장 딱지 재료로 쓸 수 있다.'],...P.titles(G.profile).filter(id=>id!=='village').length?[['트로피',`집 선반에 ${P.titles(G.profile).length}개 · 경기 능력치에는 영향 없음`]]:[]].filter(Boolean);if(!list.length)return;const box=this.el('section','keepsakes');box.id='keepsakes';box.append(this.el('h4','','보관품'));for(const [name,desc] of list){const row=this.el('p');row.append(this.el('strong','',name),document.createTextNode(` · ${desc}`));box.append(row)}body.append(box)},
+ // 다시 보기: seen main story scenes replay from the menu without touching progress.
+ story(body){
+  const seen=TtakjiStory.replayOrder.filter(id=>G.profile.story.seen[id]),can=this.canEquip()&&G.state==='explore';
+  body.append(this.el('p','',seen.length?`본 장면 ${seen.length}개 · 마을 게시판에서도 다시 볼 수 있다.`:'아직 다시 볼 이야기가 없다.'));
+  for(const id of seen){const b=this.button(TtakjiStory.scenes[id].title,()=>{if(!this.canEquip()||G.state!=='explore')return;unpause();replayScene(id,()=>{G.state='explore';panels('explore-ui');updateInteract();$('game').focus({preventScroll:true})})},'journey-entry');b.dataset.scene=id;b.disabled=!can;body.append(b)}
+  if(seen.length&&!can)body.append(this.el('p','item-restriction','마을이나 대회장을 걷고 있을 때 다시 볼 수 있다.'))
  },
  settings(body){
   const soundButton=this.button('',()=>{toggleSound();this.show('settings')});soundButton.id='menu-sound';soundButton.setAttribute('aria-pressed',String(G.sound));soundButton.textContent=`게임 소리 · ${G.sound?'켜짐':'꺼짐'}`;
-  const screen=this.button(document.fullscreenElement?'전체 화면 나가기':'전체 화면으로',async()=>{await $('fullscreen').onclick();if(G.paused&&this.view==='settings')this.show('settings')});screen.id='menu-fullscreen';body.append(soundButton,screen,this.button(`목적지 안내 · ${G.profile.map.guidance?'켜짐':'꺼짐'}`,()=>{G.profile.map.guidance=!G.profile.map.guidance;checkpoint(G.checkpoint);this.show('settings')}))
+  const screen=this.button(document.fullscreenElement?'전체 화면 나가기':'전체 화면으로',async()=>{await $('fullscreen').onclick();if(G.paused&&this.view==='settings')this.show('settings')});screen.id='menu-fullscreen';body.append(soundButton,screen,this.button(`목적지 안내 · ${G.profile.map.guidance?'켜짐':'꺼짐'}`,()=>{G.profile.map.guidance=!G.profile.map.guidance;checkpoint(G.checkpoint);this.show('settings')}));settingsControls(body,()=>{const d=document.activeElement?.dataset;this.show('settings');if(d?.setting)$('menu-body').querySelector(`[data-setting="${d.setting}"][data-value="${d.value}"]`)?.focus({preventScroll:true})})
  },
  controls(body){
-  const list=this.el('dl','controls-list');for(const [label,key] of [['이동','← → / A D'],['지도','M'],['대화 · 시설 이용','E'],['대화 넘기기 · 딱지 치기','Space'],['딱지 접기','1 · 2 · 3 · 4'],['집중 / 뿌리 버티기 / 승부수','F / R / C'],['이야기 수첩','J'],['인벤토리','I'],['메뉴 / 뒤로','Esc'],['메뉴 선택 / 실행','방향키 · Tab / Enter']]){const row=this.el('div');row.append(this.el('dt','',label),this.el('dd','',key));list.append(row)}body.append(list)
+  const list=this.el('dl','controls-list');for(const [label,key] of [['이동','← → / A D'],['지도','M'],['대화 · 시설 이용','E'],['대화 넘기기 · 딱지 치기','Space'],['딱지 접기','1 · 2 · 3 · 4'],['정밀 타격 / 강타 / 꾹 눌러 펴기','R / C / F'],['터치 · 마우스 이동','화면 아래 ◀ ▶ · 상호작용'],['이야기 수첩','J'],['인벤토리','I'],['열린 창 닫기 · 메뉴','Esc'],['메뉴 선택 / 실행','방향키 · Tab / Enter']]){const row=this.el('div');row.append(this.el('dt','',label),this.el('dd','',key));list.append(row)}body.append(list)
  },
  keys(event){
   if(event.altKey||event.ctrlKey||event.metaKey)return;

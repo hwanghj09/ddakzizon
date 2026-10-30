@@ -3,8 +3,7 @@ const J=TtakjiJourneys;
 const Journeys={
  selected:null,
  atHub(){return Object.hasOwn(J.regions,G.scene)&&G.hub===G.scene},
- objective(a){return a.type==='drill'?`5번 중 GOOD 이상 ${a.good}회${a.perfect?` · PERFECT ${a.perfect}회`:''}`:({focus:'집중(F)을 사용하고 승리',guard:'뿌리 버티기(R)를 사용하고 승리',power:'승부수(C) 타격 후 승리'}[a.goal]||'상대 딱지를 뒤집어 승리')},
- gate(region){if(J.canCompete(G.profile,region))return false;this.selected=J.current(G.profile,region)?.id;this.open();return true},
+ objective(a){return a.type==='drill'?`5번 중 GOOD 이상 ${a.good}회${a.perfect?` · PERFECT ${a.perfect}회`:''}`:(a.goal?`${R.skills[a.goal].name}(${R.skills[a.goal].key}) 사용 후 승리`:'상대 딱지를 뒤집어 승리')},
  link(content){
   const e=J.current(G.profile,G.hub),b=document.createElement('button');b.className='facility-choice';b.textContent=e&&G.profile.journey.stages[e.id]!==2?`이야기 · ${e.title}`:'이야기 수첩';b.onclick=()=>{if(!G.paused&&G.state==='facility'){this.selected=e?.id;this.open()}};content.append(b)
  },

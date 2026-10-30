@@ -24,7 +24,7 @@ Use $ttakji-sprite-artist to write four prompts for a metal ttakji. Do not gener
 
 The skill contains instructions and prompts. Generated newspaper PNG assets are available in `assets/sprites/ttakji/newspaper/`.
 
-## Play — school through national championship
+## Play — school yard to the planet exchange (v1.0)
 
 Open `index.html` in a modern browser, or run `npm start` and visit
 `http://localhost:4173`. No install, build, external fonts, or network connection
@@ -35,6 +35,8 @@ Newspaper sprites in `assets/` appear in the title, school, battle, completed fo
 and inventory HUD. The front changes to damaged after taking a hit; the reverse
 image appears after the flip passes its midpoint. Equipment and training affect
 the school rematch and later tournament stats.
+
+> 전투 공식, 스킬, 터치 조작과 설정의 최신 내용은 맨 아래 **v0.11** 섹션을, 프롤로그·튜토리얼·대회 흐름은 **v0.12** 섹션을, 도 대회부터 행성 교류전·엔딩까지는 **v1.0** 섹션을 따른다. 버전별 섹션의 옛 수치(BAD/GOOD/PERFECT 10/24/40, 집중·뿌리 버티기·승부수 등)는 기록용이다.
 
 ### Controls
 
@@ -315,7 +317,7 @@ award scene. The menu records the province championship. The desk offers the sto
 again, a reward-free former-champion sparring match, and travel to the national
 championship added in v0.8 below.
 
-`province.js` owns the hub and story; growth, reward gates and attack intentions
+`province.js` (v1.0: merged into `stages.js`) owned the hub and story; growth, reward gates and attack intentions
 remain in `progression.js`. Shared facilities return to the current hub, including
 refining and inventory changes. Geometric scenery and existing material sprites
 are reused. The v3 save gains province entry/round fields plus intro and reward
@@ -358,7 +360,7 @@ The final leads to a family award scene and continental qualification. That next
 competition remains future content. The completed desk offers the story again and
 reward-free sparring.
 
-`national.js` owns the hub and story, while `progression.js` owns entry/reward gates,
+`national.js` (v1.0: merged into `stages.js`) owned the hub and story, while `progression.js` owns entry/reward gates,
 opening bonuses and save normalization. Old saves default national progress to
 locked; only a province champion may enter. Intro/final checkpoints resume their
 stories after reload without issuing duplicate rewards. Fresh games clear progress.
@@ -427,7 +429,7 @@ start after story preparation; the new full campaign test exercises the real gat
 ## Continent, world and planet — v1.0
 
 After the national title, the national cup desk opens the **continent** tournament,
-then **world** and **planet**. All three share one hub flow in `frontier.js`
+then **world** and **planet**. All three shared one hub flow in `frontier.js` (v1.0: merged into `stages.js`)
 (transport, training, workshop, cup desk) with three rounds each, new opponent
 patterns, and story beats: the old boss returns to say "세계를 뒤집어보지 않을래",
 and the planet title ends on a `????` teaser for the next stage.
@@ -497,3 +499,57 @@ collectible ttakji: the requested 45 types plus fusion (46 playable types), defi
 - 위치·방문 기록·포스터 확인·재료·안내 설정을 기존 v3 저장에 포함한다. NPC 대화, 현수막, 표창장·트로피가 진행에 따라 변한다.
 
 `exploration.js`의 구역 데이터가 출입구·폭·상호작용 좌표를 관리하고, `map-renderer.js`가 건물/바닥/전경을 분리해 그린다. 캐릭터와 배경은 기존 프로토타입의 도형 아트를 유지하며 딱지 PNG는 그대로 사용한다.
+
+### v0.11 — 전투 규칙·스킬·터치 조작·설정 (기획 03 §2, 06 §2)
+
+- 판정 4단계: 완벽 ×1.3 / 좋음 ×1.1 / 보통 ×1.0 / 빗나감 ×0.6. 게이지에 세 구간(노랑·초록·파랑)과 범례가 보인다. 집중력이 구간을 넓히고(1당 +2.5%, 최대 +50%), 강타는 구간을 0.6배로 좁힌다. 게이지 속도는 설정값을 따른다.
+- 피해 = max(1, 반올림((공격력 + 힘 − 상대 방어력 × 0.5) × 판정 배율 × 스킬·자세 배율)). HP는 0 아래로 내려가지 않는다. 예: 공격 20, 힘 4, 방어 8, 좋음 → 22.
+- 뒤집기 확률 = 10% + 60% × (1 − 현재 HP / 최대 HP) − 안정성 × 0.5%p + 스킬 보정, 5~75%로 제한. 모든 대회 단계에서 공격 뒤마다 판정하며 HP 0이면 판정 없이 뒤집힌다. 예: HP 48/100, 안정성 10 → 36.2%.
+- 딱지 능력치: HP·공격력·방어력·안정성(+집중력 보너스). 신문지 딱지 100 / 20 / 8 / 10. 압축 1회마다 겹 +1, 공격 +3, HP +10, 방어 −1(최소 0). 비용은 그대로.
+- 선수: 힘 4에서 시작해 훈련 레벨당 +2, 집중력은 레벨 + 딱지 보너스.
+- 상대는 같은 공식을 쓴다. 판정은 상대별 분포(novice·club·ace·master·legend)에서 뽑고, 기존 패턴(방어·빈틈·완벽/빗나감 예고)은 유지한다. 방어/관통/빈틈 자세는 피해 배율(×0.5 / ×1.5)로 남았다. 상대 HP는 새 공식에 맞춰 기존의 75%로 조정했다.
+- 스킬(집중·뿌리 버티기·승부수 대체): 정밀 타격 R(피해 ×0.8, 이번 타격 뒤집기 +15%p, 쿨타임 3턴, 마을 우승 후 박태풍), 강타 C(피해 ×1.4, 구간 좁아짐, 쿨타임 3턴, 시 대회 첫 승리 후 코치), 꾹 눌러 펴기 F(최대 HP 15% 회복, 공격·뒤집기 없음, 경기당 1회, 도 대회 첫 승리 후 철벽 선배). 쿨타임은 자기 턴 시작마다 1 감소하며 버튼에 남은 턴이 표시된다. 스킬을 가진 상대도 같은 쿨타임을 따른다. 옛 저장은 진행도에서 스킬을 다시 계산한다.
+- 첫 학교 경기는 그대로 패배하며, 부하의 반응 대사가 판정 4단계에 맞춰 바뀐다.
+- 탐험 중 화면 왼쪽 아래 ◀ ▶(누르고 있는 동안 이동, 여러 터치 지원), 오른쪽 아래 상호작용 버튼. 마우스로도 쓸 수 있다. Esc는 열린 시설·일반 대화·타이틀 설정을 먼저 닫고, 아무것도 없을 때 메뉴를 연다.
+- 설정: 텍스트 속도(느림/보통/빠름/즉시), 게이지 속도(느리게/보통/빠르게)를 `ddakzizon.settings`에 저장. 타이틀에 설정 버튼이 있고, 저장이 없으면 이어하기는 비활성으로 보인다.
+- `tests/rules.test.js`가 공식·예시·쿨타임을 검사하고, 브라우저 테스트는 결정적인 난수(0.9/0.95: 뒤집기 없음, 상대 빗나감)로 패턴·스킬 수치를 확인한다.
+
+### v0.12 — 주인공 이름, 프롤로그·튜토리얼, 공통 대회 시스템 (기획 04 §2-6, 05 §2-6·§12, 06 §4-9)
+
+- **주인공 이름**: 처음부터 시작하면 이름을 묻는다(최대 8글자, 글자·숫자·공백만, 비우면 ‘주인공’). 대사의 `나`와 `{name}`, 전투 HUD, 메뉴에 쓰인다. 이름이 없는 옛 저장은 기본값으로 옮긴다.
+- **인물 이름 통일**: 민수(부하), 도윤(대장), 하나(유치원 친구), 박태풍(탈모 아저씨), 앞집 아저씨. 이야기 수첩 에피소드도 같은 이름을 쓴다.
+- **프롤로그**: 내기 대사 → 판정별 첫 반응 4종 → 고정 패배(게임 전체에서 이것 하나). 도윤은 딱지를 *보관*한다(“잃어버리면 곤란하잖아.”). 신문 조각을 줍고, “그날 뒤집힌 건 내 딱지가 아니라 인생이다.” 뒤에 작은 글씨가 붙는다. 패배와 신문 조각은 장면 전에 저장되어 다시 실행되지 않는다.
+- **튜토리얼**: 집으로 걸어가 식탁에서 접는다. 첫 시도는 비뚤어지고(“그건 딱지야, 종이비행기야?”) 틀린 모서리를 눌러도 계속 진행된다. 접기는 능력치를 바꾸지 않으며, 유료 압축·XP 보너스 단계는 없앴다. 지우개 표적 연습 3회(첫 타격은 양말), 마지막엔 뒤집기 연출. 공격 1회 + 게이지 정지 1회만 필수이고 연습은 반복 가능하다. 재대결 패배 시 “접힌 선을 한 번 더 눌러 볼까?”와 함께 재도전/집에서 연습을 고른다.
+- **공통 대회 시스템** (`tournament.js` + `P.tournaments`): 정류장 대회 선택 → 접수 → 대진표(현재 라운드, 상대 딱지·성향 힌트, 내 경기 결과, 다른 참가자 경기 결과) → 준비 화면(장착 딱지·능력치·스킬, 딱지 바꾸기, 강화·훈련하러 가기, 경기 시작, 뒤로) → 경기 → 결과(최초/반복 보상 구분, 해금, 다음 경기·재도전·준비 화면·마을로). 보상은 `P.completeMatch`가 경기 기록과 함께 한 번만 지급하고, 대회 도중 재접속하면 마지막으로 끝낸 경기 뒤 대진표에서 시작한다. 우승 뒤 자유 경기는 최초 상금의 20%만 준다.
+- **마을 대회(주민센터 컵)**: 앞집 아저씨(종이 박스, 방어↑ 공격↓, 50원, 압축기 안내) → 하나(색종이, 균형형, 70원 + 색종이 재료) → 박태풍(머리카락, 첫 턴 스킬 없음, 완벽 판정 시 뒤집기 +10%p, 150원 + 정밀 타격 + 머리카락 딱지 + 표창장 + 시 대회 참가권). 사회자 “아, 아”, 현수막, 물컵 연출. 정밀 타격은 결승 결과 화면에서 지급하고 광장의 박태풍은 설명만 한다. 표창장은 보관품이며 집 식탁에서 ‘마을 표창장 딱지’로 접을 때 원본 보관 여부를 묻는다. 벽의 복사본 액자는 그대로 남는다.
+- **NPC 배치**: 대회 중 앞집 아저씨·하나는 대회장 로비에만 있고, 박태풍은 결승 전 주민센터 앞 의자 → 우승 후 광장. 골목 아저씨 대사는 단계별(튜토리얼 전/패배 뒤/대회 전/대회 후). 민수는 재대결 뒤 단계별 응원 대사.
+- **시 대회(학교 체육관)**: 지역구 예선 서준(L자 파일, 공격↑ 안정↓, 100원) → 한별(모의고사 종이, 방어/공격 교대, 빨간 점수, 120원) → 시 결승 도윤(방어·정밀 타격·정타 혼합, 300원 + 도 대회 참가권, 패배 시 대사 후 재도전). 첫 시 경기 전 복도 재회에서 원래 딱지 ‘첫 신문지 딱지’를 돌려받는다(한 번만, 건너뛰어도 지급). 강타는 시 첫 승리 후, 꾹 눌러 펴기는 도 첫 승리 후(v0.11 그대로).
+- **해금 시점**: 마을 압축기는 1회전 뒤. 제련소는 도 대회 우승 뒤(그전엔 ‘공사 중’, 이미 산 형태는 계속 적용). 융합기는 대륙 대회부터(기존).
+- **대사 건너뛰기·다시 보기**: 주요 장면에 ‘건너뛰기’ 버튼. 건너뛰어도 같은 완료 처리를 실행하므로 보상·상태 변화는 빠지지 않는다. 본 장면은 메뉴 ‘이야기 다시 보기’와 광장 게시판에서 다시 볼 수 있고, 다시 보기는 진행을 바꾸지 않는다.
+- **이야기 수첩 에피소드는 선택**: 대회 경기를 막지 않는다. 보상과 진행은 그대로.
+- 데이터: 장면 대사는 `story-data.js`, 대회 정의는 `progression.js`의 `tournaments`(id, stage, name, venue, field, opponents, condition, open/entered/enter/award, firstReward, others). 상대 데이터에 `hint`(성향), `unlocks`, `calmStart`, `perfectFlip`이 추가됐다. 저장에 `name`, `villageEntered`, `keepsakes`, `story`, `map.tournament`가 추가됐다.
+
+### v1.0 — 도 대회부터 행성 교류전, 엔딩까지 (기획 04 §7-13, 05 §2-1·§2-3·§7-11, 06 §4-1·§4-4)
+
+- **모든 대회가 공통 흐름으로**: 도·전국·대륙·세계·행성 대회도 `tournament.js`의 대진표(다른 참가자 8명) → 준비 → 경기 → 결과(최초/반복 보상) → 재도전·준비 화면 → 재접속 복귀 → 우승 후 자유 경기(최초 상금의 20%)를 쓴다. 대회장은 모두 걸어 다니는 구역(`exploration.js`의 `province`~`planet`)이고, 접수처가 대진표를, 정류장이 대회 선택을 연다. 대회별 화면 코드(`province.js`, `national.js`, `frontier.js`)는 지우고 `stages.js` 하나로 합쳤다.
+- **상대와 상금** (밸런스는 `tests/balance-sim.cjs`로 시뮬레이션, 아래 표):
+
+| 대회 | 1회전 | 준결승 | 결승 |
+|---|---|---|---|
+| 도 · 시립 경기장 | 상자왕 · 종이 박스, 방어형 · 200원 | 최단단 · 압축(철) 딱지, 방어↑ 안정 0 · 250원 | 윤서 · 피아노 딱지, 정확한 4박자, 낮은 내구도에선 정해진 정타 없음 · 600원 + 제련소 + 전국 참가권 |
+| 전국 · 대형 실내 체육관 | 테이프 딱지 선수 · 절반 아래에서 두 번까지 회복 · 400원 | 공인 딱지 선수 · 표창장 딱지, 균형형 · 500원 | 이규격 · 백과사전 딱지, 다음 수를 알리지 않음(7수 고정 표) · 1200원 + 융합기 + 대륙 참가권 |
+| 대륙 · 국제 전시장 | 마리 · 식빵 무늬 종이, 버티기 · 800원 | 리오 · 구리색 종이, 공격↑ 안정↓ · 1000원 | 아라 · 레고 딱지, 거꾸로 접기(첫 박자 정타) · 2500원 + 세계 참가권 |
+| 세계 · 원형 경기장 | 미라 · 유리 무늬 투명 종이, 방어형(완벽만 뚫림) · 1500원 | 연맹 추천 선수 · 반도체 딱지, 균형형 · 2000원 | 한결 · 다이아 딱지, 상황형(뒤지면 막고 앞서면 몰아침, 정밀·강타·회복) · 5000원 + 세계 우승 트로피 + 행성 초대장 |
+| 행성 · 우주 정거장 | 모서리 셋 · 석영 딱지, 안정↑ 공격↓ · 3000원 | 반짝 · 표창(별) 딱지, 게이지 ×0.8(설정 ‘느리게’면 그대로) · 4000원 | 무중 · 슬라임 딱지, 상황형 · 10000원 + 교류전 우승 장식 |
+
+- **도 대회**: 첫 경기 전 박태풍의 편지(한 번만). 준비 화면에 보유 딱지 중 공격형·방어형 추천을 나란히 보여 주고 한 번에 장착할 수 있다(강제 없음). 최단단의 바닥 움푹·무게 재기 개그와 ‘강한 딱지 ≠ 두껍고 무거운 딱지’ 교훈. 꾹 눌러 펴기는 1회전 뒤 상자왕이 알려 준다. 결승 후 윤서 “좋은 딱지를 믿는 만큼 네 손도 믿어”, 박태풍 답장 “잘했다. TV에 내 머리 정수리만 나왔다.” 우승 시 제련소 개방.
+- **전국 대회**: 후원사가 **공인 딱지**(새 선택 장비, 평범한 균형형 능력치)를 무료로 권한다. 접수 화면의 버튼으로 받을 수 있고, 받지 않아도·받고 안 써도 된다. 1회전 뒤 별도 장면에서 도윤이 공인 딱지 선수에게 지고(“내가 익숙한 방식을 끝까지 믿지 못했어”), 대진표도 그때 결과를 보여 준다. 결승 전 이규격의 자 재기 개그, 결승 후 “틀린 접기인 줄 알았는데, 다른 접기였군요”, 관중석의 백지훈. 우승 시 **융합기 개방**(이전: 대륙 진입 시).
+- **대륙 대회**: 같은 국가 대표 도윤, 번역기 개그(절대 뒤집어지지 않은 감자). 대진표에 **무료 연습전**(다음 상대와 같은 데이터, 보상·기록 없음). 1회전 뒤 도윤이 다른 경기에서 탈락하고 준비를 돕는다. 결승 전후 아라와 접기 교환, 우승 뒤 백지훈의 새 국제 규격 발표(안전 규정 + ‘지정 소재와 형태만’ 검토).
+- **세계 대회**: 하나의 영상 통화 “그럼 내 딱지도 이제 못 쓰는 거야?”, 도윤의 “처음 널 만났을 때…”, 첫 딱지. 1회전 뒤 회장이 과거 사고를 설명하고, 준결승 뒤 공개 논의에서 시범 경기·대표 회의를 통한 검토를 약속한다(경기 한 번으로 규정이 바뀌지 않음). 보유 장비는 어느 시점에도 쓸 수 없게 되지 않는다. 결승 한결 대사, 우승 뒤 대표 회의·시험 운영 발표, 화면 속 박태풍·하나·민수, 하늘의 딱지 그림자와 행성 초대장(“그래서 내가 도 대회에서 잘하라고 했잖아.” / “도 다음이 행성이에요?”).
+- **행성 교류전**: 정복전이 아닌 교류전, 같은 규칙. 모서리 셋(“그건 삼각형인데?” / “우리 행성에서는 딱지가 먼저 생겼다.”)과 접기 교환, 반짝의 빠른 게이지, 결승 무중과 “다시 한 장만.”
+- **엔딩** (`ending.js`): 행성 우승 직후 학교 운동장 벤치 → 아이들의 질문 → 도윤 “이제 너랑 끝내지 못한 승부, 한 판 더?” → 운동장 경기(이겨도 져도 이야기가 끝난다) → 카메라가 하늘로, 딱 소리, 페이드 → 출연진 스크롤 크레딧(건너뛰기, 동작 줄이기 설정이면 정지 화면) → 크레딧 후 ‘???? 대회’ 초대장과 박태풍 “이번엔 내가 나간다.” 엔딩 플래그(`story.ending`)는 경기 직후 저장되어 저절로 반복되지 않는다. 엔딩 중 재접속하면 벤치 장면부터 다시 시작한다. 이후 **자유 경기**: 정류장에서 모든 대회 반복, 운동장의 도윤과 보상 없는 친선전(바로 다시 하기). ‘이야기 다시 보기’에서 엔딩·크레딧을 경기 없이 다시 볼 수 있다.
+- **집과 마을의 변화**: 우승할 때마다 집 선반에 트로피가 하나씩(마을~행성 7개, 세계는 큰 컵, 행성은 별 장식) 놓이고 조사할 수 있다. 표창장 액자, 프롤로그 이후의 신문 조각은 그대로. 주민센터 앞 현수막은 대회 중 “{이름} 선수, ○○ 힘내라!”, 우승 뒤 “축! {이름}, ○○ 우승!”으로 바뀌고 우승 수만큼 깃발 줄과 관중이 늘어난다. 장식은 능력치에 영향이 없다.
+- **이야기 다시 보기**: 도 대회~엔딩의 새 장면 37개가 `story-data.js`의 다시 보기 순서에 들어 있다. `{name}`이 대사에 반영된다.
+- **밸런스 시뮬레이션** (`node tests/balance-sim.cjs`, `tests/balance.test.js`): 단계마다 상한의 약 3/4까지 압축·훈련한 대표 빌드(도·전국: 머리카락 +9/+12, 대륙~행성: 융합 +15/+18/+21), 평균적인 타이밍(게이지 중앙에서 표준편차 0.09)으로 경기당 3000~4000판. 결승 승률 62~66%, 1회전·준결승 68~82%. 압축·훈련 없이(+0, Lv.1) 도 결승에 가면 약 22%, 행성 결승을 상한까지 키우면 약 85%. 이 전투 공식에서는 경기가 2~3턴이면 끝나고 뒤집기 확률이 결과를 크게 좌우하므로, 타이밍 실력보다 빌드 차이가 승률을 더 많이 바꾼다.
+- 데이터·저장: 상대 필드 `steady`, `hidden`, `heals`/`healAt`, `gaugeScale` 추가. 상대 행동은 `P.foeIntent`/`P.plan`(게임과 시뮬레이션이 같이 쓰는 순수 함수). `P.titles`, `P.takeOfficial`, `P.finishEnding`, `P.fusionOpen`. 저장에 `story.official`, `story.ending`, `map.tournament`(모든 대회), 새 구역 `continent`/`world`/`planet`이 추가됐다. 트로피 딱지 출처를 새 상대에 맞게 바꿨고(예: 철 → 최단단, 다이아 → 한결), 더는 상대가 쓰지 않는 고무·나무·피쉬앤칩스·로봇·우라늄(모조품) 딱지는 해당 단계 가게에서 판다. 상자·테이프·피아노·식빵·레고 딱지는 가게에서 사거나 이겨서 얻는다.
+- 테스트: `tests/stages.test.js`, `tests/balance.test.js`, `tests/ending.browser.cjs`(준비된 세계 챔피언 프로필로 행성 결승 → 엔딩 → 크레딧 → 자유 경기 → 다시 보기). `tests/province|national|frontier.browser.cjs`는 공통 흐름 기준으로 다시 썼다.
