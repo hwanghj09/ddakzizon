@@ -13,17 +13,11 @@ const Minimum={
    const campaign=Exploration[name];
    Exploration[name]=(...args)=>this.active?(name==='data'?this.zoneData(...args):this[name](...args)):campaign.apply(Exploration,args);
   }
-  for(const button of document.querySelectorAll('[data-move]')){
-   const release=()=>G.keys.delete(button.dataset.move);
-   button.onpointerdown=e=>{if(!this.active||G.paused||G.state!=='explore')return;e.preventDefault();button.setPointerCapture(e.pointerId);G.keys.add(button.dataset.move);initAudio()};
-   button.onpointerup=release;button.onpointercancel=release;button.onlostpointercapture=release;
-  }
-  $('touch-interact').onclick=()=>{if(this.active&&!G.paused&&G.state==='explore')this.interact()};
   this.title();
  },
  title(){
   this.active=false;document.body.classList.remove('minimum-mode');
-  $('minimum-load').hidden=!this.saved;$('minimum-touch').hidden=true;$('minimum-help').hidden=true;
+  $('minimum-load').hidden=!this.saved;$('minimum-help').hidden=true;
   $('timing-guide').hidden=true;
   $('gauge').setAttribute('aria-label','밝은 중앙 구간에서 멈추면 PERFECT');
  },
@@ -34,7 +28,7 @@ const Minimum={
   G.flipPlayer=G.flipEnemy=0;G.stolen=false;G.practice=[];
   this.enter(this.progress.zone,this.progress.x);
   if(!resume)this.talk([
-   ['민수','여기로 와! 좌우 방향키나 A, D로 걷고, 가까이에서 E로 말을 걸어. 휴대폰에서는 아래 버튼을 누르면 돼.'],
+   ['민수','여기로 와! 좌우 방향키나 A, D로 걷고, 가까이에서 E로 말을 걸어. 마우스로 화면의 버튼을 눌러도 돼.'],
    ['나','오늘은 내 신문지 딱지로 도전해 볼까?']
   ]);
  },
@@ -256,7 +250,7 @@ const Minimum={
    const button=m.button(`게임 소리 · ${G.sound?'켜짐':'꺼짐'}`,()=>{toggleSound();this.menu('settings')});button.id='menu-sound';button.setAttribute('aria-pressed',String(G.sound));
    body.append(button,m.button(`목적지 안내 · ${this.progress.guidance?'켜짐':'꺼짐'}`,()=>{this.progress.guidance=!this.progress.guidance;this.save();this.menu('settings')}));
   }else if(view==='controls'){
-   body.append(m.el('p','','이동: ← → 또는 A / D · 휴대폰: 좌우 버튼 길게 누르기'),m.el('p','','대화·조사: E 또는 상호작용 버튼'),m.el('p','','공격·게이지 정지: 스페이스 또는 공격 버튼'),m.el('p','','대화: 다음 / 스페이스 · 건너뛰기 버튼'),m.el('p','','인벤토리 I · 지도 M · 메뉴 Esc'),m.el('p','','완벽 1.3배 · 좋음 1.1배 · 보통 1배 · 빗나감 0.6배. 스킬은 아직 배우지 않았다.'));
+   body.append(m.el('p','','이동: ← → 또는 A / D'),m.el('p','','대화·조사: E · 화면 버튼은 마우스로 선택'),m.el('p','','공격·게이지 정지: 스페이스 또는 공격 버튼'),m.el('p','','대화: 다음 / 스페이스 · 건너뛰기 버튼'),m.el('p','','인벤토리 I · 지도 M · 메뉴 Esc'),m.el('p','','완벽 1.3배 · 좋음 1.1배 · 보통 1배 · 빗나감 0.6배. 스킬은 아직 배우지 않았다.'));
   }else{
    body.append(m.el('h4','',this.objective()[1]),m.el('p','','학교에서의 첫 패배부터 마을 대회 접수까지. 강화와 대회 경기는 다음 단계에서 이어진다.'),m.el('p','save-note',G.storageOK?'주요 사건과 멈춘 위치가 자동 저장된다.':'저장 공간에 접근할 수 없다. 현재 플레이는 계속할 수 있다.'));
    if(!G.storageOK)body.append(m.button('자동 저장 다시 시도',()=>{this.save();this.menu('overview')}));
@@ -265,7 +259,7 @@ const Minimum={
  },
  sync(){
   const exploring=this.active&&G.state==='explore';
-  $('minimum-touch').hidden=!exploring;$('minimum-help').hidden=!exploring||G.paused;
+  $('minimum-help').hidden=!exploring||G.paused;
   $('minimum-help').textContent='← → / A D 이동 · E 대화 · M 지도';
  }
 };

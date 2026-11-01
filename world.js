@@ -31,9 +31,8 @@ function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h
 function panel(x,y,w,h,r,fill,o=OUT,t=3){rr(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(t){ctx.lineWidth=t;ctx.strokeStyle=o;ctx.lineJoin='round';ctx.stroke()}}
 function poly(points,fill,o=OUT,t=3){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(t){ctx.lineWidth=t;ctx.strokeStyle=o;ctx.lineJoin='round';ctx.stroke()}}
 function grad(x,y,w,h,top,bottom){const g=ctx.createLinearGradient(0,y,0,y+h);g.addColorStop(0,top);g.addColorStop(1,bottom);ctx.fillStyle=g;ctx.fillRect(x,y,w,h)}
-// On narrow screens show a closer slice of the map; world coordinates and
-// movement speed stay the same. Battle and campaign scenes retain the full view.
-function viewWidth(){return width<700&&height>width&&window.Minimum?.active&&Exploration.active()?560:960}
+// Desktop scenes share a fixed logical viewport.
+function viewWidth(){return 960}
 function resize(){const b=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);width=b.width;height=b.height;viewportWidth=viewWidth();canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);scale=Math.min(width/viewportWidth,height/600);ox=(width-viewportWidth*scale)/2;oy=(height-600*scale)/2;ctx.imageSmoothingEnabled=false;if(window.Minimum?.active&&Exploration.active())G.camera=Math.max(0,Math.min(Exploration.data().width-viewportWidth,G.hero.x-viewportWidth/2))}
 window.World={viewWidth,spriteReady(id,state){const image=ttakjiSprites[id]?.[state];return image?.failed?false:image?.naturalWidth?true:undefined},screenToWorld(x,y){const b=canvas.getBoundingClientRect();return{x:(x-b.left-ox)/scale,y:(y-b.top-oy)/scale}}};new ResizeObserver(resize).observe(canvas);window.addEventListener('resize',resize);
 
