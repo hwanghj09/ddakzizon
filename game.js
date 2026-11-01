@@ -11,7 +11,7 @@ const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function loadSave(){try{const raw=localStorage.getItem(SAVE_KEY)||localStorage.getItem('ddakzizon.chapter1.v2');const saved=JSON.parse(raw);if(saved&&[2,3].includes(saved.version)&&checkpoints.includes(saved.checkpoint)){G.profile=TtakjiProgression.restore(saved.profile);G.save={...saved,version:3,profile:structuredClone(G.profile)}}G.sound=localStorage.getItem('ddakzizon.sound')!=='off'}catch{G.storageOK=false}updateSoundButton()}
 function checkpoint(value){if(window.Minimum?.active){Minimum.save();return}if(window.Exploration?.active()){G.profile.map.zone=G.mapZone;G.profile.map.x=Math.round(G.hero.x)}G.checkpoint=value;G.save={version:3,checkpoint:value,profile:structuredClone(G.profile),date:Date.now()};try{localStorage.setItem(SAVE_KEY,JSON.stringify(G.save));G.storageOK=true}catch{G.storageOK=false;toast('이 환경에서는 자동 저장을 사용할 수 없어요.')}}
 function setInventory(label,owned=true,coloredPaper=false){$('inventory').classList.remove('campaign-item');$('inventory').textContent=label.replace(/^◇ /,'');$('inventory').classList.toggle('has-newspaper',owned);$('inventory').classList.toggle('has-colored-paper',coloredPaper)}
-function toast(message){$('toast').textContent=message;G.toastUntil=G.now+2300;$('toast').classList.add('visible')}
+function toast(message,kind='notice'){$('toast').dataset.kind=kind;$('toast').textContent=message;G.toastUntil=G.now+2300;$('toast').classList.add('visible')}
 function after(ms,fn){G.tasks.push({at:G.now+ms,fn})}
 function cancelScene(){G.mapPractice=false;window.GameMenu?.release();G.storyJob=null;G.coach='';G.tasks=[];G.keys.clear();G.target=null;G.animation=null;G.particles=[];G.floaters=[];G.shake=0;G.flash=0;G.impactUntil=0;$('impact').textContent='';$('curtain').classList.remove('closed');$('chapter-card').hidden=true;G.paused=false;$('pause-screen').hidden=true;$('game').classList.remove('paused')}
 function coach(text,duration=0){G.coach=text;G.coachUntil=duration?G.now+duration:Infinity}
@@ -40,7 +40,7 @@ function sound(kind,grade='GOOD'){
  else if(kind==='lose'){[330,294,220].forEach((n,i)=>note(n,.3,'triangle',.06,i*.15))}
  else note(440,.055,'square',.025)
 }
-function updateSoundButton(){$('sound').textContent=G.sound?'♪':'♪̸';$('sound').setAttribute('aria-label',G.sound?'소리 끄기':'소리 켜기')}
+function updateSoundButton(){$('sound').innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4 6 8H3v8h3l5 4V4Z"/><path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/><path class="sound-off" d="m3 3 18 18"/></svg>';$('sound').setAttribute('aria-pressed',String(G.sound));$('sound').setAttribute('aria-label',G.sound?'소리 끄기':'소리 켜기')}
 function toggleSound(){G.sound=!G.sound;initAudio();updateSoundButton();try{localStorage.setItem('ddakzizon.sound',G.sound?'on':'off')}catch{}if((!G.sound||G.paused)&&G.audio)G.audio.suspend().catch(()=>{})}
 function music(){if(!G.sound||G.paused||G.audio?.state!=='running'||G.now<G.musicAt)return;G.musicAt=G.now+390;const melody=[262,0,330,392,0,330,294,0,262,0,220,294,330,0,294,0];let n=melody[G.musicStep++%melody.length];if(n)note(n,G.scene==='battle'?.13:.24,'triangle',.018);if(G.musicStep%4===0)note(131,.3,'sine',.02)}
 function title(){window.Minimum?.title();cancelScene();G.state='title';G.scene='school';G.hero={x:245,y:377,walk:0,facing:1};panels('title-screen');$('load-game').hidden=!G.save;if(G.audio&&!G.sound)G.audio.suspend().catch(()=>{})}

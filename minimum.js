@@ -54,7 +54,7 @@ const Minimum={
   G.camera=Math.max(0,Math.min(MinimumRules.zones[zone]-view,G.hero.x-view/2));
   this.progress.zone=zone;this.progress.x=G.hero.x;this.progress.visited[zone]=true;
   G.profile.map.zone=zone;G.profile.map.x=G.hero.x;
-  panels('explore-ui');this.hud();this.save();this.updateInteract();toast(Exploration.zones[zone].name);$('game').focus({preventScroll:true});
+  panels('explore-ui');this.hud();this.save();this.updateInteract();toast(Exploration.zones[zone].name,'location');$('game').focus({preventScroll:true});
  },
  save(){
   if(!this.active)return;
