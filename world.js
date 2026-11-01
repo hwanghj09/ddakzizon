@@ -67,21 +67,21 @@ function school(){
  for(const[x,y,w,h]of[[695,233,76,5],[695,233,5,52],[766,233,5,52]])box(x,y,w,h,WHITE,2);for(let i=0;i<7;i++)rect(702+i*10,238,1,45,'#ffffff99');for(let i=0;i<4;i++)rect(700,246+i*10,66,1,'#ffffff99');
 }
 
-// Character materials use muted midtones; bright scene colours are not clothing.
-const CHARACTER={outline:'#354238',light:'#d1c5ad',accent:'#b6a071',shadow:'#26382f2b',skinShadow:'#3d352a20',blush:'#aa75634d'};
+// Clear colour identities with controlled highlights, rather than greyed fills.
+const CHARACTER={outline:'#2b3440',light:'#eee6d4',accent:'#d2b862',shadow:'#1c314510',skinShadow:'#9b603814',blush:'#c57c6a30'};
 const LOOKS={
- hero:{skin:'#c6a186',hair:'#4c4239',shirt:'#9c6458',trim:'#c9bea7',pants:'#4c6579',shoe:'#c9bea7',cap:'#4c6579'},
- rival:{skin:'#c8a386',hair:'#987046',shirt:'#69806a',trim:'#4e6855',pants:'#4b5157',shoe:'#897254',spiky:true},
- boss:{skin:'#b68f73',hair:'#343a35',shirt:'#75657f',trim:'#b19a69',pants:'#4e4c57',shoe:'#41483f',shades:true,band:'#986657'},
- champ:{skin:'#b68f73',hair:'#343a35',shirt:'#aa9060',trim:'#9a685d',pants:'#4e4c57',shoe:'#c9bea7',shades:true,band:'#986657'},
- friend:{skin:'#c9a88c',hair:'#625044',shirt:'#b1a06a',trim:'#a27e86',pants:'#a27e86',shoe:'#c9bea7',tails:true},
- neighbor:{skin:'#bc9879',hair:'#4c463c',shirt:'#5d7c8a',trim:'#c9bea7',pants:'#5d5547',shoe:'#494439',glasses:true},
- uncle:{skin:'#bc9879',hair:'#4c463c',shirt:'#a4865e',trim:'#7f6751',pants:'#596264',shoe:'#494439',bald:true,mustache:true},
- sprinter:{skin:'#c5a184',hair:'#343a35',shirt:'#a16b69',trim:'#c9bea7',pants:'#a16b69',shoe:'#b09e6b',band:'#c9bea7'},
- folder:{skin:'#c6a186',hair:'#514958',shirt:'#5f837d',trim:'#496b65',pants:'#505c64',shoe:'#c0baa8',beanie:'#796c89'},
- globe:{skin:'#b68f73',hair:'#b6b6a6',shirt:'#5d7c8a',trim:'#b19a69',pants:'#4b586e',shoe:'#c9bea7',shades:true,band:'#b19a69'},
- alien:{skin:'#91a27b',hair:'#637b5e',shirt:'#796c89',trim:'#b19a69',pants:'#4e4e5c',shoe:'#c0baa8',bald:true,antenna:true},
- alien_champ:{skin:'#91a27b',hair:'#637b5e',shirt:'#aa9060',trim:'#9a685d',pants:'#4e4e5c',shoe:'#c9bea7',bald:true,antenna:true,shades:true}
+ hero:{skin:'#e1b695',hair:'#514135',shirt:'#c96b5f',trim:'#e1dac8',pants:'#3d68a8',shoe:'#e1dac8',cap:'#3d68a8'},
+ rival:{skin:'#e4b993',hair:'#be874c',shirt:'#499563',trim:'#347347',pants:'#4b535f',shoe:'#b6804c',spiky:true},
+ boss:{skin:'#d2a17c',hair:'#30343c',shirt:'#8a64ac',trim:'#c7a953',pants:'#424355',shoe:'#3d424b',shades:true,band:'#bc6769'},
+ champ:{skin:'#d2a17c',hair:'#30343c',shirt:'#c3a04a',trim:'#bc6769',pants:'#424355',shoe:'#e1dac8',shades:true,band:'#bc6769'},
+ friend:{skin:'#e7c19f',hair:'#704a34',shirt:'#c9b356',trim:'#c78d9d',pants:'#c78d9d',shoe:'#e1dac8',tails:true},
+ neighbor:{skin:'#d9ac85',hair:'#554536',shirt:'#4f8eae',trim:'#e1dac8',pants:'#665b4c',shoe:'#514436',glasses:true},
+ uncle:{skin:'#d9ac85',hair:'#554536',shirt:'#bd9057',trim:'#956b43',pants:'#566878',shoe:'#514436',bald:true,mustache:true},
+ sprinter:{skin:'#dfb18c',hair:'#30343c',shirt:'#c46672',trim:'#e1dac8',pants:'#c46672',shoe:'#c7ad5b',band:'#e1dac8'},
+ folder:{skin:'#e1b695',hair:'#51415f',shirt:'#45958a',trim:'#36766d',pants:'#475b71',shoe:'#ddd8ca',beanie:'#8a73b3'},
+ globe:{skin:'#d2a17c',hair:'#d5d4ce',shirt:'#4f8eae',trim:'#c7a953',pants:'#425b81',shoe:'#e1dac8',shades:true,band:'#c7a953'},
+ alien:{skin:'#9cbe79',hair:'#567d4c',shirt:'#8a73b3',trim:'#c7a953',pants:'#48465e',shoe:'#ddd8ca',bald:true,antenna:true},
+ alien_champ:{skin:'#9cbe79',hair:'#567d4c',shirt:'#c3a04a',trim:'#bc6769',pants:'#48465e',shoe:'#e1dac8',bald:true,antenna:true,shades:true}
 };
 function actor(x,y,kind='hero',walk=0,scaleActor=1,facing=1){
  kind=({wall:'folder',offbeat:'sprinter',champion:'boss',charger:'sprinter',fortress:'folder',national_champion:'champ',gust:'sprinter',glacier:'folder',continent_champion:'champ',showman:'rival',architect:'folder',world_champion:'globe',martian:'alien',lunar:'alien',planet_champion:'alien_champ'})[kind]||kind;const L=LOOKS[kind]||LOOKS.friend,f=facing>0?1:-1;
@@ -100,7 +100,7 @@ function actor(x,y,kind='hero',walk=0,scaleActor=1,facing=1){
  rect(-14,-36,28,4,L.trim);rect(-5,-46,10,4,L.trim);if(kind==='hero')rect(3,-44,6,6,CHARACTER.accent);
  if(L.band)rect(-20,-80,40,5,L.band);if(L.antenna){rect(-2,-102,5,18,CHARACTER.outline);circle(0,-104,6,CHARACTER.outline);circle(0,-104,4,CHARACTER.accent)}
  const ex=f*4,blink=(G.now+x*37)%3400<130;
- if(L.shades){rect(-15+ex,-70,30,8,CHARACTER.outline);rect(-11+ex,-68,6,2,'#c8c7b45c')}
+ if(L.shades){rect(-15+ex,-70,30,8,CHARACTER.outline);rect(-11+ex,-68,6,2,'#dbdce37a')}
  else if(blink){rect(-10+ex,-64,5,2,CHARACTER.outline);rect(5+ex,-64,5,2,CHARACTER.outline)}
  else{rect(-10+ex,-70,5,8,CHARACTER.outline);rect(5+ex,-70,5,8,CHARACTER.outline);rect(-9+ex,-69,2,2,CHARACTER.light);rect(6+ex,-69,2,2,CHARACTER.light)}
  if(L.glasses){ctx.strokeStyle=CHARACTER.outline;ctx.lineWidth=2;ctx.strokeRect(-13+ex,-72,11,11);ctx.strokeRect(2+ex,-72,11,11);rect(-2+ex,-67,4,2,CHARACTER.outline)}
@@ -202,7 +202,7 @@ function drawTier(id){const L=TIER_LOOK[id];tierHub(id);actor(285,371,L.left,0,.
 function tierArena(id){const L=TIER_LOOK[id],planet=id==='planet';
  grad(0,0,960,272,L.wall[0],L.wall[1]);if(id!=='continent')stars(40,140);
  ctx.fillStyle='#fff6c022';for(const k of[160,480,800]){ctx.beginPath();ctx.moveTo(k-14,0);ctx.lineTo(k+14,0);ctx.lineTo(k+130,272);ctx.lineTo(k-130,272);ctx.closePath();ctx.fill()}
- const skins=planet?[LOOKS.alien.skin,LOOKS.hero.skin,'#879c9e']:[LOOKS.hero.skin,LOOKS.boss.skin,'#a88669'];
+ const skins=planet?[LOOKS.alien.skin,LOOKS.hero.skin,'#83a5bc']:[LOOKS.hero.skin,LOOKS.boss.skin,'#bd9475'];
  for(let row=0;row<2;row++){rect(40,166+row*57,880,9,OUT);for(let i=0;i<17;i++){const x=78+i*50,y=150+row*57+Math.sin(G.now/220+i*1.7+row)*2;box(x-11,y+10,22,18,[LOOKS.hero.shirt,LOOKS.neighbor.shirt,LOOKS.rival.shirt,LOOKS.friend.shirt][(i+row)%4],2);circle(x,y,10,OUT);circle(x,y,8,skins[i%3])}}
  panel(300,12,360,52,12,L.banner);text(L.title,480,47,24,WHITE,'center',900,OUT);
  rect(0,268,960,4,OUT);grad(0,272,960,328,planet?'#b9b4c9':'#f7c47e',planet?'#7a7396':'#d98a42');rect(0,272,960,5,'#ffffff88');for(let i=0;i<14;i++)rect(i*75,285,3,315,'#00000018');
