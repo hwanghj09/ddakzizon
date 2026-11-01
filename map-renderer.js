@@ -1,7 +1,8 @@
 'use strict';
-/* Layered procedural scenery: no external artwork or fonts required. */
+/* Authored artwork is preferred; procedural scenery remains a loading fallback. */
 const MapRenderer={
  arena(ctx,a,region){
+  if(globalThis.GameArt?.background(ctx,'lobby',285)){a.text(region==='village'?'주민센터 컵':region==='city'?'지존시 지역구 예선':region==='province'?'도 딱지 선수권':'전국 딱지 선수권',480,88,22,'#244542','center');return}
   const {rect:r,text:t,line:l,actor}=a,village=region==='village',city=region==='city',province=region==='province',national=region==='national';
   r(0,0,960,600,national?'#193542':province?'#879a91':city?'#c1c7ad':'#a8bdb0');
   r(0,270,960,330,village?'#b5aa87':'#a49c81');
@@ -17,6 +18,7 @@ const MapRenderer={
   r(20,272,920,6,'#e0cda0');for(let x=0;x<960;x+=80)l(x,280,x+65,600,'#787e6a44',1);
  },
  draw(ctx,a){
+  if(globalThis.GameArt?.map(ctx,a))return;
   const {rect:r,text:t,line:l,tree,actor,paper}=a,z=Exploration.data(),theme=z.theme,w=z.width,camera=G.camera||0,p=G.profile;
   const indoor=['home','lobby','city','province','national'].includes(theme),night=theme==='national';
   r(0,0,960,600,night?'#182c3a':indoor?'#b8b59c':'#b5cfc7');

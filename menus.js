@@ -77,7 +77,7 @@ window.GameMenu={
   }
  },
  player(body){
-  const p=G.profile,s=P.stats(p),header=this.el('div','player-summary');header.append(this.el('span','player-avatar',''),this.el('h4','',`선수 Lv.${P.level(p)+1}`),this.el('p','',`타격 보너스 +${P.level(p)*2} · 집중 ${s.concentration}`));body.append(header);
+  const p=G.profile,s=P.stats(p),header=this.el('div','player-summary');header.append(this.el('span','player-avatar',''),this.el('h4','',`선수 Lv.${P.level(p)+1}`),this.el('p','',`타격 보너스 +${P.level(p)*2} · 집중 ${s.concentration}`));body.append(header);window.GameArt?.portrait(header.querySelector('.player-avatar'),'hero');
   const meter=this.el('progress');meter.max=P.trainingLimit(p);meter.value=p.xp;meter.setAttribute('aria-label','선수 훈련 성장');body.append(meter,this.el('p','',p.xp>=P.trainingLimit(p)?'현재 훈련 숙련 완료':`훈련 ${p.xp}/${P.trainingLimit(p)} · 다음 성장까지 ${3-p.xp%3}회`));
   const focusUnlocked=p.schoolReward||(p.homeUpgradeDone&&G.checkpoint==='practice')||['rematch','complete','village','village_reward'].includes(G.checkpoint);
   for(const [name,key,unlocked,desc,unlock] of [['집중','F',focusUnlocked,'한 경기 한 번, 다음 타이밍 게이지가 느려진다.','학교 연습 후 습득'],['뿌리 버티기','R',p.guardUnlocked,'한 경기 한 번, 다음에 받는 피해를 절반으로 줄인다.','마을 대회 우승 후 습득'],['승부수','C',p.powerUnlocked,'다음 공격 GOOD 이상은 1.5배, BAD는 절반. 한 경기 한 번.','시 대회 첫 승리 후 습득']]){const card=this.el('div',`skill-card${unlocked?'':' locked'}`);const title=this.el('h4','',name);title.append(this.el('kbd','',unlocked?key:'잠김'));card.append(title,this.el('p','',unlocked?desc:unlock));body.append(card)}

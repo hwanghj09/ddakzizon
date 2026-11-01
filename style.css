@@ -187,3 +187,7 @@ h1{font-size:clamp(86px,8vw,122px);letter-spacing:-.075em;font-weight:750;line-h
 }
 /* Round status has its own header space, clear of the arena sign. */
 #round-label{top:32px}
+
+/* Portraits crop the same authored character image used in the world. */
+.portrait.image-portrait,.player-avatar.image-portrait{background-color:#e9dfc9;background-size:cover;background-position:center;background-repeat:no-repeat}
+.portrait.image-portrait::before,.portrait.image-portrait i{display:none}
