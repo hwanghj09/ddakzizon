@@ -23,7 +23,7 @@ function ttakji(x,y,size,material='newspaper',state='base',angle=0,flipScale=1){
 const OUT='#293442',NAVY='#334b53',YELLOW='#e8be70',RED='#c98069',BLUE='#7297a1',WHITE='#fff0ce';
 const rect=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))};
 const box=(x,y,w,h,c,t=3)=>{rect(x-t,y-t,w+t*2,h+t*2,OUT);rect(x,y,w,h,c)};
-function text(str,x,y,size=12,color=WHITE,align='left',weight=800,stroke){ctx.font=`${weight} ${size}px Galmuri11,"Malgun Gothic",system-ui,sans-serif`;ctx.textAlign=align;if(stroke){ctx.lineJoin='round';ctx.lineWidth=Math.max(3,size/4);ctx.strokeStyle=stroke;ctx.strokeText(str,x,y)}ctx.fillStyle=color;ctx.fillText(str,x,y)}
+function text(str,x,y,size=12,color=WHITE,align='left',weight=800,stroke){ctx.font=`${weight} ${size}px Jua,"Malgun Gothic",system-ui,sans-serif`;ctx.textAlign=align;if(stroke){ctx.lineJoin='round';ctx.lineWidth=Math.max(3,size/4);ctx.strokeStyle=stroke;ctx.strokeText(str,x,y)}ctx.fillStyle=color;ctx.fillText(str,x,y)}
 function line(x1,y1,x2,y2,color=WHITE,w=2){ctx.strokeStyle=color;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
 function circle(x,y,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,Math.max(0,r),0,Math.PI*2);ctx.fill()}
 function ell(x,y,rx,ry,c){ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}

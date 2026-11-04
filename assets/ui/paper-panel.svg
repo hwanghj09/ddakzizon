@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400" preserveAspectRatio="none">
+<defs><linearGradient id="paper" x2=".2" y2="1"><stop stop-color="#fffdf0"/><stop offset="1" stop-color="#f5e9cb"/></linearGradient><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".68" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".065"/></feComponentTransfer><feBlend in="SourceGraphic" mode="multiply"/></filter><clipPath id="clip"><path d="M12 13Q215 5 447 12T885 10Q896 104 887 194T890 388Q644 397 442 389T10 390Q3 266 10 199T12 13Z"/></clipPath></defs>
+<path d="M17 18Q215 10 447 17T890 15L895 393Q647 402 442 394T15 395Z" fill="#563c2e" opacity=".16"/>
+<g clip-path="url(#clip)"><path d="M0 0H900V400H0Z" fill="url(#paper)" filter="url(#grain)"/><path d="M-25 25Q156 8 265 19T922 13" fill="none" stroke="#e6bd7c" stroke-width="33" opacity=".12"/><path d="M-10 378Q121 350 251 381T924 373" fill="none" stroke="#d8aa6f" stroke-width="39" opacity=".1"/><path d="M24 35Q200 24 380 31M516 375Q714 386 866 373" fill="none" stroke="#ab9570" stroke-width=".9" opacity=".3"/></g>
+<path d="M12 13Q215 5 447 12T885 10Q896 104 887 194T890 388Q644 397 442 389T10 390Q3 266 10 199T12 13Z" fill="none" stroke="#785a44" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M20 20Q256 13 447 19T878 18M881 24Q890 190 883 324M18 383Q239 378 442 384T880 381M17 369Q11 190 18 33" fill="none" stroke="#bca47e" stroke-width="1.1" opacity=".55"/>
+</svg>

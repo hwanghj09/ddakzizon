@@ -1,8 +1,9 @@
 'use strict';
 /* A single pixel-art renderer. Legacy illustrations stay in assets for save/catalog compatibility. */
 window.GameArt=(()=>{
- const manifest=window.ART_MANIFEST||{},cache=new Map(),portraits=new Map();
- document.fonts?.ready.then(()=>{cache.clear();portraits.clear();document.querySelectorAll('[data-art-character]').forEach(el=>portrait(el,el.dataset.artCharacter))});
+ const manifest=window.ART_MANIFEST||{},cache=new Map(),portraits=new Map(),portraitImages=new Map();
+ const fontReady=document.fonts?Promise.all(['16px Jua','24px GamjaFlower','14px Galmuri11','700 14px Galmuri11'].map(font=>document.fonts.load(font))):Promise.resolve();
+ fontReady.then(()=>{cache.clear();document.querySelectorAll('[data-art-character]').forEach(el=>portrait(el,el.dataset.artCharacter))});
  const C={ink:'#293442',deep:'#233745',sky:'#b7d4cb',mist:'#d7dfbc',cream:'#fff0c9',sand:'#dbb480',sandLight:'#e9c897',sandDark:'#b88b68',brick:'#c88168',roof:'#a65d50',roofLight:'#d08864',leaf:'#66866b',leafLight:'#94ac79',leafDark:'#476858',wood:'#8e6551',woodLight:'#ba8b62',glass:'#6f9994',blue:'#526e83',gold:'#e6b65f'};
  const looks={hero:['#364458','#cf765f','#536d86','#edbf8d'],rival:['#78513d','#71885b','#526078','#edbf8d'],minsu:['#78513d','#71885b','#526078','#edbf8d'],friend:['#73503e','#e0b971','#ab7077','#f0c69a'],neighbor:['#574839','#65918e','#77705e','#dcb184'],uncle:['#5f4b3a','#bd9363','#5c7180','#ddb289'],boss:['#353c4c','#8d7497','#4d5368','#ddb083'],champ:['#353c4c','#d3af63','#4d5368','#ddb083'],folder:['#796c91','#6d9b8c','#51627b','#e7ba8c'],sprinter:['#4b4350','#b86d77','#786276','#e7ba8c'],globe:['#b9b8a7','#6393a5','#4e6785','#d5a580'],alien:['#638578','#927a9b','#5d5878','#b0bf87'],alien_champ:['#638578','#d3af63','#5d5878','#b0bf87']};
  const canonical=k=>k==='minsu'?'rival':k;
@@ -103,7 +104,33 @@ window.GameArt=(()=>{
   if(['boss','champ','globe','alien_champ'].includes(kind)){r(-12,-76,28,7,C.ink);r(-8,-75,6,2,'#9eaba6')}if(kind==='neighbor'){r(-12,-77,12,10,C.ink);r(4,-77,12,10,C.ink);r(-10,-75,8,6,'#b3c6b1');r(6,-75,8,6,'#b3c6b1');r(0,-73,4,2,C.ink)}if(kind==='uncle')r(-5,-61,16,3,hair);
  })}
  function actor(ctx,x,y,kind='hero',walk=0,scale=1,facing=1,animation=null,now=0){const attack=animation&&((kind==='hero'&&animation.kind==='player-hit')||(['rival','minsu'].includes(kind)&&animation.kind==='enemy-hit'))&&now-animation.at<620;const pose=attack?'attack':walk?'walk':'idle',frame=walk?Math.floor(walk/125)%2:(now+x*17)%3700<120?2:0,im=sprite(kind,pose,frame);ctx.save();ctx.translate(Math.round(x/2)*2,Math.round(y/2)*2);ctx.scale(facing<0?-scale:scale,scale);ctx.fillStyle='#263f452b';ctx.fillRect(-23,-2,46,6);ctx.fillRect(-17,4,34,2);ctx.imageSmoothingEnabled=false;const bob=walk?(frame?0:2):0;ctx.drawImage(im,-40,-100-bob,80,104);ctx.restore();return true}
- function portrait(el,kind='hero'){if(!el)return;kind=canonical(kind);el.dataset.artCharacter=kind;if(!portraits.has(kind)){const tile=document.createElement('canvas');tile.width=tile.height=96;const ctx=tile.getContext('2d');ctx.fillStyle='#526b6e';ctx.fillRect(0,0,96,96);ctx.fillStyle='#6f8880';ctx.fillRect(4,4,88,88);ctx.imageSmoothingEnabled=false;ctx.drawImage(sprite(kind),6,0,29,30,0,0,96,100);portraits.set(kind,tile.toDataURL())}el.style.backgroundImage=`url("${portraits.get(kind)}")`;el.classList.add('image-portrait')}
+ function portrait(el,kind='hero'){
+  if(!el)return;kind=canonical(kind);
+  if(el.dataset.artCharacter!==kind){el.style.backgroundImage='';el.classList.remove('image-portrait');delete el.dataset.portraitStyle}
+  el.dataset.artCharacter=kind;
+  const usePortrait=()=>{if(el.dataset.artCharacter!==kind)return;el.style.backgroundImage=`url("${portraits.get(kind)}")`;el.dataset.portraitStyle='illustrated';el.classList.add('image-portrait')};
+  if(portraits.has(kind)){usePortrait();return}
+  if(!portraitImages.has(kind)){
+   const image=new Image();
+   const ready=new Promise(resolve=>{
+    image.onload=()=>{
+     const tile=document.createElement('canvas');tile.width=tile.height=192;const ctx=tile.getContext('2d');
+     ctx.fillStyle='#eee4c8';ctx.fillRect(0,0,192,192);
+     const wash=ctx.createRadialGradient(92,76,10,96,96,130);wash.addColorStop(0,'#fff8df');wash.addColorStop(1,'#d4dbb4');ctx.fillStyle=wash;ctx.fillRect(0,0,192,192);
+     ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+     ctx.drawImage(image,63,5,134,134,0,0,192,192);portraits.set(kind,tile.toDataURL());resolve();
+    };
+    image.onerror=()=>{
+     // A missing portrait keeps a readable, locally drawn character in the frame.
+     const tile=document.createElement('canvas');tile.width=tile.height=192;const ctx=tile.getContext('2d');ctx.fillStyle='#e8dfbf';ctx.fillRect(0,0,192,192);ctx.drawImage(sprite(kind),6,0,29,30,0,0,192,192);portraits.set(kind,tile.toDataURL());resolve();
+    };
+    image.src=`assets/art/characters/${kind==='rival'?'minsu':Object.hasOwn(looks,kind)?kind:'friend'}/idle.png`;
+   });
+   portraitImages.set(kind,ready);
+  }
+  portraitImages.get(kind).then(usePortrait);
+ }
+
  function map(ctx,a){const zone=Exploration.data();if(!zone)return false;const theme=zone.theme,w=zone.width,camera=Math.round((G.camera||0)/2)*2,objects=Exploration.objects(),near=G.state==='explore'?Exploration.nearest():null;
   const scene=surface('map:'+G.mapZone,w,600,c=>landscape(c,theme,w,{map:true}));blit(ctx,scene,-camera);
   const npc={minsu:'rival',doyun:'boss',neighbor:'neighbor',hana:'friend',uncle:'uncle',reception:'folder',spectator:'friend'};
@@ -175,5 +202,5 @@ window.GameArt=(()=>{
   }
   return true;
  }
- return {manifest,ready:document.fonts?.ready.then(()=>true)||Promise.resolve(true),loaded:()=>null,background,prop,actor,portrait,map,title,folded,arena,hub,style:'pixel-village'};
+ return {manifest,ready:fontReady,loaded:()=>null,background,prop,actor,portrait,map,title,folded,arena,hub,style:'pixel-village',uiStyle:'illustrated-paper'};
 })();

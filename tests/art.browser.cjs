@@ -8,6 +8,8 @@ fs.mkdirSync(dir,{recursive:true});
   page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(!r.ok())failed.push(r.url());if(r.url().includes('/assets/art/'))legacy.push(r.url())});
   await page.goto(base);await page.evaluate(()=>GameArt.ready);
   assert.equal(await page.evaluate(()=>GameArt.style),'pixel-village');
+  assert.equal(await page.evaluate(()=>GameArt.uiStyle),'illustrated-paper');
+  assert(await page.evaluate(()=>document.fonts.check('16px Jua')&&document.fonts.check('24px GamjaFlower')),'local illustration UI fonts load');
   assert(await page.evaluate(()=>document.fonts.check('12px Galmuri11')),'bundled Korean pixel font loads');
   await page.screenshot({path:path.join(dir,'art-title.png')});
   await page.locator('#minimum-new').click();await page.locator('#skip-dialogue').click();await page.waitForFunction(()=>G.state==='explore');
@@ -50,6 +52,7 @@ fs.mkdirSync(dir,{recursive:true});
   await page.screenshot({path:path.join(dir,'art-battle.png')});
   await page.keyboard.press('Escape');const now=await page.evaluate(()=>G.now);await page.waitForTimeout(100);assert.equal(await page.evaluate(()=>G.now),now);await page.locator('#resume').click();await page.locator('#strike').click();
   await page.evaluate(()=>say([['아빠','한 장씩 접다 보면, 네 손에 맞는 딱지가 될 거야.']],()=>{}));
+  await page.waitForFunction(()=>document.querySelector('#portrait').dataset.artCharacter==='neighbor'&&document.querySelector('#portrait').classList.contains('image-portrait')&&document.querySelector('#portrait').dataset.portraitStyle==='illustrated'&&document.querySelector('#portrait').style.backgroundImage.includes('data:image/png'));
   assert(await page.locator('#portrait').evaluate(el=>el.classList.contains('image-portrait')&&el.dataset.artCharacter==='neighbor'&&el.style.backgroundImage.startsWith('url("data:image/png')));
   await page.waitForTimeout(300);await page.screenshot({path:path.join(dir,'art-dialogue.png')});
   await page.locator('#skip-dialogue').click();
@@ -62,7 +65,15 @@ fs.mkdirSync(dir,{recursive:true});
    await page.screenshot({path:path.join(dir,`art-map-menu-${width}.png`)});await page.locator('#resume').click();
    await page.locator('.map-shortcut').focus();await page.keyboard.press('Space');assert.equal(await page.evaluate(()=>G.paused&&GameMenu.view==='map'),true);await page.locator('#resume').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'game');
   }
-  assert.deepEqual(legacy,[],'excluded legacy character/background/prop PNGs are not fetched');assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
-  console.log('PASS pixel art: ten scrolling maps fully painted, local Korean font, real keyboard walking/facing, distinct anchored poses, shared portrait, battle timing/pause and PC HUD/map-button bounds');
+  // A delayed portrait for the previous speaker cannot replace the current speaker.
+  await page.route('**/assets/art/characters/globe/idle.png',async route=>{await new Promise(resolve=>setTimeout(resolve,180));await route.continue()});
+  const latePortrait=page.waitForResponse(r=>r.url().endsWith('/characters/globe/idle.png'));
+  await page.evaluate(()=>{window.uiPortraitProbe=document.createElement('div');GameArt.portrait(uiPortraitProbe,'globe');GameArt.portrait(uiPortraitProbe,'friend')});
+  await page.waitForFunction(()=>uiPortraitProbe.dataset.artCharacter==='friend'&&uiPortraitProbe.classList.contains('image-portrait'));
+  const currentPortrait=await page.evaluate(()=>uiPortraitProbe.style.backgroundImage);
+  await latePortrait;await page.waitForTimeout(100);
+  assert.equal(await page.evaluate(()=>uiPortraitProbe.style.backgroundImage),currentPortrait,'late image keeps the current speaker portrait');
+  assert(legacy.every(url=>url.includes('/characters/')),'excluded background and prop PNGs stay unloaded; character art is used for illustrated portraits');assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
+  console.log('PASS illustrated UI and pixel world: local handwritten fonts/portrait and async speaker switching, ten scrolling maps fully painted, real keyboard walking/facing, distinct anchored poses, shared portrait, battle timing/pause and PC HUD/map-button bounds');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
