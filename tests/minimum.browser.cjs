@@ -69,7 +69,7 @@ fs.mkdirSync(artifacts,{recursive:true});
   await reload('poster');await cross('left');await at('lobby');await reach('explore');await at('reception');await skip();
   await p.getByRole('button',{name:'아직 준비할게요',exact:true}).click();await stage('poster');
   await at('reception');await skip();await p.getByRole('button',{name:'참가 신청 확인',exact:true}).click();await stage('registered');
-  assert.equal(await p.locator('#minimum-bracket li').count(),3);assert.match(await p.locator('#facility-content').textContent(),/최소 플레이 버전 완료/);
+  assert.equal(await p.locator('#minimum-bracket li').count(),3);assert.match(await p.locator('#facility-content').textContent(),/첫 번째 이야기 완료/);
   await p.screenshot({path:path.join(artifacts,'minimum-registration-desktop.png')});
   await reload('registered');await at('reception');assert.equal(await p.locator('#minimum-bracket li').count(),3);await stage('registered');
   assert.equal(await p.evaluate(()=>G.profile.coins),0);assert.equal(await p.evaluate(()=>localStorage.getItem(SAVE_KEY)),null);
