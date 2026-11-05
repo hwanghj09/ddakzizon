@@ -89,7 +89,7 @@ function drawing(who,pose){
 function crc32(data){let crc=0xffffffff;for(const b of data){crc^=b;for(let k=0;k<8;k++)crc=crc&1?0xedb88320^(crc>>>1):crc>>>1}return (crc^0xffffffff)>>>0}
 function chunk(type,data){const tag=Buffer.from(type),len=Buffer.alloc(4),crc=Buffer.alloc(4);len.writeUInt32BE(data.length);crc.writeUInt32BE(crc32(Buffer.concat([tag,data])));return Buffer.concat([len,tag,data,crc])}
 function png(pixels){
- const header=Buffer.alloc(13);header.writeUInt32BE(16,0);header.writeUInt32BE(16,4);header[8]=8;header[9]=6;
+ const header=Buffer.alloc(13);header.writeUInt32BE(pixels[0].length,0);header.writeUInt32BE(pixels.length,4);header[8]=8;header[9]=6;
  const bytes=Buffer.from(pixels.flatMap(row=>[0,...row.flat()]));
  return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',header),chunk('IDAT',zlib.deflateSync(bytes)),chunk('IEND',Buffer.alloc(0))]);
 }

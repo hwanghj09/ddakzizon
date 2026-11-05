@@ -14,8 +14,8 @@ fs.mkdirSync(dir,{recursive:true});
    const corners=[3,(c.width-1)*4+3,((c.height-1)*c.width)*4+3,(c.width*c.height-1)*4+3].map(i=>data[i]);
    return {key,width:im.naturalWidth,height:im.naturalHeight,corners,bounds:entry.bounds};
   }));
-  assert.equal(assets.length,74);
-  for(const a of assets){const character=a.key.startsWith('characters/'),size=character?16:256;assert.equal(a.width,size,a.key);assert.equal(a.height,size,a.key);if(!a.key.startsWith('backgrounds/')){assert.deepEqual(a.corners,[0,0,0,0],a.key+' has transparent margins');assert(character?a.bounds[0]>=1&&a.bounds[1]>=0&&a.bounds[2]<=15&&a.bounds[3]===15:a.bounds[0]>=10&&a.bounds[1]>=10&&a.bounds[2]<=246&&a.bounds[3]<=242,a.key+' fits its canvas')}}
+  assert.equal(assets.length,81);
+  for(const a of assets){const character=a.key.startsWith('characters/'),background=a.key.startsWith('backgrounds/'),size=character?16:background?240:32;assert.equal(a.width,size,a.key);assert.equal(a.height,background?160:size,a.key);if(!background){assert.deepEqual(a.corners,[0,0,0,0],a.key+' has transparent margins');assert(character?a.bounds[0]>=1&&a.bounds[1]>=0&&a.bounds[2]<=15&&a.bounds[3]===15:a.bounds[0]>=1&&a.bounds[1]>=1&&a.bounds[2]<=31&&a.bounds[3]<=30,a.key+' fits its canvas')}}
   // Walking and attacks reuse a fixed feet anchor without resizing crouched poses.
   const alignment=await page.evaluate(()=>[...new Set(Object.keys(GameArt.manifest).filter(k=>k.startsWith('characters/')).map(k=>k.split('/')[1]))].map(who=>['idle','walk-a','walk-b','attack'].map(pose=>GameArt.manifest[`characters/${who}/${pose}`])));
   for(const frames of alignment){for(const frame of frames)assert.deepEqual(frame.anchor,[8,15]);assert(frames[3].bounds[3]-frames[3].bounds[1]<frames[0].bounds[3]-frames[0].bounds[1])}
@@ -71,6 +71,6 @@ fs.mkdirSync(dir,{recursive:true});
    finally{frame.failed=false}
   }));
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
-  console.log('PASS 48 native 16x16 character frames + 26 scene assets, all tournament attackers, nearest-neighbor integer drawing, seven maps, keyboard walk/facing, exact mirroring, pixel portraits and fallback');
+  console.log('PASS 48 native 16x16 character frames + 33 pixel scene assets, all tournament attackers, nearest-neighbor integer drawing, seven maps, keyboard walk/facing, exact mirroring, pixel portraits and fallback');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

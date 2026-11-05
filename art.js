@@ -13,10 +13,15 @@ window.GameArt=(()=>{
  })));
  function smooth(ctx){ctx.imageSmoothingEnabled=false}
  function background(ctx,theme,ground=402){
-  const key='backgrounds/'+theme,image=loaded(key);if(!image)return false;
-  // Keep the square artwork's proportions and place its wall above the walk lane.
-  const horizon=theme==='home'?.665:theme==='lobby'?.65:theme==='classroom'?.60:theme==='gazebo'?.64:.63;
-  ctx.save();smooth(ctx);ctx.drawImage(image,0,ground-horizon*960,960,960);ctx.restore();return true;
+  const key='backgrounds/'+theme,image=loaded(key),entry=manifest[key];if(!image)return false;
+  // Native landscape pixels keep their proportions and share the interaction lane.
+  const pixel=4,horizon=entry.horizon,top=Math.round(ground-horizon*pixel),bottom=top+image.naturalHeight*pixel;
+  ctx.save();smooth(ctx);ctx.beginPath();ctx.rect(0,0,960,600);ctx.clip();
+  ctx.fillStyle=entry.sky;ctx.fillRect(0,0,960,600);
+  ctx.drawImage(image,0,top,960,image.naturalHeight*pixel);
+  // Extend the last clear floor strip for battle/home cameras without stretching.
+  for(let y=bottom;y<600;y+=16)ctx.drawImage(image,0,image.naturalHeight-12,image.naturalWidth,4,0,y,960,16);
+  ctx.restore();return true;
  }
  function prop(ctx,name,x,y,maxWidth=150,maxHeight=130,stretch=false){
   const key='props/'+name,image=loaded(key),b=manifest[key]?.bounds;if(!image||!b)return false;
@@ -52,8 +57,8 @@ window.GameArt=(()=>{
  }
  function refreshPortraits(){document.querySelectorAll('[data-art-character]').forEach(el=>portrait(el,el.dataset.artCharacter))}
  function map(ctx,a){
-  const zone=Exploration.data(),theme=zone.theme,back=['city','province','national'].includes(theme)?'lobby':theme;
-  if(!background(ctx,back))return false;
+  const zone=Exploration.data(),theme=zone.theme;
+  if(!background(ctx,theme))return false;
   const {text,actor:person,paper}=a,camera=G.camera||0,objects=Exploration.objects(),nearest=G.state==='explore'?Exploration.nearest():null;
   const npc={minsu:'rival',doyun:'boss',neighbor:'neighbor',hana:'friend',uncle:'uncle',reception:'folder',spectator:'friend'};
   const sign=(label,x,y,width=180,active=false)=>{
@@ -91,5 +96,15 @@ window.GameArt=(()=>{
   if(nearest&&G.coach){const x=Math.max(camera+170,Math.min(camera+790,nearest.x));sign(G.coach,x,nearest.type==='npc'?210:256,Math.max(240,G.coach.length*11+24),true)}
   ctx.restore();return true;
  }
- return {manifest,ready,loaded,background,prop,actor,portrait,map};
+ function hub(ctx,theme,places,text){
+  if(!background(ctx,theme,315))return false;
+  for(const place of places){
+   const asset=({bus:'bus',training:'target',press:'press',forge:'press',cup:'desk'})[place.id]||'board';
+   prop(ctx,asset,place.x,320,asset==='bus'?65:135,110);
+   ctx.fillStyle='#263b3deb';ctx.fillRect(Math.round(place.x-84),180,168,30);
+   text(place.name,place.x,200,13,'#efe0b2','center',700);
+  }
+  return true;
+ }
+ return {manifest,ready,loaded,background,prop,actor,portrait,map,hub};
 })();

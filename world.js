@@ -117,6 +117,7 @@ function speech(x,y){if(!G.coach||G.now>G.coachUntil)return;const size=13;ctx.fo
 function paper(x,y,size,type='news',angle=.12,sy=.8,folds=4,spriteState='base',flipScale=1){if(ttakji(x,y,size,type==='red'?'colored_paper':type==='news'?'newspaper':type,spriteState,angle,flipScale))return;ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(1,sy);const half=size/2;rect(-half+4,-half+5,size,size,'#1b123044');rect(-half,-half,size,size,type==='red'?'#ff6b4a':'#fff1d0');if(type==='news'){for(let i=0;i<6;i++){rect(-half+10,-half+12+i*(size-20)/6,size*.28,2,'#6b728066');rect(half*.1,-half+12+i*(size-20)/6,size*.3,2,'#6b728066')}}ctx.lineWidth=3;ctx.strokeStyle=OUT;ctx.strokeRect(-half,-half,size,size);if(folds>=1)line(-half,-half,half,half,OUT,2);if(folds>=2)line(half,-half,-half,half,OUT,2);ctx.restore()}
 
 function villageBackground(){
+ if(window.GameArt?.hub(ctx,'village',Village.places,text))return;
  sky(320,'#4fc3ff','#d4f4ff');sun(90,64);cloud(240+Math.sin(G.now/22000)*14,60);cloud(700,46,.8);cloud(480,92,.5);hills(232);
  grassEdge(296);grad(0,310,960,290,'#ffd08a','#f2a65a');rect(0,318,960,8,'#fff1cf');
  for(let i=0;i<24;i++){rect(i*42+2,458,32,16,OUT);rect(i*42+4,460,28,12,'#ffe2ad')}
@@ -145,6 +146,7 @@ function citySkyline(province=false,national=false){
  rect(0,447,960,3,OUT);rect(0,450,960,150,'#434b60');for(let i=0;i<14;i++)rect(i*80,475,42,6,YELLOW);
 }
 function cityHub(province=false,national=false){
+ if(window.GameArt?.hub(ctx,national?'national':province?'province':'city',(national?National:province?Province:City).places,text))return;
  citySkyline(province,national);const walls=[null,'#fff1d0','#d8f3ff','#ffe0ec'],awn=[null,'#3cc464',BLUE,RED];
  (national?National:province?Province:City).places.forEach((place,i)=>{const x=place.x-80;
   if(i===0){box(x+15,215,6,108,'#9aa5b1',2);box(x+139,215,6,108,'#9aa5b1',2);panel(x,181,160,34,8,'#2f80ed');text(place.name,place.x,204,14,WHITE,'center',900);box(x+27,280,106,9,'#ff9f1c');box(x+32,290,6,26,'#9aa5b1',2);box(x+122,290,6,26,'#9aa5b1',2);panel(x+52,232,56,32,5,WHITE);text('무료',place.x,254,13,'#2f80ed','center',900)}
@@ -161,6 +163,7 @@ function drawProvince(){cityHub(true);actor(285,371,'boss',0,.96,1);actor(852,38
 function drawNational(){cityHub(true,true);actor(285,371,'neighbor',0,.96,1);actor(852,380,'national_champion',0,1,-1);actor(G.hero.x,G.hero.y,'hero',G.hero.walk,1,G.hero.facing);if(G.state==='explore'){const place=National.nearest();speech(place?place.x:480,115)}}
 // Indoor arena: spotlights, a cheering crowd and a wooden floor.
 function cityArena(province=false,national=false){
+ if(window.GameArt?.background(ctx,national?'national':province?'province':'city',285))return;
  grad(0,0,960,272,national?'#4a1d6e':'#1f2a6e',national?'#8e3fa8':'#3f4fb8');
  ctx.fillStyle='#fff6c022';for(const k of[160,480,800]){ctx.beginPath();ctx.moveTo(k-14,0);ctx.lineTo(k+14,0);ctx.lineTo(k+130,272);ctx.lineTo(k-130,272);ctx.closePath();ctx.fill()}
  for(let row=0;row<2;row++){rect(40,166+row*57,880,9,OUT);for(let i=0;i<17;i++){const x=78+i*50,y=150+row*57+Math.sin(G.now/220+i*1.7+row)*2;box(x-11,y+10,22,18,[LOOKS.hero.shirt,LOOKS.neighbor.shirt,LOOKS.rival.shirt,LOOKS.friend.shirt][(i+row)%4],2);circle(x,y,10,OUT);circle(x,y,8,[LOOKS.hero.skin,LOOKS.boss.skin,LOOKS.friend.skin][i%3])}}
@@ -189,6 +192,7 @@ function tierGround(id){const L=TIER_LOOK[id];rect(0,252,960,4,OUT);grad(0,255,9
  else for(let i=0;i<24;i++)rect(i*40,256,2,194,'#00000014');
  rect(0,447,960,3,OUT);rect(0,450,960,150,L.road);for(let i=0;i<14;i++)rect(i*80,475,42,6,id==='planet'?'#a259ff':YELLOW)}
 function tierHub(id){
+ if(window.GameArt?.hub(ctx,id,Tiers[id].places,text))return;
  const L=TIER_LOOK[id],walls=[null,'#fff1d0','#d8f3ff','#ffe0ec'],awn=[null,'#3cc464',BLUE,RED];
  tierSky(id);tierGround(id);
  Tiers[id].places.forEach((place,i)=>{const x=place.x-80;
@@ -202,6 +206,7 @@ function tierHub(id){
 }
 function drawTier(id){const L=TIER_LOOK[id];tierHub(id);actor(285,371,L.left,0,.96,1);actor(852,380,L.right,0,1,-1);actor(G.hero.x,G.hero.y,'hero',G.hero.walk,1,G.hero.facing);if(G.state==='explore'){const place=Tiers[id].nearest();speech(place?place.x:480,115)}}
 function tierArena(id){const L=TIER_LOOK[id],planet=id==='planet';
+ if(window.GameArt?.background(ctx,id,285)){text(L.title,480,70,22,WHITE,'center',900,OUT);return}
  grad(0,0,960,272,L.wall[0],L.wall[1]);if(id!=='continent')stars(40,140);
  ctx.fillStyle='#fff6c022';for(const k of[160,480,800]){ctx.beginPath();ctx.moveTo(k-14,0);ctx.lineTo(k+14,0);ctx.lineTo(k+130,272);ctx.lineTo(k-130,272);ctx.closePath();ctx.fill()}
  const skins=planet?[LOOKS.alien.skin,LOOKS.hero.skin,'#83a5bc']:[LOOKS.hero.skin,LOOKS.boss.skin,'#bd9475'];
