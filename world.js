@@ -84,9 +84,9 @@ const LOOKS={
  alien:{skin:'#9cbe79',hair:'#567d4c',shirt:'#8a73b3',trim:'#c7a953',pants:'#48465e',shoe:'#ddd8ca',bald:true,antenna:true},
  alien_champ:{skin:'#9cbe79',hair:'#567d4c',shirt:'#c3a04a',trim:'#bc6769',pants:'#48465e',shoe:'#e1dac8',bald:true,antenna:true,shades:true}
 };
-function actor(x,y,kind='hero',walk=0,scaleActor=1,facing=1){
+function actor(x,y,kind='hero',walk=0,scaleActor=1,facing=1,role){
  kind=({wall:'folder',offbeat:'sprinter',champion:'boss',charger:'sprinter',fortress:'folder',national_champion:'champ',gust:'sprinter',glacier:'folder',continent_champion:'champ',showman:'rival',architect:'folder',world_champion:'globe',martian:'alien',lunar:'alien',planet_champion:'alien_champ'})[kind]||kind;const L=LOOKS[kind]||LOOKS.friend,f=facing>0?1:-1;
- if(window.GameArt?.actor(ctx,x,y,kind,walk,scaleActor,facing,G.animation,G.now))return;
+ if(window.GameArt?.actor(ctx,x,y,kind,walk,scaleActor,facing,G.animation,G.now,role))return;
  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(scaleActor,scaleActor);
  const bob=walk?Math.abs(Math.sin(walk/90))*3:Math.sin(G.now/500+x)*1.2,step=walk?Math.sin(walk/90)*6:0,liftL=Math.max(0,step)*.7,liftR=Math.max(0,-step)*.7,swing=step*.6;
  ell(0,1,22,6,'#25392b33');ctx.translate(0,-bob);
@@ -215,7 +215,7 @@ function drawBattle(){const practice=['practice','training','story_training'].in
  else{if(Village.isBattle()){if(Tiers[G.hub])tierArena(G.hub);else MapRenderer.arena(ctx,{rect,text,line,actor},G.hub)}else school()}
  // Battle mat.
  if(!window.GameArt?.prop(ctx,'mat',480,437,660,151,true)){ell(480,446,345,16,'#1b123033');panel(150,286,660,151,20,WHITE);panel(160,294,640,135,14,'#3d7bff',OUT,0);ctx.strokeStyle='#ffffffaa';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(480,361,96,42,0,0,Math.PI*2);ctx.stroke();line(480,296,480,427,'#ffffff77',3);rect(160,294,640,6,'#ffffff33')}
- actor(125,347,'hero',0,1.1,1);if(!practice){actor(837,347,Village.isBattle()?G.opponent.kind:'rival',0,1.1,-1);if(!Village.isBattle()&&!window.Minimum?.active)actor(891,313,'boss',0,.85,-1)}let px=310,py=350,ex=650,ey=350,pa=-.16,ea=.15,ps=1,es=1;
+ actor(125,347,'hero',0,1.1,1,'player');if(!practice){actor(837,347,Village.isBattle()?G.opponent.kind:'rival',0,1.1,-1,'enemy');if(!Village.isBattle()&&!window.Minimum?.active)actor(891,313,'boss',0,.85,-1)}let px=310,py=350,ex=650,ey=350,pa=-.16,ea=.15,ps=1,es=1;
 if(G.animation){const t=(G.now-G.animation.at)/1000;const grade=G.animation.grade;const power=grade==='PERFECT'?1:grade==='GOOD'?.65:.3;if(G.animation.kind==='player-hit'){if(t<.36){const q=t/.36;px=310+Math.pow(q,2)*320;py=350-Math.sin(q*Math.PI)*95;pa=-.16-q*.7;ps=1+Math.sin(q*Math.PI)*.25}else if(t<.7){const q=(t-.36)/.34;px=630-(630-310)*q;py=350-55*Math.sin(q*Math.PI);ey-=Math.sin(q*Math.PI)*55*power;ea+=Math.sin(q*Math.PI*2)*.35*power}}else if(G.animation.kind==='enemy-ready'){ey-=Math.sin(Math.min(t/.75,1)*Math.PI/2)*35;ea-=.2*Math.min(t/.75,1)}else if(G.animation.kind==='enemy-hit'){if(t<.36){const q=t/.36;ex=650-Math.pow(q,2)*320;ey=315-Math.sin(q*Math.PI)*105;ea=.15+q*.8;es=1+Math.sin(q*Math.PI)*.35}else if(t<.7){const q=(t-.36)/.34;ex=330+320*q;ey=350-Math.sin(q*Math.PI)*50;py-=Math.sin(q*Math.PI)*25}}}
 let psy=.76,esy=.76;if(G.flipPlayer){const t=Math.min((G.now-G.flipPlayer)/800,1);psy=Math.cos(t*Math.PI)*.76;py-=Math.sin(t*Math.PI)*95;pa+=t*.18}if(G.flipEnemy){const t=Math.min((G.now-G.flipEnemy)/800,1);esy=Math.cos(t*Math.PI)*.76;ey-=Math.sin(t*Math.PI)*95;ea-=t*.2}if(G.stolen){const t=Math.min((G.now-G.stolenAt)/900,1);px+=t*560;py-=t*90;ctx.globalAlpha=1-t}
  // Ground shadows under each ttakji sell the height of each throw.

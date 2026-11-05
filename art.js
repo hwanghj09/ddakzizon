@@ -1,8 +1,8 @@
 'use strict';
-/* Authored PNGs are optional while loading; the original renderer is the fallback. */
+/* Native pixel characters share a fixed foot anchor in every scene and portrait. */
 window.GameArt=(()=>{
  const manifest=window.ART_MANIFEST||{},images={},portraits=new Map();
- const aliases={rival:'minsu'};
+ const aliases={rival:'minsu',wall:'folder',offbeat:'sprinter',champion:'boss',charger:'sprinter',fortress:'folder',national_champion:'champ',gust:'sprinter',glacier:'folder',continent_champion:'champ',showman:'minsu',architect:'folder',world_champion:'globe',martian:'alien',lunar:'alien',planet_champion:'alien_champ'};
  const canonical=kind=>aliases[kind]||kind;
  const loaded=key=>{const image=images[key];return image?.complete&&image.naturalWidth&&!image.failed?image:null};
  const ready=Promise.all(Object.entries(manifest).map(([key,entry])=>new Promise(resolve=>{
@@ -11,7 +11,7 @@ window.GameArt=(()=>{
   image.onerror=()=>{image.failed=true;console.warn('Game artwork unavailable: '+entry.src);resolve(false)};
   image.src=entry.src;
  })));
- function smooth(ctx){ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high'}
+ function smooth(ctx){ctx.imageSmoothingEnabled=false}
  function background(ctx,theme,ground=402){
   const key='backgrounds/'+theme,image=loaded(key);if(!image)return false;
   // Keep the square artwork's proportions and place its wall above the walk lane.
@@ -24,16 +24,17 @@ window.GameArt=(()=>{
   const width=stretch?maxWidth:sw*ratio,height=stretch?maxHeight:sh*ratio;
   ctx.save();smooth(ctx);ctx.drawImage(image,b[0],b[1],sw,sh,x-width/2,y-height,width,height);ctx.restore();return true;
  }
- function actor(ctx,x,y,kind,walk=0,scale=1,facing=1,animation=null,now=0){
-  const who=canonical(kind),attack=animation&&((kind==='hero'&&animation.kind==='player-hit')||(kind==='rival'&&animation.kind==='enemy-hit'))&&now-animation.at<620;
+ function actor(ctx,x,y,kind,walk=0,scale=1,facing=1,animation=null,now=0,role=kind==='hero'?'player':canonical(kind)==='minsu'?'enemy':null){
+  const who=canonical(kind),age=animation?now-animation.at:Infinity;
+  const attack=age>=0&&age<620&&((role==='player'&&animation.kind==='player-hit')||(role==='enemy'&&animation.kind==='enemy-hit'));
   const pose=attack?'attack':walk?(Math.floor(walk/140)%2?'walk-b':'walk-a'):'idle';
   let key=`characters/${who}/${pose}`;if(!loaded(key))key=`characters/${who}/idle`;
   const image=loaded(key),idle=manifest[`characters/${who}/idle`];if(!image||!idle)return false;
-  const ratio=98/(idle.bounds[3]-idle.bounds[1])*scale;
-  const bob=walk?Math.sin(walk/90)*.7:0;
-  ctx.save();ctx.translate(x,y);ctx.scale(facing<0?-1:1,1);smooth(ctx);
-  ctx.fillStyle='#25392b20';ctx.beginPath();ctx.ellipse(0,1,18*scale,4*scale,0,0,Math.PI*2);ctx.fill();
-  ctx.drawImage(image,-128*ratio,-240*ratio-bob,256*ratio,256*ratio);ctx.restore();return true;
+  // Integer magnification and one common anchor prevent animation size/feet jitter.
+  const pixel=Math.max(1,Math.round(7*scale)),[ax,ay]=idle.anchor;
+  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(facing<0?-1:1,1);smooth(ctx);
+  ctx.fillStyle='#25392b30';ctx.fillRect(-3*pixel,0,6*pixel,pixel);
+  ctx.drawImage(image,-ax*pixel,-ay*pixel,image.naturalWidth*pixel,image.naturalHeight*pixel);ctx.restore();return true;
  }
  function portrait(element,kind='hero'){
   if(!element)return;element.dataset.artCharacter=canonical(kind);
@@ -41,10 +42,10 @@ window.GameArt=(()=>{
   element.classList.remove('image-portrait');element.style.backgroundImage='';
   if(!image||!b)return;
   if(!portraits.has(key)){
-   const tile=document.createElement('canvas');tile.width=tile.height=192;
-   const c=tile.getContext('2d'),side=(b[3]-b[1])*.46;
-   c.imageSmoothingQuality='high';
-   c.drawImage(image,128-side/2,b[1]-3,side,side,0,0,192,192);
+   const tile=document.createElement('canvas');tile.width=tile.height=12;
+   const c=tile.getContext('2d');smooth(c);
+   // Same 12x12 head/shoulder crop for all 16x16 characters, including antennae.
+   c.drawImage(image,2,0,12,12,0,0,12,12);
    portraits.set(key,tile.toDataURL());
   }
   element.style.backgroundImage=`url("${portraits.get(key)}")`;element.classList.add('image-portrait');

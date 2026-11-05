@@ -6,7 +6,7 @@ button{font:inherit;font-weight:650;cursor:pointer;color:inherit;transition:back
 button:disabled{cursor:default;opacity:.45}button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}button svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 [hidden]{display:none!important}
 #game{width:100vw;height:100svh;max-width:1600px;max-height:1000px;position:relative;isolation:isolate;overflow:hidden;background:#1c302a}
-#world{width:100%;height:100%;display:block;}
+#world{width:100%;height:100%;display:block;image-rendering:pixelated}
 .vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 110px #162b241a;z-index:1}.film-lines{display:none}
 kbd{font:inherit;font-size:10px;font-weight:550;letter-spacing:.03em;background:#fff8;color:inherit;border:1px solid #84908555;border-radius:4px;padding:3px 6px;line-height:1.1;white-space:nowrap}
 .menu-primary,.menu-secondary{border:1px solid var(--line);border-radius:8px;padding:13px 18px;min-height:46px;font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:14px;text-decoration:none;text-align:left;line-height:1.4}
@@ -189,7 +189,7 @@ h1{font-size:clamp(86px,8vw,122px);letter-spacing:-.075em;font-weight:750;line-h
 #round-label{top:32px}
 
 /* Portraits crop the same authored character image used in the world. */
-.portrait.image-portrait,.player-avatar.image-portrait{background-color:#e9dfc9;background-size:cover;background-position:center;background-repeat:no-repeat}
+.portrait.image-portrait,.player-avatar.image-portrait{background-color:#e9dfc9;background-size:cover;background-position:center;background-repeat:no-repeat;image-rendering:pixelated;border-radius:0}
 .portrait.image-portrait::before,.portrait.image-portrait i{display:none}
 
 /* The classroom's only story branch stays distinct from facility menus. */

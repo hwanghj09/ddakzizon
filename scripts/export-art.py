@@ -1,8 +1,9 @@
 """Mechanically split generated originals and export game PNGs; requires Pillow + ImageMagick.
 
 Usage: python3 scripts/export-art.py /path/to/sources.json
-The source map contains hero/minsu strips, props sheet, npc-NAME singles, photo and nine backgrounds.
+The source map contains the props sheet, photo and nine backgrounds.
 Pillow only reads dimensions/alpha bounds; ImageMagick crops, scales and packages the PNGs.
+Characters are drawn separately on a native 16x16 grid by draw-characters.cjs.
 """
 import json
 import subprocess
@@ -48,16 +49,6 @@ def export(key, source, crop=None, factor=None):
     records[key] = {'src': str(path.relative_to(ROOT)), 'bounds': list(bounds(path)),
                     'anchor': [128, 240]}
 
-for who in ['hero', 'minsu']:
-    source = SOURCES[who]
-    with Image.open(source) as im:
-        w, h = im.size
-    cells = [(i*w//4, 0, (i+1)*w//4, h) for i in range(4)]
-    boxes = [bounds(source, c) for c in cells]
-    factor = min(224/max(b[3]-b[1] for b in boxes), 224/max(b[2]-b[0] for b in boxes))
-    for state, cell in zip(['idle','walk-a','walk-b','attack'], cells):
-        export(f'characters/{who}/{state}', source, cell, factor)
-
 # Hand inspected sheet regions: wide props intentionally cross grid lines.
 props = {
  'bed':(8,150,320,310), 'table':(320,115,638,310),
@@ -74,9 +65,6 @@ for name, cell in props.items():
 
 export('props/photo', SOURCES['photo'])
 
-for name in ['boss','champ','friend','neighbor','uncle','sprinter','folder','globe','alien','alien_champ']:
-    export(f'characters/{name}/idle', SOURCES['npc-'+name])
-
 for name in ['yard','home','alley','square','center','lobby','schoolfront','classroom','gazebo']:
     path = OUT / 'backgrounds' / (name+'.png')
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -86,4 +74,5 @@ for name in ['yard','home','alley','square','center','lobby','schoolfront','clas
 
 (OUT/'manifest.json').write_text(json.dumps(records, indent=2)+'\n')
 (ROOT/'art-manifest.js').write_text("'use strict';\nwindow.ART_MANIFEST="+json.dumps(records, separators=(',',':'))+';\n')
-print(f'Exported {len(records)} individual 256x256 PNGs')
+print(f'Exported {len(records)} scene PNGs at 256x256')
+subprocess.run(['node', str(ROOT / 'scripts/draw-characters.cjs')], check=True)
