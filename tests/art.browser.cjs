@@ -14,17 +14,17 @@ fs.mkdirSync(dir,{recursive:true});
    const corners=[3,255*4+3,(255*256)*4+3,(256*256-1)*4+3].map(i=>data[i]);
    return {key,width:im.naturalWidth,height:im.naturalHeight,corners,bounds:entry.bounds};
   }));
-  assert.equal(assets.length,42);
+  assert.equal(assets.length,44);
   for(const a of assets){assert.equal(a.width,256,a.key);assert.equal(a.height,256,a.key);if(!a.key.startsWith('backgrounds/')){assert.deepEqual(a.corners,[0,0,0,0],a.key+' has transparent margins');assert(a.bounds[0]>=10&&a.bounds[1]>=10&&a.bounds[2]<=246&&a.bounds[3]<=242,a.key+' fits its canvas')}}
   // Walking and attacks reuse a fixed feet anchor without resizing crouched poses.
   const alignment=await page.evaluate(()=>['hero','minsu'].map(who=>['idle','walk-a','walk-b','attack'].map(pose=>GameArt.manifest[`characters/${who}/${pose}`])));
   for(const frames of alignment){for(const frame of frames)assert.deepEqual(frame.anchor,[128,240]);assert(frames[3].bounds[3]-frames[3].bounds[1]<frames[0].bounds[3]-frames[0].bounds[1])}
   await page.screenshot({path:path.join(dir,'art-title.png')});
-  await page.locator('#minimum-new').click();await page.locator('#skip-dialogue').click();
+  await page.locator('#minimum-new').click();await page.locator('#skip-dialogue').click();await page.locator('#follow-friends').click();
   await page.waitForFunction(()=>G.state==='explore');
   for(const zone of ['yard','home','alley','square','center','lobby','schoolfront']){
    await page.evaluate(zone=>{Exploration.enter(zone,zone==='yard'?950:zone==='square'?870:zone==='lobby'?700:450);artDraws.clear()},zone);
-   await page.waitForFunction(zone=>[...artDraws].some(s=>s.endsWith('/backgrounds/'+zone+'.png'))&&[...artDraws].some(s=>s.includes('/characters/hero/')),zone);
+   await page.waitForFunction(zone=>[...artDraws].some(s=>s.endsWith('/backgrounds/'+(zone==='yard'?'gazebo':zone)+'.png'))&&[...artDraws].some(s=>s.includes('/characters/hero/')),zone);
    assert(await page.evaluate(()=>[...artDraws].some(s=>s.includes('/props/'))));
    await page.screenshot({path:path.join(dir,'art-'+zone+'.png')});
   }
@@ -53,6 +53,6 @@ fs.mkdirSync(dir,{recursive:true});
   await page.waitForFunction(()=>[...artDraws].some(s=>s.endsWith('/hero/idle.png')));
   await page.evaluate(()=>{failedArtImage.failed=false;delete window.failedArtImage});
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
-  console.log('PASS 42 exact 256x256 PNGs, alpha margins, seven authored maps, real keyboard walk/facing, aligned attack frames, mirrored rendering, shared portrait and background fallback');
+  console.log('PASS 44 exact 256x256 PNGs, alpha margins, seven authored maps, real keyboard walk/facing, aligned attack frames, mirrored rendering, shared portrait and background fallback');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -38,7 +38,7 @@ fs.mkdirSync(artifacts,{recursive:true});
    await reach('explore');
   };
   const hit=async()=>{await reach('ready');await p.locator('#attack').click();await reach('timing');await p.locator('#strike').click();await p.waitForFunction(()=>['ready','result','dialogue'].includes(G.state))};
-  await p.goto(url);await setup();await p.locator('#minimum-new').click();await skip();await reach('explore');
+  await p.goto(url);await setup();await p.locator('#minimum-new').click();await skip();await p.locator('#follow-friends').click();await reach('explore');
   await at('minsu');assert.match(await p.locator('#line').getAttribute('aria-label'),/이야기상 패배/);assert(await p.locator('#portrait').evaluate(el=>el.classList.contains('rival')));await skip();await reach('ready');
   await hit();assert.equal(await p.evaluate(()=>G.stats.turns),1);assert(await p.evaluate(()=>Number.isFinite(G.stolenAt)));await p.waitForTimeout(100);assert.deepEqual(await p.evaluate(()=>invalidCanvasTransforms),[]);await skip();await reach('explore');await stage('lost');
   await reload('lost');assert.equal(await p.evaluate(()=>G.mapZone),'yard');

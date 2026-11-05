@@ -191,3 +191,8 @@ h1{font-size:clamp(86px,8vw,122px);letter-spacing:-.075em;font-weight:750;line-h
 /* Portraits crop the same authored character image used in the world. */
 .portrait.image-portrait,.player-avatar.image-portrait{background-color:#e9dfc9;background-size:cover;background-position:center;background-repeat:no-repeat}
 .portrait.image-portrait::before,.portrait.image-portrait i{display:none}
+
+/* The classroom's only story branch stays distinct from facility menus. */
+.story-choice{position:absolute;left:50%;bottom:4%;translate:-50% 0;width:min(620px,82%);padding:18px 28px;background:#f7f2e7;z-index:5}
+.story-eyebrow{font-size:10px;letter-spacing:.09em;color:#758577;margin:0 0 8px}.story-choice h2{font-size:24px;letter-spacing:-.04em;margin:0 0 10px}.story-choice>p:not(.story-eyebrow){font-size:13px;line-height:1.8;color:#677360;margin:0 0 20px}.story-choice .menu-primary{width:100%;display:flex;justify-content:space-between;align-items:center;background:#d9c59b;border-color:#d9c59b;color:#263d35}.story-choice .menu-primary:hover{background:#ead8af}
+@media(max-height:700px){.story-choice{padding:16px 24px;bottom:3%}.story-choice .story-eyebrow{display:none}.story-choice h2{font-size:22px;margin-bottom:8px}.story-choice>p:not(.story-eyebrow){font-size:12px;line-height:1.5;margin-bottom:12px}}

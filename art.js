@@ -15,7 +15,7 @@ window.GameArt=(()=>{
  function background(ctx,theme,ground=402){
   const key='backgrounds/'+theme,image=loaded(key);if(!image)return false;
   // Keep the square artwork's proportions and place its wall above the walk lane.
-  const horizon=theme==='home'?.665:theme==='lobby'?.65:.63;
+  const horizon=theme==='home'?.665:theme==='lobby'?.65:theme==='classroom'?.60:theme==='gazebo'?.64:.63;
   ctx.save();smooth(ctx);ctx.drawImage(image,0,ground-horizon*960,960,960);ctx.restore();return true;
  }
  function prop(ctx,name,x,y,maxWidth=150,maxHeight=130,stretch=false){
@@ -82,7 +82,7 @@ window.GameArt=(()=>{
     text(active?'E':o.type==='npc'?'…':'·',o.x,o.type==='npc'?302:332,active?12:11,'#274340','center',800);
    }
   }
-  if(theme==='yard')paper(1025,430,23,'red',.2);
+  if(theme==='yard'||theme==='gazebo')paper(1025,430,23,'red',.2);
   const left=zone.left,right=zone.right;
   if(left)sign('← '+Exploration.zones[left].name,130,488,195);
   if(right)sign(Exploration.zones[right].name+' →',zone.width-140,488,200);

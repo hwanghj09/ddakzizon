@@ -46,7 +46,7 @@ function tree(x,y,s=1){const cx=x+28*s,cy=y+22*s;ell(cx,y+95*s,32*s,7*s,'#000000
 function grassEdge(y){rect(0,y-3,960,3,OUT);rect(0,y,960,14,'#4cc95a');rect(0,y+10,960,4,'#2f9e44');for(let i=0;i<48;i++)rect(i*20+(i%3)*4,y-2,4,6,'#4cc95a')}
 
 function school(){
- if(window.GameArt?.background(ctx,'yard',290))return;
+ if(window.GameArt?.background(ctx,window.Minimum?.active?'gazebo':'yard',290))return;
  sky(290);sun(866,70);cloud(98+Math.sin(G.now/20000)*15,69);cloud(640+Math.sin(G.now/24000)*12,98,.75);cloud(345,40,.5);hills(250);
  // School building with a red roof and bright glass.
  box(175,114,620,150,'#fff1d0');rect(175,240,620,24,'#f4d6a2');poly([[158,116],[812,116],[790,90],[180,90]],RED);rect(190,95,590,4,'#ff8f85');
@@ -248,7 +248,16 @@ function drawHome(){
 if(G.mode==='home_upgrade'){drawHomeWorkbench();return}
 if(illustrated)GameArt.prop(ctx,'table',480,430,440,220);
 const x=480,y=280,size=190;if(G.fold===4&&G.now-G.foldAt>=450&&ttakji(x,y,size*(1-G.fold*.055),'newspaper','inventory'))return;ctx.save();ctx.translate(x,y);const t=Math.min((G.now-G.foldAt)/450,1),foldScale=1-G.fold*.055;ctx.scale(foldScale,foldScale);rect(-95+8,-95+9,190,190,'#1b123040');box(-95,-95,190,190,'#fff6e0');for(let i=0;i<10;i++){rect(-82,-80+i*17,68,3,'#6b728055');rect(9,-80+i*17,70,3,'#6b728055')}const triangles=[[[-95,-95],[95,-95],[0,0]],[[95,95],[-95,95],[0,0]],[[95,-95],[95,95],[0,0]],[[-95,95],[-95,-95],[0,0]]];for(let i=0;i<G.fold;i++){ctx.globalAlpha=i===G.fold-1?Math.min(1,t*2):1;poly(triangles[i],['#ffe9b8','#f5d68f','#ffe1a0','#f0c97a'][i])}ctx.globalAlpha=1;ctx.restore();if(G.state==='folding'){const spots=[[385,185],[575,375],[575,185],[385,375]],p=spots[G.fold];if(p){const pulse=1+Math.sin(G.now/200)*.12;ctx.save();ctx.translate(p[0],p[1]);ctx.scale(pulse,pulse);circle(0,0,26,'#ffe14d55');circle(0,0,19,OUT);circle(0,0,16,YELLOW);text(String(G.fold+1),0,6,17,OUT,'center',900);ctx.restore()}}}
+function drawClassroom(){
+ if(!window.GameArt?.background(ctx,'classroom',402)){
+  rect(0,0,960,402,'#d7c9a9');rect(0,402,960,198,'#b68c59');
+  panel(225,105,510,173,8,'#46675b','#a87949',10);
+  for(const x of [80,850]){box(x,120,75,170,'#b9d9da');line(x+37,120,x+37,290,'#f0e2c2',4)}
+ }
+ actor(340,410,'hero',0,1.3,1);actor(570,410,'rival',0,1.2,1);actor(705,410,'boss',0,1.2,-1);
+ panel(388,53,184,46,7,'#f4ead7e8','#a68c6244',1);text('수업 끝',480,83,23,'#304b43','center',700);
+}
 function drawTitle(){school();npcGroup();actor(520,416,'hero',Math.sin(G.now/900)>0?30:0,1.5,1);paper(710,470,155,'news',-.22+Math.sin(G.now/700)*.04,.8);paper(818,420,103,'red',.18+Math.sin(G.now/800+1)*.05,.8)}
-function frame(now){if(viewWidth()!==viewportWidth)resize();const dt=Math.min(now-last||16,50);last=now;if(!G.paused)update(dt);const dpr=Math.min(devicePixelRatio||1,2);ctx.setTransform(dpr,0,0,dpr,0,0);rect(0,0,width,height,'#1c302a');ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);if(!reducedMotion&&G.shake>0.1)ctx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake);if(G.state==='title')drawTitle();else if(G.scene==='battle')drawBattle();else if(Exploration.active())MapRenderer.draw(ctx,{rect,text,line,tree,actor,paper});else if(G.scene==='home')drawHome();else if(G.scene==='village')drawVillage();else if(G.scene==='city')drawCity();else if(G.scene==='province')drawProvince();else if(G.scene==='national')drawNational();else if(Tiers[G.scene])drawTier(G.scene);else if(G.scene==='advert')drawAdvert();else drawExplore();for(const p of G.particles){ctx.globalAlpha=Math.max(0,p.life/p.max);const s=p.size+1;rect(p.x-2,p.y-2,s+4,s+4,OUT);rect(p.x,p.y,s,s,p.color)}ctx.globalAlpha=1;for(const p of G.floaters){const t=(G.now-p.at)/950;ctx.globalAlpha=Math.max(0,1-t);text(p.text,p.x,p.y-t*60,30,YELLOW,'center',900,OUT)}ctx.globalAlpha=1;if(G.flash>.005){ctx.fillStyle=`rgba(255,246,200,${G.flash})`;ctx.fillRect(0,0,960,600)}ctx.restore();requestAnimationFrame(frame)}
+function frame(now){if(viewWidth()!==viewportWidth)resize();const dt=Math.min(now-last||16,50);last=now;if(!G.paused)update(dt);const dpr=Math.min(devicePixelRatio||1,2);ctx.setTransform(dpr,0,0,dpr,0,0);rect(0,0,width,height,'#1c302a');ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);if(!reducedMotion&&G.shake>0.1)ctx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake);if(G.state==='title')drawTitle();else if(G.scene==='classroom')drawClassroom();else if(G.scene==='battle')drawBattle();else if(Exploration.active())MapRenderer.draw(ctx,{rect,text,line,tree,actor,paper});else if(G.scene==='home')drawHome();else if(G.scene==='village')drawVillage();else if(G.scene==='city')drawCity();else if(G.scene==='province')drawProvince();else if(G.scene==='national')drawNational();else if(Tiers[G.scene])drawTier(G.scene);else if(G.scene==='advert')drawAdvert();else drawExplore();for(const p of G.particles){ctx.globalAlpha=Math.max(0,p.life/p.max);const s=p.size+1;rect(p.x-2,p.y-2,s+4,s+4,OUT);rect(p.x,p.y,s,s,p.color)}ctx.globalAlpha=1;for(const p of G.floaters){const t=(G.now-p.at)/950;ctx.globalAlpha=Math.max(0,1-t);text(p.text,p.x,p.y-t*60,30,YELLOW,'center',900,OUT)}ctx.globalAlpha=1;if(G.flash>.005){ctx.fillStyle=`rgba(255,246,200,${G.flash})`;ctx.fillRect(0,0,960,600)}ctx.restore();requestAnimationFrame(frame)}
 resize();requestAnimationFrame(frame);
 })();

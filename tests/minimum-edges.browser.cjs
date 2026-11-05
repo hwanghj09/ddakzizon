@@ -7,7 +7,7 @@ const url=process.env.TEST_URL||'http://127.0.0.1:4173';
   const p=await browser.newPage();p.on('pageerror',e=>errors.push(e.message));await p.goto(url);
   await p.evaluate(()=>localStorage.setItem('ddakzizon.minimum.v1','{broken JSON'));
   await p.reload();assert(await p.locator('#minimum-load').isHidden());
-  await p.locator('#minimum-new').click();await p.locator('#skip-dialogue').click();
+  await p.locator('#minimum-new').click();await p.locator('#skip-dialogue').click();await p.locator('#follow-friends').click();await p.waitForFunction(()=>G.state==='explore');
   assert.equal(await p.evaluate(()=>Minimum.progress.stage),'school');
   // Entering the center early never skips the school or poster prerequisites.
   await p.evaluate(()=>Minimum.enter('center',700));await p.keyboard.press('KeyE');

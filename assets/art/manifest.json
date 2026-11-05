@@ -474,5 +474,11 @@
   },
   "backgrounds/schoolfront": {
     "src": "assets/art/backgrounds/schoolfront.png"
+  },
+  "backgrounds/classroom": {
+    "src": "assets/art/backgrounds/classroom.png"
+  },
+  "backgrounds/gazebo": {
+    "src": "assets/art/backgrounds/gazebo.png"
   }
 }

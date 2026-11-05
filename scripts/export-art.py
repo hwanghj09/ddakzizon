@@ -1,7 +1,7 @@
 """Mechanically split generated originals and export game PNGs; requires Pillow + ImageMagick.
 
 Usage: python3 scripts/export-art.py /path/to/sources.json
-The source map contains hero/minsu strips, props sheet, npc-NAME singles, photo and seven backgrounds.
+The source map contains hero/minsu strips, props sheet, npc-NAME singles, photo and nine backgrounds.
 Pillow only reads dimensions/alpha bounds; ImageMagick crops, scales and packages the PNGs.
 """
 import json
@@ -77,7 +77,7 @@ export('props/photo', SOURCES['photo'])
 for name in ['boss','champ','friend','neighbor','uncle','sprinter','folder','globe','alien','alien_champ']:
     export(f'characters/{name}/idle', SOURCES['npc-'+name])
 
-for name in ['yard','home','alley','square','center','lobby','schoolfront']:
+for name in ['yard','home','alley','square','center','lobby','schoolfront','classroom','gazebo']:
     path = OUT / 'backgrounds' / (name+'.png')
     path.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(['magick', SOURCES[name], '-resize', '256x256^', '-gravity', 'center',

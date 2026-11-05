@@ -33,5 +33,14 @@ test('minimum saves validate version/stage, sanitize positions and stay independ
  assert.equal(restored.visited.planet,undefined);assert.equal(restored.coins,undefined);
  assert.equal(M.restore({version:1,stage:'lost',zone:'home',x:999999}).x,1235);
  assert.equal(M.restore({version:1,stage:'lost',zone:'home',x:-10}).x,45);
- for(const stage of M.stages){const p=M.fresh();p.stage=stage;assert.deepEqual(M.restore(JSON.parse(JSON.stringify(p))),p)}
+ for(const stage of M.stages){const p=M.fresh();p.stage=stage;if(stage!=='school')p.opening='done';assert.deepEqual(M.restore(JSON.parse(JSON.stringify(p))),p)}
+});
+
+test('classroom and choice saves resume; old or later saves never replay the opening',()=>{
+ assert.equal(M.fresh().opening,'classroom');
+ for(const opening of ['classroom','choice','done'])assert.equal(M.restore({...M.fresh(),opening}).opening,opening);
+ const old={version:1,stage:'school',zone:'yard',x:500};
+ assert.equal(M.restore(old).opening,'done');assert.equal(M.restore({...old,opening:'garbage'}).opening,'done');
+ for(const stage of M.stages.slice(1))assert.equal(M.restore({...old,stage,opening:'choice'}).opening,'done');
+ const p=M.fresh();assert(M.advance(p,'lost'));assert.equal(p.opening,'done');
 });

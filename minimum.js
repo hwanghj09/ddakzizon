@@ -6,6 +6,7 @@ const Minimum={
  init(){
   try{this.saved=MinimumRules.restore(JSON.parse(localStorage.getItem(this.key)))}catch{/* Private mode or an invalid save: start normally. */}
   $('minimum-new').onclick=()=>this.start();$('minimum-load').onclick=()=>this.start(true);
+  $('follow-friends').onclick=()=>this.followFriends();
   $('skip-dialogue').onclick=()=>{if(!this.active||G.paused||G.state!=='dialogue')return;G.state='transition';G.dialogDone()};
   // Exploration owns the shared world coordinates. Select this story's behavior
   // only while it is active; campaign functions remain available unchanged.
@@ -26,13 +27,29 @@ const Minimum={
   this.progress=resume&&this.saved?structuredClone(this.saved):MinimumRules.fresh();
   G.profile=P.fresh();G.fold=MinimumRules.atLeast(this.progress,'crafted')?4:0;
   G.flipPlayer=G.flipEnemy=0;G.stolen=false;G.practice=[];
+  if(this.progress.opening!=='done'){this.opening();return}
   this.enter(this.progress.zone,this.progress.x);
-  if(!resume)this.talk([
-   ['민수','여기로 와! 좌우 방향키나 A, D로 걷고, 가까이에서 E로 말을 걸어. 마우스로 화면의 버튼을 눌러도 돼.'],
-   ['나','오늘은 내 신문지 딱지로 도전해 볼까?']
-  ]);
  },
- zoneData(){return Exploration.zones[this.progress.zone]},
+ opening(){
+  G.mapZone=null;G.scene='classroom';G.mode='minimum';this.hud();this.save();
+  if(this.progress.opening==='choice'){this.openingChoice();return}
+  this.talk([
+   ['나','딩동댕동—. 마지막 수업이 끝났다. 책을 챙기는데 옆자리에서 이야기가 들려온다.'],
+   ['민수','야, 오늘 딱지 어디서 칠 거야?'],
+   ['도윤','운동장 정자에서. 수업 끝났으니까 바로 가자.'],
+   ['나','딱지…? 둘이 뭘 하는지 궁금해졌다.']
+  ],()=>this.openingChoice());$('game').focus({preventScroll:true});
+ },
+ openingChoice(){
+  this.progress.opening='choice';G.state='choice';G.keys.clear();G.target=null;
+  panels('story-choice');this.save();$('follow-friends').focus({preventScroll:true});
+ },
+ followFriends(){
+  if(!this.active||G.paused||G.state!=='choice'||this.progress.opening!=='choice')return;
+  sound('click');this.progress.opening='done';this.progress.zone='yard';this.progress.x=760;this.save();
+  transition(()=>this.enter('yard',760));
+ },
+ zoneData(){const z=Exploration.zones[this.progress.zone];return this.progress.zone==='yard'?{...z,name:'운동장 정자',theme:'gazebo'}:z},
  phase(){return this.progress.stage==='school'?'school':MinimumRules.atLeast(this.progress,'won')?'campaign':MinimumRules.atLeast(this.progress,'practiced')?'rematch':'lost'},
  objects(){
   return Exploration.zones[this.progress.zone].objects
@@ -42,13 +59,14 @@ const Minimum={
  enter(zone,x){
   if(!Object.hasOwn(MinimumRules.zones,zone))zone='yard';
   cancelScene();G.mapZone=zone;G.hub='village';G.scene='village';G.mode='minimum';G.state='explore';
+  this.progress.opening='done';
   G.stolen=false;G.flipPlayer=G.flipEnemy=0;
   G.hero={x:Math.max(45,Math.min(MinimumRules.zones[zone]-45,x??180)),y:440,walk:0,facing:1};
   const view=window.World?.viewWidth?.()||960;
   G.camera=Math.max(0,Math.min(MinimumRules.zones[zone]-view,G.hero.x-view/2));
   this.progress.zone=zone;this.progress.x=G.hero.x;this.progress.visited[zone]=true;
   G.profile.map.zone=zone;G.profile.map.x=G.hero.x;
-  panels('explore-ui');this.hud();this.save();this.updateInteract();toast(Exploration.zones[zone].name,'location');$('game').focus({preventScroll:true});
+  panels('explore-ui');this.hud();this.save();this.updateInteract();toast(this.zoneData().name,'location');$('game').focus({preventScroll:true});
  },
  save(){
   if(!this.active)return;
@@ -61,8 +79,8 @@ const Minimum={
  },
  complete(stage){if(MinimumRules.advance(this.progress,stage)){this.save();this.hud();return true}return false},
  hud(){setInventory(MinimumRules.owned(this.progress)?'신문지 딱지 · 장착 중':'빈 주머니',MinimumRules.owned(this.progress))},
- objective(){return {
-  school:['yard','민수에게 말을 걸어 첫 경기를 하자'],lost:['home','집 식탁에서 신문지 딱지를 접자'],
+ objective(){if(this.progress.opening!=='done')return ['yard',this.progress.opening==='choice'?'궁금한 마음에 친구들을 따라가자':'옆자리 친구들의 이야기를 들어 보자'];return {
+  school:['yard','정자에 있는 민수에게 말을 걸자'],lost:['home','집 식탁에서 신문지 딱지를 접자'],
   crafted:['home','집 연습 표적으로 타이밍을 연습하자'],practiced:['yard','민수에게 재대결을 신청하자'],
   won:['schoolfront','학교 앞 대회 포스터를 읽자'],poster:['lobby','주민센터 접수원에게 참가 신청하자'],
   registered:['lobby','접수 완료! 대진표를 확인하자']
@@ -70,7 +88,7 @@ const Minimum={
  updateInteract(){
   const o=Exploration.nearest(),[dest,goal]=this.objective();
   coach(o?`${o.name} · ${o.type==='door'?'들어가기':o.type==='npc'?'대화':'조사'} [E]`:'');
-  $('map-location').textContent=Exploration.zones[this.progress.zone].name;$('map-objective').textContent=goal;
+  $('map-location').textContent=this.zoneData().name;$('map-objective').textContent=goal;
   $('map-direction').textContent=this.progress.guidance?dest!==G.mapZone?Exploration.direction(dest):this.localDirection():'';
  },
  localDirection(){
