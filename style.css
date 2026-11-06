@@ -1,6 +1,8 @@
 /* Paper, pine and warm ink: one visual language for every game overlay. */
 :root{--ink:#263b32;--navy:#294c3d;--paper:#faf7ef;--cream:#eee7d7;--gold:#dfb968;--orange:#c99850;--red:#ac5b45;--blue:#557d88;--green:#568569;--purple:#54715c;--muted:#5f6f5d;--line:#dcd8ca;--shadow:0 12px 40px #162b2426;--outline:0 2px 8px #142b2666}
 *{box-sizing:border-box}
+img{image-rendering:pixelated}
+#inventory{image-rendering:pixelated}
 body{margin:0;background:#1c302a;color:var(--ink);font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;font-weight:500;overflow:hidden;display:grid;place-items:center;height:100svh}
 button{font:inherit;font-weight:650;cursor:pointer;color:inherit;transition:background .15s,border-color .15s,box-shadow .15s,opacity .15s}
 button:disabled{cursor:default;opacity:.45}button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}button svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}

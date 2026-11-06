@@ -12,13 +12,13 @@ fs.mkdirSync(dir,{recursive:true});
    const im=GameArt.loaded(key),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const ctx=c.getContext('2d');ctx.drawImage(im,0,0);
    const data=ctx.getImageData(0,0,c.width,c.height).data;
    const corners=[3,(c.width-1)*4+3,((c.height-1)*c.width)*4+3,(c.width*c.height-1)*4+3].map(i=>data[i]);
-   return {key,width:im.naturalWidth,height:im.naturalHeight,corners,bounds:entry.bounds};
+   return {key,width:im.naturalWidth,height:im.naturalHeight,corners,bounds:entry.bounds,expected:entry.size};
   }));
-  assert.equal(assets.length,81);
-  for(const a of assets){const character=a.key.startsWith('characters/'),background=a.key.startsWith('backgrounds/'),size=character?16:background?240:32;assert.equal(a.width,size,a.key);assert.equal(a.height,background?160:size,a.key);if(!background){assert.deepEqual(a.corners,[0,0,0,0],a.key+' has transparent margins');assert(character?a.bounds[0]>=1&&a.bounds[1]>=0&&a.bounds[2]<=15&&a.bounds[3]===15:a.bounds[0]>=1&&a.bounds[1]>=1&&a.bounds[2]<=31&&a.bounds[3]<=30,a.key+' fits its canvas')}}
+  assert.equal(assets.length,96);
+  for(const a of assets){const character=a.key.startsWith('characters/'),scene=a.key.startsWith('backgrounds/')||a.key.startsWith('panoramas/');assert.deepEqual([a.width,a.height],a.expected,a.key);if(!scene){assert.deepEqual(a.corners,[0,0,0,0],a.key+' has transparent margins');assert(character?a.bounds[0]>=2&&a.bounds[1]>=0&&a.bounds[2]<=30&&a.bounds[3]===30:a.bounds[0]>=1&&a.bounds[1]>=1&&a.bounds[2]<=31&&a.bounds[3]<=30,a.key+' fits its canvas')}}
   // Walking and attacks reuse a fixed feet anchor without resizing crouched poses.
   const alignment=await page.evaluate(()=>[...new Set(Object.keys(GameArt.manifest).filter(k=>k.startsWith('characters/')).map(k=>k.split('/')[1]))].map(who=>['idle','walk-a','walk-b','attack'].map(pose=>GameArt.manifest[`characters/${who}/${pose}`])));
-  for(const frames of alignment){for(const frame of frames)assert.deepEqual(frame.anchor,[8,15]);assert(frames[3].bounds[3]-frames[3].bounds[1]<frames[0].bounds[3]-frames[0].bounds[1])}
+  for(const frames of alignment){for(const frame of frames)assert.deepEqual(frame.anchor,[16,30]);assert(frames[3].bounds[3]-frames[3].bounds[1]<frames[0].bounds[3]-frames[0].bounds[1])}
   // Every tournament kind resolves to pixel art and uses its own attacking frame.
   const drawn=await page.evaluate(()=>{
    const kinds=['hero','rival',...['opponents','cityOpponents','provinceOpponents','nationalOpponents','continentOpponents','worldOpponents','planetOpponents'].flatMap(k=>TtakjiProgression[k].map(o=>o.kind))];
@@ -33,7 +33,7 @@ fs.mkdirSync(dir,{recursive:true});
   await page.waitForFunction(()=>getComputedStyle(document.getElementById('curtain')).opacity==='0');
   for(const zone of ['yard','home','alley','square','center','lobby','schoolfront']){
    await page.evaluate(zone=>{Exploration.enter(zone,zone==='yard'?950:zone==='square'?870:zone==='lobby'?700:450);artDraws.clear()},zone);
-   await page.waitForFunction(zone=>[...artDraws].some(s=>s.endsWith('/backgrounds/'+(zone==='yard'?'gazebo':zone)+'.png'))&&[...artDraws].some(s=>s.includes('/characters/hero/')),zone);
+   await page.waitForFunction(zone=>[...artDraws].some(s=>s.endsWith('/panoramas/'+(zone==='yard'?'gazebo':zone)+'.png'))&&[...artDraws].some(s=>s.includes('/characters/hero/')),zone);
    assert(await page.evaluate(()=>[...artDraws].some(s=>s.includes('/props/'))));
    await page.screenshot({path:path.join(dir,'art-'+zone+'.png')});
   }
@@ -58,7 +58,7 @@ fs.mkdirSync(dir,{recursive:true});
   await page.screenshot({path:path.join(dir,'art-dialogue.png')});
   await page.locator('#skip-dialogue').click();
   // A missing background keeps the original canvas scene usable.
-  const fallback=await page.evaluate(()=>{Exploration.enter('home',420);window.failedArtImage=GameArt.loaded('backgrounds/home');failedArtImage.failed=true;artDraws.clear();const canvas=document.createElement('canvas');canvas.width=960;canvas.height=600;return GameArt.map(canvas.getContext('2d'),{})});assert.equal(fallback,false);
+  const fallback=await page.evaluate(()=>{Exploration.enter('home',420);window.failedArtImage=GameArt.loaded('panoramas/home');failedArtImage.failed=true;artDraws.clear();const canvas=document.createElement('canvas');canvas.width=960;canvas.height=600;return GameArt.map(canvas.getContext('2d'),{})});assert.equal(fallback,false);
   await page.waitForFunction(()=>[...artDraws].some(s=>s.endsWith('/hero/idle.png')));
   await page.evaluate(()=>{failedArtImage.failed=false;delete window.failedArtImage});
   // A non-Minsu enemy attacks through the real world renderer, not just GameArt.
@@ -71,6 +71,6 @@ fs.mkdirSync(dir,{recursive:true});
    finally{frame.failed=false}
   }));
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
-  console.log('PASS 48 native 16x16 character frames + 33 pixel scene assets, all tournament attackers, nearest-neighbor integer drawing, seven maps, keyboard walk/facing, exact mirroring, pixel portraits and fallback');
+  console.log('PASS 48 32x32 character frames + 48 pixel scene assets, all tournament attackers, nearest-neighbor integer drawing, seven scrolling maps, keyboard walk/facing, exact mirroring, pixel portraits and fallback');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

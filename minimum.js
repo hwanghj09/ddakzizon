@@ -26,9 +26,11 @@ const Minimum={
   cancelScene();initAudio();sound('click');this.active=true;document.body.classList.add('minimum-mode');
   this.progress=resume&&this.saved?structuredClone(this.saved):MinimumRules.fresh();
   G.profile=P.fresh();G.fold=MinimumRules.atLeast(this.progress,'crafted')?4:0;
+  G.profile.upgrades.newspaper=G.fold===4?1:0;
   G.flipPlayer=G.flipEnemy=0;G.stolen=false;G.practice=[];
   if(this.progress.opening!=='done'){this.opening();return}
-  this.enter(this.progress.zone,this.progress.x);
+  if(this.progress.stage==='lost'&&this.progress.homeLesson==='pending')this.enter('home',420);
+  else this.enter(this.progress.zone,this.progress.x);
  },
  opening(){
   G.mapZone=null;G.scene='classroom';G.mode='minimum';this.hud();this.save();
@@ -52,9 +54,11 @@ const Minimum={
  zoneData(){const z=Exploration.zones[this.progress.zone];return this.progress.zone==='yard'?{...z,name:'운동장 정자',theme:'gazebo'}:z},
  phase(){return this.progress.stage==='school'?'school':MinimumRules.atLeast(this.progress,'won')?'campaign':MinimumRules.atLeast(this.progress,'practiced')?'rematch':'lost'},
  objects(){
-  return Exploration.zones[this.progress.zone].objects
+  const objects=Exploration.zones[this.progress.zone].objects
    .filter(([id])=>id!=='doyun'||!MinimumRules.atLeast(this.progress,'won'))
    .map(([id,name,x,type])=>({id,name:id==='press'?'딱지 압축기 · 준비 중':id==='shop'?'종이 잡화점 · 준비 중':name,x,type}));
+  if(this.progress.zone==='home')objects.push({id:'father',name:'아빠',x:560,type:'npc'});
+  return objects;
  },
  enter(zone,x){
   if(!Object.hasOwn(MinimumRules.zones,zone))zone='yard';
@@ -67,6 +71,7 @@ const Minimum={
   this.progress.zone=zone;this.progress.x=G.hero.x;this.progress.visited[zone]=true;
   G.profile.map.zone=zone;G.profile.map.x=G.hero.x;
   panels('explore-ui');this.hud();this.save();this.updateInteract();toast(this.zoneData().name,'location');$('game').focus({preventScroll:true});
+  if(zone==='home'&&this.progress.stage==='lost'&&this.progress.homeLesson==='pending')this.fatherLesson();
  },
  save(){
   if(!this.active)return;
@@ -78,9 +83,9 @@ const Minimum={
   try{localStorage.setItem(this.key,JSON.stringify(this.saved));G.storageOK=true}catch{G.storageOK=false;toast('자동 저장을 사용할 수 없어요. 현재 플레이는 계속할 수 있어요.')}
  },
  complete(stage){if(MinimumRules.advance(this.progress,stage)){this.save();this.hud();return true}return false},
- hud(){setInventory(MinimumRules.owned(this.progress)?'신문지 딱지 · 장착 중':'빈 주머니',MinimumRules.owned(this.progress))},
+ hud(){setInventory(MinimumRules.owned(this.progress)?`신문지 딱지${MinimumRules.atLeast(this.progress,'crafted')?' +1':''} · 장착 중`:'빈 주머니',MinimumRules.owned(this.progress))},
  objective(){if(this.progress.opening!=='done')return ['yard',this.progress.opening==='choice'?'궁금한 마음에 친구들을 따라가자':'옆자리 친구들의 이야기를 들어 보자'];return {
-  school:['yard','정자에 있는 민수에게 말을 걸자'],lost:['home','집 식탁에서 신문지 딱지를 접자'],
+  school:['yard','정자에 있는 민수에게 말을 걸자'],lost:['home','아빠에게 딱지 강화 방법을 배우자'],
   crafted:['home','집 연습 표적으로 타이밍을 연습하자'],practiced:['yard','민수에게 재대결을 신청하자'],
   won:['schoolfront','학교 앞 대회 포스터를 읽자'],poster:['lobby','주민센터 접수원에게 참가 신청하자'],
   registered:['lobby','접수 완료! 대진표를 확인하자']
@@ -115,7 +120,7 @@ const Minimum={
   }
   if(id==='minsu'){
    if(stage==='school')this.talk([
-    ['민수','이 첫 경기는 이야기상 패배하는 연습 경기야. 공격과 타이밍을 한 번 경험해 봐. 다음 재대결은 실력으로 승부하자!'],
+    ['민수','한 판 해 볼래? 서로 딱지 한 장씩 걸고, 뒤집히면 끝이야. 끝까지 버텨 보자!'],
     ['민수','공격 버튼이나 스페이스로 딱지를 들고, 게이지가 가운데에 왔을 때 다시 눌러. 가운데일수록 더 강해!'],
     ['민수','내구도가 낮을수록 잘 뒤집혀. 내구도가 남아 있어도 딱지가 뒤집히면 끝이야!']
    ],()=>transition(()=>this.battle('intro_battle')));
@@ -124,11 +129,13 @@ const Minimum={
    return;
   }
   if(id==='table'){
-   if(stage==='lost')this.menuPanel('식탁 · 새 신문지 딱지',['아빠: 신문 한 장이면 다시 시작할 수 있지. 모서리를 겹쳐 단단하게 접어 보자.'],[['신문지 딱지 접기',()=>{
-    if(!this.complete('crafted'))return;G.fold=4;G.foldAt=G.now;sound('fold');
-    result('다시, 한 장.','신문지 딱지를 접어 자동으로 장착했다. 오른쪽 연습 표적으로 가 보자.','표적에 연습하러 가기',()=>this.enter('home',420));
-   }]]);
-   else this.talk(stage==='school'?'민수와 먼저 한 판 해 보자.':'내가 접은 신문지 딱지다. 강화와 압축은 다음 단계에서 배울 수 있다.');
+   if(stage==='lost'){if(this.progress.homeLesson!=='heard')this.fatherLesson();else this.workbench()}
+   else this.talk(stage==='school'?'민수와 먼저 한 판 해 보자.':'아빠에게 배운 대로 보강지를 넣고 눌렀다. 강화 +1! 이제 표적에서 연습해 보자.');
+   return;
+  }
+  if(id==='father'){
+   if(stage==='lost'){if(this.progress.homeLesson!=='heard')this.fatherLesson();else this.workbench()}
+   else this.talk([['아빠','잘 접는 것도, 손에 익히는 것도 실력이야. 표적에서 한 번 더 연습해 볼까?']]);
    return;
   }
   if(id==='target'){
@@ -160,19 +167,19 @@ const Minimum={
  },
  battle(mode){
   cancelScene();this.save();G.scene='battle';G.mode=mode;G.state='ready';G.round=1;G.practice=[];
-  G.hp=G.maxHp=G.enemyHp=G.enemyMax=MinimumRules.config.tile.hp;
+  G.hp=G.maxHp=MinimumRules.playerTile(this.progress).hp;G.enemyHp=G.enemyMax=MinimumRules.config.tile.hp;
   G.stats={perfect:0,damage:0,turns:0};G.flipPlayer=G.flipEnemy=0;G.stolen=false;
   G.focusAvailable=G.guardAvailable=G.powerAvailable=G.focused=false;
   $('guard').hidden=true;$('power').hidden=true;
   document.querySelector('.health-card.player small').textContent='신문지 딱지';
   $('enemy-name').replaceChildren(document.createTextNode(mode==='practice'?'연습 표적':'민수'));
   const small=document.createElement('small');small.textContent='신문지 딱지';$('enemy-name').append(small);
-  panels('battle-hud','combat-controls');this.hud();this.ready();
+  panels('battle-hud','combat-controls');this.hud();if(mode==='intro_battle')openingRally(()=>this.ready());else this.ready();
  },
  health(){
   $('player-hp').textContent=`${G.hp} / ${G.maxHp}`;$('enemy-hp').textContent=G.mode==='practice'?'연습용':`${G.enemyHp} / ${G.enemyMax}`;
   $('player-bar').style.width=`${100*G.hp/G.maxHp}%`;$('enemy-bar').style.width=`${100*G.enemyHp/G.enemyMax}%`;
-  $('round-label').textContent=G.mode==='practice'?'타이밍 연습':G.mode==='intro_battle'?'이야기 경기':`ROUND ${G.round}`;
+  $('round-label').textContent=G.mode==='practice'?'타이밍 연습':G.mode==='intro_battle'?'마지막 한 수':`ROUND ${G.round}`;
  },
  ready(){
   G.state='ready';G.animation=null;$('actions').hidden=false;$('timing').hidden=true;$('attack').disabled=false;
@@ -193,7 +200,9 @@ const Minimum={
   G.state='resolving';G.stats.turns++;if(grade==='PERFECT')G.stats.perfect++;
   $('timing').hidden=true;G.animation={kind:'player-hit',at:G.now,grade};sound('whoosh');
   after(360,()=>{
-   const hit=MinimumRules.hit(G.enemyHp,grade);G.stats.damage+=hit.damage;
+   const hit=MinimumRules.hit(G.enemyHp,grade,Math.random(),MinimumRules.playerTile(this.progress));
+   if(G.mode==='intro_battle'){hit.hp=1;hit.damage=Math.max(0,G.enemyHp-1);hit.flipped=false}
+   G.stats.damage+=hit.damage;
    sound('hit',grade==='MISS'?'BAD':grade);if(grade==='PERFECT')sound('perfect');
    impact(MinimumRules.config.labels[grade]+'!',grade==='MISS'?'BAD':grade);burst(650,342,grade);floatDamage(650,305,`−${hit.damage}`);
    if(G.mode==='practice'){
@@ -205,7 +214,8 @@ const Minimum={
    }
    G.enemyHp=hit.hp;this.health();
    after(950,()=>{
-    if(G.mode!=='intro_battle'&&hit.flipped){G.flipEnemy=G.now;impact('뒤집기!','PERFECT');sound('flip');sound('win');after(900,()=>this.finish(true))}
+    if(G.mode==='intro_battle'){nearMiss(()=>this.enemyTurn())}
+    else if(hit.flipped){G.flipEnemy=G.now;impact('뒤집기!','PERFECT');sound('flip');sound('win');after(900,()=>this.finish(true))}
     else this.enemyTurn();
    });
   });
@@ -216,9 +226,9 @@ const Minimum={
    G.animation={kind:'enemy-hit',at:G.now};sound('whoosh');
    after(360,()=>{
     const cfg=MinimumRules.config;
-    const scripted=G.mode==='intro_battle',hit=MinimumRules.hit(G.hp,cfg.enemy.grade,Math.random(),cfg.tile,cfg.enemy.strength,cfg.tile);
-    G.hp=scripted?0:hit.hp;sound('hit');burst(310,342,'GOOD');floatDamage(310,305,scripted?'뒤집힘':`−${hit.damage}`);this.health();
-    if(scripted||hit.flipped){G.flipPlayer=G.now;impact('뒤집혔다!','BAD');sound('flip');sound('lose');after(1000,()=>this.finish(false))}
+    const scripted=G.mode==='intro_battle',hit=MinimumRules.hit(G.hp,cfg.enemy.grade,Math.random(),cfg.tile,cfg.enemy.strength,MinimumRules.playerTile(this.progress));
+    G.hp=scripted?1:hit.hp;sound('hit');burst(310,342,'GOOD');floatDamage(310,305,scripted?'한 끗 차이…':`−${hit.damage}`);this.health();
+    if(scripted||hit.flipped){G.flipPlayer=G.now;impact(scripted?'아… 조금만 더!':'뒤집혔다!','BAD');sound('flip');sound('lose');after(1000,()=>this.finish(false))}
     else{impact('좋음!');after(950,()=>{G.round++;this.ready()})}
    });
   });
@@ -231,7 +241,8 @@ const Minimum={
   G.animation=null;
   if(G.mode==='intro_battle'){
    this.complete('lost');G.stolen=true;G.stolenAt=G.now;this.hud();
-   this.talk([['민수','내가 뒤집었네. 약속대로 이 딱지는 내가 가져갈게.'],['나','딱지 한 장 잃었다고 끝낼 순 없지. 집에서 새로 접고 연습하자.']],()=>this.enter('yard',950));return;
+   this.progress.zone='home';this.progress.x=420;this.progress.homeLesson='pending';this.save();
+   transition(()=>this.enter('home',420),700);return;
   }
   if(win){
    this.complete('won');
@@ -242,6 +253,24 @@ const Minimum={
    this.save();result('아직 끝난 게 아니야.',G.hp>0?'내구도가 남아 있어도 딱지가 뒤집히면 진다. 바로 다시 도전하거나 집에서 더 연습해 보자.':'이번에는 민수가 이겼다. 바로 다시 도전하거나 집에서 더 연습할 수 있다.','즉시 재도전',()=>transition(()=>this.battle('rematch')));
    this.secondary('집에서 연습하기',()=>this.enter('home',720));
   }
+ },
+ fatherLesson(){
+  this.talk([
+   ['아빠','왔니? 오늘은 딱지 소리가 안 들리네. 무슨 일 있었어?'],
+   ['나','거의 이겼는데… 민수 딱지가 딱 한 번만 더 넘어갔으면 됐는데.'],
+   ['아빠','그만큼 잘 싸웠다는 거네. 네가 못해서 진 건 아닐 거야.'],
+   ['나','마지막에 내 딱지가 먼저 뒤집혔어. 다음엔 꼭 이기고 싶어.'],
+   ['아빠','그럼 이번엔 더 단단하게 만들어 보자. 이게 딱지 강화야.'],
+   ['아빠','신문을 여러 겹 접고, 틈에 보강지를 한 장 넣은 다음 납작하게 꾹 눌러.'],
+   ['아빠','그러면 공격력은 20에서 23, 내구도는 100에서 110이 돼. 같은 타이밍에도 더 세게 버티고 칠 수 있지.'],
+   ['아빠','첫 재료는 아빠가 준비할게. 같이 접고 강화해 볼까?']
+  ],()=>{this.progress.homeLesson='heard';this.save();this.workbench()});
+ },
+ workbench(){
+  this.menuPanel('아빠와 함께 · 첫 딱지 강화',['신문 여러 겹 + 보강지 한 장 → 납작하게 압축','공격력 20 → 23 · 내구도 100 → 110','첫 강화 재료는 아빠가 준비했다. 비용 없음.'],[['신문지 딱지 접고 강화하기',()=>{
+   if(!this.complete('crafted'))return;G.profile.upgrades.newspaper=1;G.fold=4;G.foldAt=G.now;sound('fold');this.hud();
+   result('다시, 더 단단한 한 장.','아빠: 잘했어. 강화 +1! 이번엔 손에도 익혀 보자. 오른쪽 표적에서 연습해 봐.','표적에 연습하러 가기',()=>this.enter('home',420));
+  }]]);
  },
  map(body){
   body.append(GameMenu.el('p','',this.objective()[1]));
@@ -261,8 +290,9 @@ const Minimum={
   if(view==='map')this.map(body);
   else if(view==='inventory'){
    if(MinimumRules.owned(this.progress)){
-    const card=m.el('div','equipped-summary');card.append(m.icon('newspaper'),m.el('h4','','신문지 딱지 · 장착 중'));body.append(card);
-    body.append(m.el('p','','공격 20 · 내구도 100 · 방어 8 · 안정성 10'),m.el('p','','신문 한 장을 겹쳐 접은 딱지. 이번 버전에서는 자동으로 장착된다.'));
+    const stats=MinimumRules.playerTile(this.progress),upgraded=MinimumRules.atLeast(this.progress,'crafted');
+    const card=m.el('div','equipped-summary');card.append(m.icon('newspaper'),m.el('h4','',`신문지 딱지${upgraded?' +1':''} · 장착 중`));body.append(card);
+    body.append(m.el('p','',`공격 ${stats.attack} · 내구도 ${stats.hp} · 방어 8 · 안정성 10`),m.el('p','',upgraded?'아빠와 보강지를 넣고 납작하게 압축한 딱지. 강화 +1.':'신문 한 장을 겹쳐 접은 딱지.'));
    }else body.append(m.el('h4','','가방이 비었다.'),m.el('p','','집 식탁에서 새 신문지 딱지를 접자.'));
   }else if(view==='settings'){
    const button=m.button(`게임 소리 · ${G.sound?'켜짐':'꺼짐'}`,()=>{toggleSound();this.menu('settings')});button.id='menu-sound';button.setAttribute('aria-pressed',String(G.sound));
@@ -270,7 +300,7 @@ const Minimum={
   }else if(view==='controls'){
    body.append(m.el('p','','이동: ← → 또는 A / D'),m.el('p','','대화·조사: E · 화면 버튼은 마우스로 선택'),m.el('p','','공격·게이지 정지: 스페이스 또는 공격 버튼'),m.el('p','','대화: 다음 / 스페이스 · 건너뛰기 버튼'),m.el('p','','인벤토리 I · 지도 M · 메뉴 Esc'),m.el('p','','완벽 1.3배 · 좋음 1.1배 · 보통 1배 · 빗나감 0.6배. 스킬은 아직 배우지 않았다.'));
   }else{
-   body.append(m.el('h4','',this.objective()[1]),m.el('p','','학교에서의 첫 패배부터 마을 대회 접수까지. 강화와 대회 경기는 다음 단계에서 이어진다.'),m.el('p','save-note',G.storageOK?'주요 사건과 멈춘 위치가 자동 저장된다.':'저장 공간에 접근할 수 없다. 현재 플레이는 계속할 수 있다.'));
+   body.append(m.el('h4','',this.objective()[1]),m.el('p','','한 끗 차이의 첫 패배 → 집에서 아빠에게 첫 강화 배우기 → 연습과 재대결 → 마을 대회 접수.'),m.el('p','save-note',G.storageOK?'주요 사건과 멈춘 위치가 자동 저장된다.':'저장 공간에 접근할 수 없다. 현재 플레이는 계속할 수 있다.'));
    if(!G.storageOK)body.append(m.button('자동 저장 다시 시도',()=>{this.save();this.menu('overview')}));
   }
   document.querySelector(`[data-menu="${view}"]`)?.focus({preventScroll:true});

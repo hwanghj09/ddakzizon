@@ -5,7 +5,7 @@ const dir=process.env.ARTIFACT_DIR||'/tmp/ddakzizon-scenes';fs.mkdirSync(dir,{re
  try{
   const page=await browser.newPage({viewport:{width:1280,height:800}}),errors=[],failed=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url())});
-  await page.addInitScript(()=>{window.backgroundDraws=new Set();const draw=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(im,...args){if(im instanceof HTMLImageElement&&im.src.includes('/backgrounds/'))backgroundDraws.add(im.src.split('/').at(-1));return draw.call(this,im,...args)}});
+  await page.addInitScript(()=>{window.backgroundDraws=new Set();const draw=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(im,...args){if(im instanceof HTMLImageElement&&(im.src.includes('/backgrounds/')||im.src.includes('/panoramas/')))backgroundDraws.add(im.src.split('/').at(-1));return draw.call(this,im,...args)}});
   await page.goto(process.env.TEST_URL||'http://127.0.0.1:4173');assert((await page.evaluate(()=>GameArt.ready)).every(Boolean));
   const shot=async name=>{await page.waitForFunction(()=>getComputedStyle(document.getElementById('curtain')).opacity==='0');await page.screenshot({path:path.join(dir,name+'.png')})};
   await page.locator('#minimum-new').click();await shot('classroom');await page.locator('#skip-dialogue').click();await page.locator('#follow-friends').click();
@@ -19,7 +19,7 @@ const dir=process.env.ARTIFACT_DIR||'/tmp/ddakzizon-scenes';fs.mkdirSync(dir,{re
    await page.evaluate(id=>{backgroundDraws.clear();Tiers[id].enter()},id);
    await page.waitForFunction(id=>G.state==='explore'&&backgroundDraws.has(id+'.png'),id);await shot(id);
    // Actual interaction, not just a backdrop: open a facility with the keyboard.
-   await page.evaluate(()=>{G.hero.x=365;G.hero.y=393;G.keys.clear()});await page.keyboard.press('KeyE');
+   await page.evaluate(()=>{G.hero.x=Tiers[G.scene].places.find(p=>p.id==='training').x;G.hero.y=393;G.keys.clear()});await page.keyboard.press('KeyE');
    await page.waitForFunction(()=>['dialogue','facility'].includes(G.state));
    await page.evaluate(id=>{cancelScene();G.hub=id;G.opponent=P.tiers[id].opponents[0];battle(id+'_tournament');backgroundDraws.clear()},id);
    await page.waitForFunction(id=>backgroundDraws.has(id+'.png'),id);await shot(id+'-battle');

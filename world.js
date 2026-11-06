@@ -15,9 +15,9 @@ function ttakji(x,y,size,material='newspaper',state='base',angle=0,flipScale=1){
  if(image?.failed)image=ttakjiSprites[material].base;
  if(!image?.complete||!image.naturalWidth)return false;
  ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(1,Math.max(.001,Math.abs(flipScale)));
- ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- // The authored artwork occupies 204px of each 256px canvas. Preserve padding and aspect ratio.
- const extent=size*256/204;ctx.drawImage(image,-extent/2,-extent/2,extent,extent);ctx.restore();return true;
+ ctx.imageSmoothingEnabled=false;
+ // The 32px tile keeps its original transparent margins (about 26px of artwork).
+ const extent=size*32/26;ctx.drawImage(image,-extent/2,-extent/2,extent,extent);ctx.restore();return true;
 }
 // Shared palette: one dark ink outlines every shape so scenes read like a cartoon game.
 const OUT='#1b1230',NAVY='#2b2d6e',YELLOW='#ffe14d',RED='#ff5a4e',BLUE='#3d9be9',WHITE='#ffffff';
@@ -33,8 +33,8 @@ function poly(points,fill,o=OUT,t=3){ctx.beginPath();points.forEach((p,i)=>i?ctx
 function grad(x,y,w,h,top,bottom){const g=ctx.createLinearGradient(0,y,0,y+h);g.addColorStop(0,top);g.addColorStop(1,bottom);ctx.fillStyle=g;ctx.fillRect(x,y,w,h)}
 // Desktop scenes share a fixed logical viewport.
 function viewWidth(){return 960}
-function resize(){const b=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);width=b.width;height=b.height;viewportWidth=viewWidth();canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);scale=Math.min(width/viewportWidth,height/600);ox=(width-viewportWidth*scale)/2;oy=(height-600*scale)/2;ctx.imageSmoothingEnabled=false;if(window.Minimum?.active&&Exploration.active())G.camera=Math.max(0,Math.min(Exploration.data().width-viewportWidth,G.hero.x-viewportWidth/2))}
-window.World={viewWidth,spriteReady(id,state){const image=ttakjiSprites[id]?.[state];return image?.failed?false:image?.naturalWidth?true:undefined},screenToWorld(x,y){const b=canvas.getBoundingClientRect();return{x:(x-b.left-ox)/scale,y:(y-b.top-oy)/scale}}};new ResizeObserver(resize).observe(canvas);window.addEventListener('resize',resize);
+function resize(){const b=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);width=b.width;height=b.height;viewportWidth=viewWidth();canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);scale=Math.min(width/viewportWidth,height/600);ox=(width-viewportWidth*scale)/2;oy=(height-600*scale)/2;ctx.imageSmoothingEnabled=false;if(Exploration.active())G.camera=Math.max(0,Math.min(Exploration.data().width-viewportWidth,G.hero.x-viewportWidth/2))}
+window.World={viewWidth,areaWidth(){return Tiers[G.scene]?.width||960},spriteReady(id,state){const image=ttakjiSprites[id]?.[state];return image?.failed?false:image?.naturalWidth?true:undefined},screenToWorld(x,y){const b=canvas.getBoundingClientRect();return{x:(x-b.left-ox)/scale,y:(y-b.top-oy)/scale}}};new ResizeObserver(resize).observe(canvas);window.addEventListener('resize',resize);
 
 // --- Scenery pieces ---
 function sky(h,top='#45b8ff',bottom='#c9f1ff'){grad(0,0,960,h,top,bottom)}
@@ -192,7 +192,7 @@ function tierGround(id){const L=TIER_LOOK[id];rect(0,252,960,4,OUT);grad(0,255,9
  else for(let i=0;i<24;i++)rect(i*40,256,2,194,'#00000014');
  rect(0,447,960,3,OUT);rect(0,450,960,150,L.road);for(let i=0;i<14;i++)rect(i*80,475,42,6,id==='planet'?'#a259ff':YELLOW)}
 function tierHub(id){
- if(window.GameArt?.hub(ctx,id,Tiers[id].places,text))return;
+ if(window.GameArt?.hub(ctx,id,Tiers[id].places,text,Tiers[id].width))return;
  const L=TIER_LOOK[id],walls=[null,'#fff1d0','#d8f3ff','#ffe0ec'],awn=[null,'#3cc464',BLUE,RED];
  tierSky(id);tierGround(id);
  Tiers[id].places.forEach((place,i)=>{const x=place.x-80;
@@ -204,7 +204,7 @@ function tierHub(id){
   }
  });
 }
-function drawTier(id){const L=TIER_LOOK[id];tierHub(id);actor(285,371,L.left,0,.96,1);actor(852,380,L.right,0,1,-1);actor(G.hero.x,G.hero.y,'hero',G.hero.walk,1,G.hero.facing);if(G.state==='explore'){const place=Tiers[id].nearest();speech(place?place.x:480,115)}}
+function drawTier(id){const L=TIER_LOOK[id];tierHub(id);ctx.save();ctx.translate(-Math.round(G.camera||0),0);actor(570,371,L.left,0,.96,1);actor(Tiers[id].width-216,380,L.right,0,1,-1);actor(G.hero.x,G.hero.y,'hero',G.hero.walk,1,G.hero.facing);if(G.state==='explore'){const place=Tiers[id].nearest();speech(place?place.x:G.hero.x,115)}ctx.restore()}
 function tierArena(id){const L=TIER_LOOK[id],planet=id==='planet';
  if(window.GameArt?.background(ctx,id,285)){text(L.title,480,70,22,WHITE,'center',900,OUT);return}
  grad(0,0,960,272,L.wall[0],L.wall[1]);if(id!=='continent')stars(40,140);
@@ -222,7 +222,7 @@ function drawBattle(){const practice=['practice','training','story_training'].in
  if(!window.GameArt?.prop(ctx,'mat',480,437,660,151,true)){ell(480,446,345,16,'#1b123033');panel(150,286,660,151,20,WHITE);panel(160,294,640,135,14,'#3d7bff',OUT,0);ctx.strokeStyle='#ffffffaa';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(480,361,96,42,0,0,Math.PI*2);ctx.stroke();line(480,296,480,427,'#ffffff77',3);rect(160,294,640,6,'#ffffff33')}
  actor(125,347,'hero',0,1.1,1,'player');if(!practice){actor(837,347,Village.isBattle()?G.opponent.kind:'rival',0,1.1,-1,'enemy');if(!Village.isBattle()&&!window.Minimum?.active)actor(891,313,'boss',0,.85,-1)}let px=310,py=350,ex=650,ey=350,pa=-.16,ea=.15,ps=1,es=1;
 if(G.animation){const t=(G.now-G.animation.at)/1000;const grade=G.animation.grade;const power=grade==='PERFECT'?1:grade==='GOOD'?.65:.3;if(G.animation.kind==='player-hit'){if(t<.36){const q=t/.36;px=310+Math.pow(q,2)*320;py=350-Math.sin(q*Math.PI)*95;pa=-.16-q*.7;ps=1+Math.sin(q*Math.PI)*.25}else if(t<.7){const q=(t-.36)/.34;px=630-(630-310)*q;py=350-55*Math.sin(q*Math.PI);ey-=Math.sin(q*Math.PI)*55*power;ea+=Math.sin(q*Math.PI*2)*.35*power}}else if(G.animation.kind==='enemy-ready'){ey-=Math.sin(Math.min(t/.75,1)*Math.PI/2)*35;ea-=.2*Math.min(t/.75,1)}else if(G.animation.kind==='enemy-hit'){if(t<.36){const q=t/.36;ex=650-Math.pow(q,2)*320;ey=315-Math.sin(q*Math.PI)*105;ea=.15+q*.8;es=1+Math.sin(q*Math.PI)*.35}else if(t<.7){const q=(t-.36)/.34;ex=330+320*q;ey=350-Math.sin(q*Math.PI)*50;py-=Math.sin(q*Math.PI)*25}}}
-let psy=.76,esy=.76;if(G.flipPlayer){const t=Math.min((G.now-G.flipPlayer)/800,1);psy=Math.cos(t*Math.PI)*.76;py-=Math.sin(t*Math.PI)*95;pa+=t*.18}if(G.flipEnemy){const t=Math.min((G.now-G.flipEnemy)/800,1);esy=Math.cos(t*Math.PI)*.76;ey-=Math.sin(t*Math.PI)*95;ea-=t*.2}if(G.stolen){const t=Math.min((G.now-G.stolenAt)/900,1);px+=t*560;py-=t*90;ctx.globalAlpha=1-t}
+let psy=.76,esy=.76;if(G.animation?.kind==='near-flip'&&!reducedMotion){const q=Math.min(1,(G.now-G.animation.at)/1500),lift=Math.sin(q*Math.PI);ey-=lift*60;ea+=lift*.7;ex+=Math.sin(q*Math.PI*4)*7;esy*=1-lift*.93}if(G.flipPlayer){const t=Math.min((G.now-G.flipPlayer)/800,1);psy=Math.cos(t*Math.PI)*.76;py-=Math.sin(t*Math.PI)*95;pa+=t*.18}if(G.flipEnemy){const t=Math.min((G.now-G.flipEnemy)/800,1);esy=Math.cos(t*Math.PI)*.76;ey-=Math.sin(t*Math.PI)*95;ea-=t*.2}if(G.stolen){const t=Math.min((G.now-G.stolenAt)/900,1);px+=t*560;py-=t*90;ctx.globalAlpha=1-t}
  // Ground shadows under each ttakji sell the height of each throw.
  ell(px,402,46*(1-(350-py)/260),9,'#1b123044');ell(ex,402,46*(1-(350-ey)/260),9,'#1b123044');
  const playerSprite=G.flipPlayer&&psy<0?'flipped':G.hp<G.maxHp?'damaged':'base';paper(px,py,106*ps,Village.isBattle()?G.profile.equipped:'news',pa,1,4,playerSprite,Math.abs(psy)/.76);ctx.globalAlpha=1;const enemySprite=G.flipEnemy&&esy<0?'flipped':G.enemyHp<G.enemyMax?'damaged':'base';paper(ex,ey,106*es,Village.isBattle()?G.opponent.material:window.Minimum?.active?'newspaper':'red',ea,1,4,enemySprite,Math.abs(esy)/.76);if(G.mode!=='practice')speech(760,245);

@@ -1,5 +1,5 @@
 'use strict';
-// Native 16x16 pixel drawings. No resampling of the former illustrations.
+// 32x32 characters: a shared silhouette with details drawn on the final grid.
 // Run with: node scripts/draw-characters.cjs (Node's standard library only).
 const fs=require('node:fs'),path=require('node:path'),zlib=require('node:zlib');
 const root=path.join(__dirname,'..'),out=path.join(root,'assets/art');
@@ -66,7 +66,7 @@ const bodies={
  '....#WW##WW#....'
  ]
 };
-function drawing(who,pose){
+function silhouette(who,pose){
  const l=looks[who],rows=Array.from({length:16},()=>Array(16).fill('.'));
  const stamp=(pattern,y)=>pattern.forEach((row,j)=>[...row].forEach((p,x)=>{rows[y+j][x]=p}));
  const down=pose==='attack'?2:0;stamp(head,down);stamp(bodies[pose],pose==='attack'?9:8);
@@ -86,6 +86,19 @@ function drawing(who,pose){
  const palette={'.':[0,0,0,0],'#':'#263341',H:l.hair,h:l.shine,S:l.skin,s:l.detail.startsWith('antenna')?'#729455':'#c98b70',C:l.shirt,c:l.shade,T:l.trim,P:l.pants,W:'#f3e4bf'};
  return rows.map(row=>row.map(c=>typeof palette[c]==='string'?[...palette[c].slice(1).match(/../g).map(h=>parseInt(h,16)),255]:palette[c]));
 }
+function drawing(who,pose){
+ const base=silhouette(who,pose),l=looks[who],pixels=Array.from({length:32},(_,y)=>Array.from({length:32},(_,x)=>[...base[Math.floor(y/2)][Math.floor(x/2)]]));
+ const color=hex=>[...hex.slice(1).match(/../g).map(h=>parseInt(h,16)),255],down=pose==='attack'?4:0;
+ const dot=(x,y,hex)=>{if(pixels[y]?.[x]?.[3])pixels[y][x]=color(hex)};
+ // Single-pixel eye glints, a nose, cheek and seams distinguish the 32px art.
+ for(const x of [14,18])dot(x,8+down,'#f3e4bf');
+ dot(17,11+down,l.detail.startsWith('antenna')?'#729455':'#c98b70');
+ dot(20,11+down,l.detail.startsWith('antenna')?'#729455':'#c98b70');
+ for(let y=19+down;y<Math.min(25+down,27);y++)dot(18,y,l.shade);
+ dot(14,18+down,l.trim);dot(15,18+down,l.trim);
+ for(const x of [12,20]){dot(x,28,'#f3e4bf');dot(x+1,28,'#f3e4bf')}
+ return pixels;
+}
 function crc32(data){let crc=0xffffffff;for(const b of data){crc^=b;for(let k=0;k<8;k++)crc=crc&1?0xedb88320^(crc>>>1):crc>>>1}return (crc^0xffffffff)>>>0}
 function chunk(type,data){const tag=Buffer.from(type),len=Buffer.alloc(4),crc=Buffer.alloc(4);len.writeUInt32BE(data.length);crc.writeUInt32BE(crc32(Buffer.concat([tag,data])));return Buffer.concat([len,tag,data,crc])}
 function png(pixels){
@@ -99,11 +112,11 @@ function generate(){
   const key=`characters/${who}/${pose}`,pixels=drawing(who,pose),file=path.join(out,key+'.png');
   fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,png(pixels));
   const points=pixels.flatMap((row,y)=>row.flatMap((p,x)=>p[3]?[[x,y]]:[]));
-  manifest[key]={src:`assets/art/${key}.png`,size:[16,16],bounds:[Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[0]))+1,Math.max(...points.map(p=>p[1]))+1],anchor:[8,15]};
+  manifest[key]={src:`assets/art/${key}.png`,size:[32,32],bounds:[Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[0]))+1,Math.max(...points.map(p=>p[1]))+1],anchor:[16,30]};
  }
  fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
  fs.writeFileSync(path.join(root,'art-manifest.js'),"'use strict';\nwindow.ART_MANIFEST="+JSON.stringify(manifest)+';\n');
- console.log(`Drew ${Object.keys(looks).length} characters / ${Object.keys(looks).length*poses.length} native 16x16 RGBA frames`);
+ console.log(`Drew ${Object.keys(looks).length} characters / ${Object.keys(looks).length*poses.length} 32x32 RGBA frames`);
 }
 if(require.main===module)generate();
 module.exports={looks,poses,drawing,png};

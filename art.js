@@ -23,6 +23,15 @@ window.GameArt=(()=>{
   for(let y=bottom;y<600;y+=16)ctx.drawImage(image,0,image.naturalHeight-12,image.naturalWidth,4,0,y,960,16);
   ctx.restore();return true;
  }
+ function panorama(ctx,theme,camera=0,ground=402){
+  const key='panoramas/'+theme,image=loaded(key),entry=manifest[key];if(!image)return false;
+  const x=-Math.round(Math.max(0,Math.min(entry.worldWidth-960,camera))),top=ground-entry.horizon*4,bottom=top+image.naturalHeight*4;
+  ctx.save();smooth(ctx);ctx.beginPath();ctx.rect(0,0,960,600);ctx.clip();ctx.fillStyle=entry.sky;ctx.fillRect(0,0,960,600);
+  // One continuous scene at its native scale: every landmark shares world coordinates.
+  ctx.drawImage(image,x,top,entry.worldWidth,image.naturalHeight*4);
+  for(let y=bottom;y<600;y+=16)ctx.drawImage(image,0,image.naturalHeight-12,image.naturalWidth,4,x,y,entry.worldWidth,16);
+  ctx.restore();return true;
+ }
  function prop(ctx,name,x,y,maxWidth=150,maxHeight=130,stretch=false){
   const key='props/'+name,image=loaded(key),b=manifest[key]?.bounds;if(!image||!b)return false;
   const sw=b[2]-b[0],sh=b[3]-b[1],ratio=Math.min(maxWidth/sw,maxHeight/sh);
@@ -36,7 +45,7 @@ window.GameArt=(()=>{
   let key=`characters/${who}/${pose}`;if(!loaded(key))key=`characters/${who}/idle`;
   const image=loaded(key),idle=manifest[`characters/${who}/idle`];if(!image||!idle)return false;
   // Integer magnification and one common anchor prevent animation size/feet jitter.
-  const pixel=Math.max(1,Math.round(7*scale)),[ax,ay]=idle.anchor;
+  const pixel=Math.max(1,Math.round(3*scale)),[ax,ay]=idle.anchor;
   ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(facing<0?-1:1,1);smooth(ctx);
   ctx.fillStyle='#25392b30';ctx.fillRect(-3*pixel,0,6*pixel,pixel);
   ctx.drawImage(image,-ax*pixel,-ay*pixel,image.naturalWidth*pixel,image.naturalHeight*pixel);ctx.restore();return true;
@@ -47,10 +56,10 @@ window.GameArt=(()=>{
   element.classList.remove('image-portrait');element.style.backgroundImage='';
   if(!image||!b)return;
   if(!portraits.has(key)){
-   const tile=document.createElement('canvas');tile.width=tile.height=12;
+   const tile=document.createElement('canvas');tile.width=tile.height=24;
    const c=tile.getContext('2d');smooth(c);
-   // Same 12x12 head/shoulder crop for all 16x16 characters, including antennae.
-   c.drawImage(image,2,0,12,12,0,0,12,12);
+   // Same 24x24 head/shoulder crop for all 32x32 characters, including antennae.
+   c.drawImage(image,4,0,24,24,0,0,24,24);
    portraits.set(key,tile.toDataURL());
   }
   element.style.backgroundImage=`url("${portraits.get(key)}")`;element.classList.add('image-portrait');
@@ -58,9 +67,10 @@ window.GameArt=(()=>{
  function refreshPortraits(){document.querySelectorAll('[data-art-character]').forEach(el=>portrait(el,el.dataset.artCharacter))}
  function map(ctx,a){
   const zone=Exploration.data(),theme=zone.theme;
-  if(!background(ctx,theme))return false;
-  const {text,actor:person,paper}=a,camera=G.camera||0,objects=Exploration.objects(),nearest=G.state==='explore'?Exploration.nearest():null;
-  const npc={minsu:'rival',doyun:'boss',neighbor:'neighbor',hana:'friend',uncle:'uncle',reception:'folder',spectator:'friend'};
+  const camera=Math.round(G.camera||0);
+  if(!panorama(ctx,theme,camera))return false;
+  const {text,actor:person,paper}=a,objects=Exploration.objects(),nearest=G.state==='explore'?Exploration.nearest():null;
+  const npc={minsu:'rival',doyun:'boss',neighbor:'neighbor',father:'neighbor',hana:'friend',uncle:'uncle',reception:'folder',spectator:'friend'};
   const sign=(label,x,y,width=180,active=false)=>{
    ctx.save();ctx.fillStyle=active?'#173e42f2':'#f3ead8ed';ctx.strokeStyle=active?'#e4bd70':'#796a4b55';ctx.lineWidth=1;
    ctx.beginPath();ctx.roundRect(x-width/2,y,width,30,6);ctx.fill();ctx.stroke();
@@ -96,15 +106,17 @@ window.GameArt=(()=>{
   if(nearest&&G.coach){const x=Math.max(camera+170,Math.min(camera+790,nearest.x));sign(G.coach,x,nearest.type==='npc'?210:256,Math.max(240,G.coach.length*11+24),true)}
   ctx.restore();return true;
  }
- function hub(ctx,theme,places,text){
-  if(!background(ctx,theme,315))return false;
+ function hub(ctx,theme,places,text,worldWidth=960){
+  const camera=worldWidth>960?Math.round(G.camera||0):0;
+  if(!(worldWidth>960?panorama(ctx,theme,camera,315):background(ctx,theme,315)))return false;
+  ctx.save();ctx.translate(-camera,0);
   for(const place of places){
    const asset=({bus:'bus',training:'target',press:'press',forge:'press',cup:'desk'})[place.id]||'board';
    prop(ctx,asset,place.x,320,asset==='bus'?65:135,110);
    ctx.fillStyle='#263b3deb';ctx.fillRect(Math.round(place.x-84),180,168,30);
    text(place.name,place.x,200,13,'#efe0b2','center',700);
   }
-  return true;
+  ctx.restore();return true;
  }
- return {manifest,ready,loaded,background,prop,actor,portrait,map,hub};
+ return {manifest,ready,loaded,background,panorama,prop,actor,portrait,map,hub};
 })();

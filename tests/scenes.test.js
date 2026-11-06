@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),zlib=require('node:zlib'),crypto=require('node:crypto'),vm=require('node:vm');
 const manifest=require('../assets/art/manifest.json');
 test('all sixteen pixel backgrounds and seventeen props have native dimensions, limited colors and matching metadata',()=>{
- const scenes=Object.entries(manifest).filter(([k])=>!k.startsWith('characters/'));
+ const scenes=Object.entries(manifest).filter(([k])=>k.startsWith('backgrounds/')||k.startsWith('props/'));
  assert.equal(scenes.filter(([k])=>k.startsWith('backgrounds/')).length,16);assert.equal(scenes.filter(([k])=>k.startsWith('props/')).length,17);
  const hashes=new Set();
  for(const [key,entry]of scenes){
@@ -22,4 +22,12 @@ test('all sixteen pixel backgrounds and seventeen props have native dimensions, 
  }
  const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../art-manifest.js'),'utf8'),sandbox);
  assert.deepEqual(JSON.parse(JSON.stringify(sandbox.window.ART_MANIFEST)),manifest);
+});
+test('each walkable district has one continuous panorama matching its actual world width',()=>{
+ const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../exploration.js'),'utf8'),sandbox);
+ for(const zone of Object.values(sandbox.window.Exploration.zones)){
+  const entry=manifest['panoramas/'+zone.theme];assert(entry,zone.theme);assert.equal(entry.worldWidth,zone.width);
+ }
+ const panoramas=Object.entries(manifest).filter(([k])=>k.startsWith('panoramas/'));assert.equal(panoramas.length,15);
+ for(const [key,entry]of panoramas){const b=fs.readFileSync(path.join(__dirname,'..',entry.src));assert.equal(b.readUInt32BE(16)*4,entry.worldWidth,key);assert.equal(b.readUInt32BE(20),142,key);assert(entry.worldWidth>960);assert(entry.horizon<142)}
 });
