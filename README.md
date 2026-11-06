@@ -1,5 +1,70 @@
 # ddakzizon
 
+## 개발 대상 플랫폼
+
+**PC 웹 브라우저 전용 · 키보드와 마우스 조작을 기준으로 개발합니다.**
+휴대폰·태블릿의 터치 조작과 모바일 전용 UI는 개발·검증 범위에 포함하지 않습니다.
+권장 창 크기는 1280×720 이상이며, 작은 PC 창은 1024×600까지 확인합니다.
+이 기준은 이전 기획 문서의 모바일 지원 설명보다 우선합니다.
+
+## 스크롤되는 픽셀 월드 · 32×32 스프라이트
+
+등장 캐릭터 12종을 모두 실제 **32×32 RGBA 픽셀 아트**로 새로 그렸습니다. 각 캐릭터의 대기·걷기 A/B·내려치기까지 총 48장입니다.
+정수 배율·보간 없는 확대로 픽셀을 선명하게 유지하고, 대화·메뉴 초상화에도 같은 그림을 사용합니다. `npm run art:characters`로 원본 도안에서 다시 생성할 수 있습니다.
+탐험에는 맵 폭 1280~2200에 맞춘 **긴 파노라마 배경 15종**을 추가했습니다. 플레이어를 따라 카메라가 이동하면 배경의 건물·바닥·소품·NPC도 같은 월드 좌표로 움직입니다. 대륙·세계·행성 허브도 폭 1920의 스크롤 구역입니다.
+기존 고정 장면용 배경 **16종**도 픽셀 아트입니다. 교실·정자·집·마을과 시·도·전국 경기장, 대륙·세계·행성까지 각각 다른 240×160 배경을 사용합니다.
+문·게시판·벤치·식탁·대전 매트 등 소품 17종도 32×32 픽셀로 다시 그렸습니다. 딱지 46종의 4상태, 184개 PNG도 전부 실제 32×32 RGBA로 통일했습니다. `npm run art:scenes`, `npm run art:panoramas`, `npm run art:characters`, `npm run art:items`로 각 아트 규격을 재생성/검증합니다.
+[이미지 구성과 적용 범위](assets/art/README.md) · 서버 실행 후 `npm run test:art`.
+
+## 최소 플레이 버전 v0.11
+
+[최소 구현 문서](docs/game-planning/07-minimum-playable-version.md)를 기준으로,
+타이틀의 **처음부터 시작**에서 아래 흐름을 플레이할 수 있습니다.
+
+수업이 끝난 교실 → 친구들의 딱지 약속 → **관심이 생겨서 따라간다** 선택 → 운동장 정자 →
+짧은 공방 → 상대 딱지가 내구도 1로 버티는 아쉬운 패배 → 페이드아웃/인으로 집에 도착 →
+아빠와 대화하며 보강지·압축을 배움 → 신문지 딱지 접기·강화 +1·자동 장착 →
+집 표적에 한 번 연습 → 학교 재대결 → 학교 앞 포스터 → 주민센터 접수·임시 대진표·완료 안내.
+
+```sh
+npm start
+```
+
+브라우저에서 `http://localhost:4173`을 엽니다. 별도 빌드나 서버 API는 필요하지 않습니다.
+게임 실행에 npm 의존성은 필요하지 않으며, `npm ci`는 개발용 브라우저 테스트 도구를 설치합니다.
+
+- PC: 좌우 방향키 / A, D 이동 · E 상호작용 · Space 공격과 게이지 정지.
+- I 인벤토리 · M 지도 · Esc 메뉴. 대화는 다음 버튼이나 Space로 넘기거나 건너뛸 수 있습니다.
+- 첫 경기는 마지막 한 수까지 몰리는 이야기 경기입니다. 재대결은 실제 승패를 적용하며,
+  패배하면 즉시 재도전하거나 집에서 연습할 수 있습니다.
+- 연습은 빗나가도 완료됩니다. 결과 화면에서 반복하거나 끝낼 수 있습니다.
+- 오프닝 대화·선택지와 주요 사건, 멈춘 위치를 자동 저장합니다. **이어서 하기**로 복귀합니다.
+  브라우저 저장이 차단된 경우 안내를 표시하고 현재 세션은 계속 플레이할 수 있습니다.
+- 아빠에게 배우는 첫 강화 이후의 상점·고급 압축·제련·융합·훈련·접수 이후 경기는 이 짧은 버전에서 준비 중으로 표시합니다.
+
+`minimum-rules.js`에 문서의 임시 전투 수치, 4단계 타이밍 판정, 피해·뒤집기 계산식,
+진행 단계와 대진표를 모았습니다. `minimum.js`는 기존 맵·렌더러·대화·시계를 재사용해
+짧은 여정을 연결합니다. 확정된 밸런스나 최종 아트를 의미하지 않습니다.
+
+기존 긴 캠페인은 **기존 전체 캠페인 시작 / 전체 캠페인 이어하기**에서 계속 이용할 수 있습니다.
+저장 키는 짧은 버전 `ddakzizon.minimum.v1`, 기존 캠페인 `ddakzizon.campaign.v3`로 분리됩니다.
+
+개발 검증(별도 터미널에서 `npm start` 실행):
+
+```sh
+npm ci
+npm run check
+npm test
+npm run test:opening
+npm run test:minimum
+npm run test:browser
+```
+
+브라우저 테스트는 로컬 Chromium이 있으면 사용하고, 없으면 `npx playwright install chromium`으로
+설치할 수 있습니다. `BROWSER_EXECUTABLE`, `TEST_URL`, `ARTIFACT_DIR`로 실행 환경을 바꿀 수 있습니다.
+`npm run test:browser`에는 기존 캠페인과 새 최소 버전의 검증이 모두 포함됩니다.
+구체적인 검증 범위와 한계는 [검증 기록](tests/VALIDATION.md#최소-플레이-버전-v011)을 참고하세요.
+
 ## Ttakji sprite skill
 
 The repository includes a reusable Codex/Agent Skill:
@@ -24,7 +89,7 @@ Use $ttakji-sprite-artist to write four prompts for a metal ttakji. Do not gener
 
 The skill contains instructions and prompts. Generated newspaper PNG assets are available in `assets/sprites/ttakji/newspaper/`.
 
-## Play — school yard to the planet exchange (v1.0)
+## Full campaign — school yard to the planet exchange (v1.0)
 
 Open `index.html` in a modern browser, or run `npm start` and visit
 `http://localhost:4173`. No install, build, external fonts, or network connection
@@ -476,7 +541,7 @@ collectible ttakji: the requested 45 types plus fusion (46 playable types), defi
   Lego (continent), Saimdang (world), and magic carpet (planet).
 - Each item has its own HP, attack and focus bonus and starts at +0 compression.
 - Every playable type has separate base, flipped, inventory, and damaged sprites.
-  All 184 PNGs are 256×256 RGBA. The renderer switches battle states, while menus,
+  All 184 runtime PNGs are 32×32 RGBA. The renderer switches battle states, while menus,
   the HUD, workshops, shops, and trophy rewards use the same item IDs.
   Base fallback remains available for a failed image request.
 - `npm test` checks catalog coverage, PNG headers, acquisition, upgrades, and save
@@ -491,7 +556,7 @@ collectible ttakji: the requested 45 types plus fusion (46 playable types), defi
 시·도·전국 로비도 각각 학교 체육관, 철제 압축 경기장, 대형 실내 체육관으로 교체했다. 전투장은 같은 지역의 관중·설비·현수막을 사용한다.
 
 - A/D 또는 좌우 방향키로 이동. E/Space로 가장 가까운 대상과 상호작용. 같은 거리에서는 NPC 우선. M은 지도, 목적지 안내는 설정에서 끌 수 있다.
-- 첫 패배 후 운동장에서 집으로 걸어가 접고 강화한다. 연습 뒤 집에서 학교로 돌아와 재대결하고, 학교 앞 포스터를 읽은 뒤 주민센터 로비에서 접수한다.
+- 첫 패배 후 페이드 전환으로 집에 도착해 아빠와 대화하며 접고 강화한다. 연습 뒤 집에서 학교로 돌아와 재대결하고, 학교 앞 포스터를 읽은 뒤 주민센터 로비에서 접수한다.
 - 기존 12개 이야기와 대회 진행, 능력치와 보상은 유지한다. 기존 저장에는 마을 좌표와 재료를 안전한 기본값으로 추가하고, 이미 학교를 완료한 옛 저장은 포스터 조건을 인정한다.
 - 잡화점 신문 10원 / 색종이 20원. 확인 후 1장 구매. 집 식탁에서 해당 재료 1장으로 보유 딱지를 1단계 보강(기존 강화 상한 적용). 초반 접기·재도전에는 구매가 필요 없다. 이 가격과 보강 조합은 기획의 미정 항목에 대한 초기 구현값이다.
 - 집/훈련장의 무료 연습은 능력치·상금 보상이 없다. 유료 훈련은 확인 후 30원, XP +3(상한 적용). 기존 이야기 과제와 훈련 대결은 별도 메뉴에서 이용한다.

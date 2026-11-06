@@ -1,12 +1,12 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),P=require('../progression.js');
 const generated=require('../assets/sprites/ttakji/generation.json'),states=['base','flipped','inventory','damaged'];
-test('all 45 requested ttakji and fusion have four distinct 256x256 RGBA PNGs',()=>{
+test('all 45 requested ttakji and fusion have four distinct 32x32 RGBA PNGs',()=>{
  const ids=['newspaper','colored_paper','hair',...generated.items.map(x=>x.slug)];
  assert.equal(ids.length,45);assert.equal(Object.keys(P.items).length,49);assert.deepEqual(Object.keys(P.items).filter(id=>P.items[id].sprite),['first_newspaper','award_ttakji','official'],'Keepsakes and the optional 공인 딱지 reuse existing sprite folders');
  for(const id of [...ids,'fusion']){assert(P.items[id],id+' must be playable');const hashes=new Set();
   for(const state of states){const bytes=fs.readFileSync(path.join(__dirname,'../assets/sprites/ttakji',id,'ttakji_'+id+'_'+state+'.png'));
    assert(bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])),id+'/'+state);
-   assert.equal(bytes.readUInt32BE(16),256);assert.equal(bytes.readUInt32BE(20),256);assert.equal(bytes[25],6,'PNG must include RGBA');
+   assert.equal(bytes.readUInt32BE(16),32);assert.equal(bytes.readUInt32BE(20),32);assert.equal(bytes[25],6,'PNG must include RGBA');
    hashes.add(crypto.createHash('sha256').update(bytes).digest('hex'));
   }assert.equal(hashes.size,4,id+' states must differ');
  }

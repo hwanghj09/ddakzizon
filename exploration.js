@@ -12,9 +12,9 @@ const Exploration={
   city:{name:'시 대회 · 학교 체육관',width:1800,theme:'city',objects:[['bus','시외 정류장',140,'facility'],['training','몸풀기 매트',500,'facility'],['press','딱지 공방',850,'facility'],['cup','접수 부스',1200,'facility'],['score','수동 점수판',1530,'inspect']]},
   province:{name:'도 대회 · 압축 경기장',width:2000,theme:'province',objects:[['bus','시외 정류장',140,'facility'],['training','선수 대기실',550,'facility'],['press','압축 공방',980,'facility'],['cup','대회 접수',1400,'facility'],['machine','대형 압축기',1760,'inspect']]},
   national:{name:'전국 선수권 · 실내 체육관',width:2200,theme:'national',objects:[['bus','시외 정류장',140,'facility'],['training','선수 대기실',580,'facility'],['press','장비 준비실',1020,'facility'],['cup','선수 접수',1460,'facility'],['inspection','규격 측정 부스',1770,'inspect'],['broadcast','중계석',2020,'inspect']]},
-  continent:{name:'대륙 대회 · 국제 전시장',width:2200,theme:'continent',objects:[['bus','시외 정류장',140,'facility'],['training','연습 매트',560,'facility'],['press','국제 공방',980,'facility'],['cup','선수 접수',1400,'facility'],['booth','접기 전시 부스',1760,'inspect'],['translator','번역 자막판',2040,'inspect']]},
-  world:{name:'세계 대회 · 원형 경기장',width:2200,theme:'world',objects:[['bus','시외 정류장',140,'facility'],['training','선수 대기실',560,'facility'],['press','세계 공방',980,'facility'],['cup','선수 접수',1400,'facility'],['safety','안전 검사대',1760,'inspect'],['screen','대형 스크린',2040,'inspect']]},
-  planet:{name:'행성 대회 · 우주 정거장',width:2200,theme:'planet',objects:[['bus','귀환 셔틀',140,'facility'],['training','무중력 훈련장',560,'facility'],['press','우주 공방',980,'facility'],['cup','교류전 접수',1400,'facility'],['starwindow','별이 보이는 창',1760,'inspect'],['interpreter','통역 장치',2040,'inspect']]}
+  continent:{name:'대륙 대회 · 국제 전시장',width:1920,theme:'continent',objects:[['bus','시외 정류장',120,'facility'],['training','연습 매트',490,'facility'],['press','국제 공방',860,'facility'],['cup','선수 접수',1220,'facility'],['booth','접기 전시 부스',1540,'inspect'],['translator','번역 자막판',1780,'inspect']]},
+  world:{name:'세계 대회 · 원형 경기장',width:1920,theme:'world',objects:[['bus','시외 정류장',120,'facility'],['training','선수 대기실',490,'facility'],['press','세계 공방',860,'facility'],['cup','선수 접수',1220,'facility'],['safety','안전 검사대',1540,'inspect'],['screen','대형 스크린',1780,'inspect']]},
+  planet:{name:'행성 대회 · 우주 정거장',width:1920,theme:'planet',objects:[['bus','귀환 셔틀',120,'facility'],['training','무중력 훈련장',490,'facility'],['press','우주 공방',860,'facility'],['cup','교류전 접수',1220,'facility'],['starwindow','별이 보이는 창',1540,'inspect'],['interpreter','통역 장치',1780,'inspect']]}
  },
  active(){return G.mapZone&&G.scene===(P.stageIds.includes(G.mapZone)?G.mapZone:'village')},
  data(){return this.zones[G.mapZone]},
@@ -32,12 +32,12 @@ const Exploration={
  enter(zone,x){
   if(!this.zones[zone])zone='square';cancelScene();G.mapZone=zone;G.hub=P.stageIds.includes(zone)?zone:'village';G.scene=G.hub;G.mode=G.hub;G.state='explore';G.stolen=false;G.flipPlayer=G.flipEnemy=0;
   G.hero={x:Math.max(45,Math.min(this.zones[zone].width-45,x??G.profile.map.x??160)),y:440,walk:0,facing:1};G.camera=Math.max(0,Math.min(this.data().width-960,G.hero.x-480));
-  G.profile.map.zone=zone;G.profile.map.x=G.hero.x;G.profile.map.visited[zone]=true;panels('explore-ui');Village.hud();if(this.phase()==='lost')setInventory('빈 주머니',false);this.save();this.updateInteract();toast(this.data().name);$('game').focus({preventScroll:true});
+  G.profile.map.zone=zone;G.profile.map.x=G.hero.x;G.profile.map.visited[zone]=true;panels('explore-ui');Village.hud();if(this.phase()==='lost')setInventory('빈 주머니',false);this.save();this.updateInteract();toast(this.data().name,'location');$('game').focus({preventScroll:true});
  },
  save(){if(this.active()){G.profile.map.zone=G.mapZone;G.profile.map.x=Math.round(G.hero.x)}checkpoint(G.profile.schoolReward?Village.hubCheckpoint():'exploration')},
  move(zone,x){note(220,.09,'triangle',.025);transition(()=>this.enter(zone,x))},
  update(dt){const d=this.data(),dx=(G.keys.has('right')?1:0)-(G.keys.has('left')?1:0);if(dx){G.hero.x=Math.max(25,Math.min(d.width-25,G.hero.x+dx*220*dt/1000));G.hero.facing=dx;G.hero.walk+=dt;if(Math.floor(G.hero.walk/350)!==Math.floor((G.hero.walk-dt)/350))note(95,.035,'triangle',.018)}else G.hero.walk=0;G.hero.y=440;
-  const camera=Math.max(0,Math.min(d.width-960,G.hero.x-480));G.camera+=(camera-G.camera)*(1-Math.exp(-dt/110));
+  const view=window.World?.viewWidth?.()||960,camera=Math.max(0,Math.min(d.width-view,G.hero.x-view/2));G.camera+=(camera-G.camera)*(1-Math.exp(-dt/110));
   if(G.hero.x<=28&&dx<0&&d.left){this.move(d.left,this.zones[d.left].width-90);return}if(G.hero.x>=d.width-28&&dx>0&&d.right){this.move(d.right,90);return}
   if(!dx&&G.profile.map.x!==Math.round(G.hero.x))this.save();this.updateInteract();
  },

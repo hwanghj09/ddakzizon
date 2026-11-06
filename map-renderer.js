@@ -1,7 +1,8 @@
 'use strict';
-/* Layered procedural scenery: no external artwork or fonts required. */
+/* Authored artwork is preferred; procedural scenery remains a loading fallback. */
 const MapRenderer={
  arena(ctx,a,region){
+  if(globalThis.GameArt?.background(ctx,region==='village'?'lobby':region,285)){a.text(region==='village'?'주민센터 컵':region==='city'?'지존시 지역구 예선':region==='province'?'도 딱지 선수권':'전국 딱지 선수권',480,88,22,'#efe0b2','center',800,'#283b3d');return}
   const {rect:r,text:t,line:l,actor}=a,village=region==='village',city=region==='city',province=region==='province',national=region==='national';
   r(0,0,960,600,national?'#193542':province?'#879a91':city?'#c1c7ad':'#a8bdb0');
   r(0,270,960,330,village?'#b5aa87':'#a49c81');
@@ -17,6 +18,7 @@ const MapRenderer={
   r(20,272,920,6,'#e0cda0');for(let x=0;x<960;x+=80)l(x,280,x+65,600,'#787e6a44',1);
  },
  draw(ctx,a){
+  if(globalThis.GameArt?.map(ctx,a))return;
   const {rect:r,text:t,line:l,tree,actor,paper}=a,z=Exploration.data(),theme=z.theme,w=z.width,camera=G.camera||0,p=G.profile;
   const indoor=['home','lobby',...P.stageIds].includes(theme),night=['national','world','planet'].includes(theme);
   r(0,0,960,600,night?'#182c3a':indoor?'#b8b59c':'#b5cfc7');
@@ -83,7 +85,7 @@ const MapRenderer={
   }
   if(z.left){sign('← '+Exploration.zones[z.left].name,130,463,200);r(125,498,6,40,'#455f54')}if(z.right){sign(Exploration.zones[z.right].name+' →',w-140,463,210);r(w-145,498,6,40,'#455f54')}
   actor(G.hero.x,440,'hero',G.hero.walk,1,G.hero.facing);
-  const nearest=G.state==='explore'?Exploration.nearest():null;if(nearest){const x=Math.max(camera+170,Math.min(camera+790,nearest.x));sign(G.coach,x,235,Math.max(240,G.coach.length*10+24),'#1c3a3bef')}
+  const nearest=G.state==='explore'?Exploration.nearest():null;if(nearest){const view=window.World?.viewWidth?.()||960,x=Math.max(camera+170,Math.min(camera+view-170,nearest.x));sign(G.coach,x,235,Math.max(240,G.coach.length*10+24),'#1c3a3bef')}
   ctx.restore();
   // Foreground curb remains separate from the walkable lane.
   r(0,578,960,22,indoor?'#5b6659':'#435e55');r(0,578,960,3,'#91a18b');

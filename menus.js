@@ -10,6 +10,7 @@ window.GameMenu={
  el(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el},
  button(text,action,className='menu-secondary'){const b=this.el('button',className,text);b.onclick=action;return b},
  show(view='overview'){
+  if(window.Minimum?.active){Minimum.menu(view);return}
   const names={map:'동네 지도',journal:'이야기 수첩',story:'이야기 다시 보기',achievements:'도전 과제',overview:'게임 현황',inventory:'인벤토리',player:'선수 · 스킬',settings:'설정',controls:'조작키'};
   if(!names[view])return;this.view=view;$('menu-view-title').textContent=names[view];$('menu-message').textContent='';
   document.querySelectorAll('[data-menu]').forEach(b=>{const active=b.dataset.menu===view;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
@@ -80,7 +81,7 @@ window.GameMenu={
   }
  },
  player(body){
-  const p=G.profile,s=P.stats(p),header=this.el('div','player-summary');header.append(this.el('span','player-avatar',''),this.el('h4','',`${heroName()} · 선수 Lv.${P.level(p)+1}`),this.el('p','',`힘 ${s.strength} · 집중력 ${s.concentration} · 타이밍 구간 +${Math.round((R.zones(s.concentration).normal/R.zones(0).normal-1)*100)}%`));body.append(header);
+  const p=G.profile,s=P.stats(p),header=this.el('div','player-summary');header.append(this.el('span','player-avatar',''),this.el('h4','',`${heroName()} · 선수 Lv.${P.level(p)+1}`),this.el('p','',`힘 ${s.strength} · 집중력 ${s.concentration} · 타이밍 구간 +${Math.round((R.zones(s.concentration).normal/R.zones(0).normal-1)*100)}%`));body.append(header);window.GameArt?.portrait(header.querySelector('.player-avatar'),'hero');
   const meter=this.el('progress');meter.max=P.trainingLimit(p);meter.value=p.xp;meter.setAttribute('aria-label','선수 훈련 성장');body.append(meter,this.el('p','',p.xp>=P.trainingLimit(p)?'현재 훈련 숙련 완료':`훈련 ${p.xp}/${P.trainingLimit(p)} · 다음 성장까지 ${3-p.xp%3}회`));
   for(const [id,desc,unlock] of [['precise','피해 0.8배, 이번 타격의 뒤집기 확률 +15%p. 쿨타임 3턴.','마을 대회 우승 시 박태풍에게 배움'],['smash','피해 1.4배, 타이밍 구간이 좁아진다. 쿨타임 3턴.','시 대회 첫 승리 후 코치에게 배움'],['press','최대 내구도의 15% 회복. 공격과 뒤집기 판정 없음. 경기당 1회.','도 대회 첫 승리 후 상자왕에게 배움']]){const unlocked=P.hasSkill(p,id),card=this.el('div',`skill-card${unlocked?'':' locked'}`),title=this.el('h4','',R.skills[id].name);title.append(this.el('kbd','',unlocked?R.skills[id].key:'잠김'));card.append(title,this.el('p','',unlocked?desc:unlock));body.append(card)}
  },

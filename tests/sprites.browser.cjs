@@ -1,5 +1,5 @@
 const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-(async()=>{const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||undefined});try{
+(async()=>{const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE||(fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});try{
  const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[],failed=[];page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.url().includes('/assets/sprites/ttakji/')&&!r.ok())failed.push(r.url())});
  await page.addInitScript(()=>{window.spriteDraws=new Set();const draw=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(image,...args){if(image instanceof HTMLImageElement&&image.src.includes('/assets/sprites/ttakji/'))spriteDraws.add(new URL(image.src).pathname);return draw.call(this,image,...args)}});
  await page.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
@@ -10,7 +10,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
  await page.getByRole('button',{name:/마법의 양탄자 딱지.*7000원/}).click();
  assert(await page.evaluate(()=>G.profile.owned.includes('magic_carpet')));
  await page.evaluate(()=>Planet.enter());await page.keyboard.press('KeyI');assert.equal(await page.locator('[data-item]').count(),49);
- for(const id of ids){await page.locator('[data-item="'+id+'"]').click();await page.waitForFunction(id=>{const img=document.querySelector('#item-detail .item-art');return img?.complete&&img.naturalWidth===256&&img.src.endsWith('ttakji_'+(P.items[id].sprite||id)+'_base.png')},id);if(!await page.locator('#equip-item').isDisabled())await page.locator('#equip-item').click();assert.equal(await page.evaluate(()=>G.profile.equipped),id);}
+ for(const id of ids){await page.locator('[data-item="'+id+'"]').click();await page.waitForFunction(id=>{const img=document.querySelector('#item-detail .item-art');return img?.complete&&img.naturalWidth===32&&img.src.endsWith('ttakji_'+(P.items[id].sprite||id)+'_base.png')},id);if(!await page.locator('#equip-item').isDisabled())await page.locator('#equip-item').click();assert.equal(await page.evaluate(()=>G.profile.equipped),id);}
  const art=await page.locator('#item-detail .item-art').boundingBox(),body=await page.locator('#menu-body').boundingBox();assert(art.y>=body.y&&art.y+art.height<=body.y+body.height,'Selected art stays visible when scrolling the collection');
  const dir=process.env.ARTIFACT_DIR||path.join(require('node:os').tmpdir(),'ddakzizon-checks');fs.mkdirSync(dir,{recursive:true});await page.screenshot({path:path.join(dir,'catalog-inventory.png')});
  await page.reload();await page.locator('#load-game').click();await page.waitForFunction(()=>G.scene==='planet'&&G.state==='explore');assert.equal(await page.evaluate(()=>G.profile.owned.length),49);assert.equal(await page.evaluate(()=>G.profile.equipped),ids.at(-1));
