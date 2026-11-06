@@ -1,0 +1,78 @@
+/* Desktop composition: quiet dark chrome, warm reading surfaces. */
+:root{--navy:#233c3b;--ink:#243532;--gold:#d7bc82;--green:#668b78;--shadow:0 24px 64px #0b181a40}
+body{background:#111d20;font-weight:450}
+#game{min-width:960px;min-height:540px;background:#142326}
+.panel{border-radius:8px;border-color:#dcd7c9;box-shadow:var(--shadow)}
+.menu-primary,.menu-secondary{border-radius:5px;min-height:42px;font-size:13px;padding:12px 17px;font-weight:600}
+.menu-primary{background:#294642;border-color:#294642;box-shadow:none}
+.menu-primary:hover:not(:disabled){background:#385c54;border-color:#385c54;box-shadow:0 3px 14px #203c3226}
+.menu-secondary{background:transparent;border-color:#cfd2c3}.menu-secondary:hover:not(:disabled){background:#e9ecdf}
+button:focus-visible{outline:2px solid #b19457;outline-offset:4px}
+kbd{border-radius:3px;font-size:10px;letter-spacing:.03em;background:#2539380d;border:1px solid #263c3826;padding:3px 5px}
+.title-screen{background:linear-gradient(90deg,#10252bf5 0%,#10252be8 30%,#10252b88 60%,#10252b22 100%)}
+.title-screen:before{content:'';position:absolute;inset:24px;border:1px solid #e4dec51a;pointer-events:none}
+.title-copy{left:8%;width:490px;padding:0;top:48%}
+.title-kicker{font-size:11px;letter-spacing:.12em;font-weight:450;color:#b7c6bd;margin-bottom:30px}
+.title-kicker:before{width:15px;height:15px;border-color:#b79e67;background:linear-gradient(135deg,#dec99c44 49%,#dec99c11 50%)}
+h1{font-size:clamp(86px,8vw,122px);letter-spacing:-.075em;font-weight:750;line-height:1.08;color:#f5f0e2}
+.version-note{font-size:15px;font-weight:350;line-height:1.9;color:#c0ccc3;margin:26px 0 34px;letter-spacing:-.015em}
+.title-menu{width:308px;gap:8px}
+.title-menu .menu-primary{min-height:66px;border:1px solid #e0c897;background:#deca9e;padding:14px 20px;border-radius:5px;box-shadow:0 8px 28px #0a202533;font-size:15px;font-weight:700}
+.title-menu .menu-primary:hover{background:#efddba;border-color:#efddba}
+.button-copy{display:flex;flex-direction:column;gap:5px}.button-copy small{font-size:10px;font-weight:450;color:#57654f;letter-spacing:.01em}
+.title-menu .menu-secondary{border-radius:5px;min-height:45px;font-size:13px;padding:12px 18px}
+.title-menu .campaign-start{min-height:32px;padding:8px 0;font-size:11px;border:0;color:#a5b7ad}
+.title-menu #new-game{margin-top:13px;padding-top:15px;border-top:1px solid #c2d0bc26;border-radius:0}
+.title-footer{position:absolute;bottom:32px;left:8%;right:7%;display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:450;letter-spacing:.04em;color:#aebdb2;gap:30px}
+.title-footer>div{display:flex;gap:24px}.title-footer>div>span{display:flex;align-items:center;gap:6px}.title-footer kbd{background:#ecdfbe0a;border-color:#d4deca30;color:#e3dfce}
+#hud{padding:22px 26px}.top-actions{gap:2px;background:#182c30e8;border:1px solid #e0e3cd1f;border-radius:6px;padding:4px;box-shadow:0 4px 18px #0c1c2020;backdrop-filter:blur(12px)}
+.top-actions button{width:36px;height:36px;background:transparent;border:0;box-shadow:none;border-radius:3px;color:#d2d8cc}
+.top-actions button svg{width:18px;height:18px}.top-actions button:hover{background:#d4decb17;color:#fff5d7}
+#inventory{font-size:11px;font-weight:500;min-height:36px;padding:4px 13px 4px 6px;margin:0 5px 0 0;background:transparent;border:0;border-right:1px solid #cad7c329;border-radius:0;color:#d9decf;gap:8px}
+.has-newspaper::before,.has-colored-paper::after,#inventory.campaign-item::before{width:26px;height:26px}
+#map-hud{left:26px;top:22px;max-width:360px;padding:14px 18px;background:#182c30ec;border:1px solid #d7dfc323;border-radius:6px;box-shadow:0 4px 18px #0d202522;backdrop-filter:blur(12px);gap:6px}
+#map-location{font-size:10px;color:#97aea4;letter-spacing:.07em}#map-objective{font-size:13px;line-height:1.7;font-weight:550;color:#e4e7da}#map-direction{font-size:11px;color:#c6b78f}
+#minimum-help{left:26px;bottom:23px;font-size:10px;color:#b2c5b7;letter-spacing:.02em;text-shadow:0 1px 5px #14292a}
+.dialogue{left:50%;right:auto;width:min(960px,84%);translate:-50% 0;bottom:4%;min-height:162px;padding:25px 30px 17px;background:#172c30f5;color:#edf0e3;border:1px solid #c7d6bc2b;backdrop-filter:blur(14px);gap:24px;box-shadow:0 14px 45px #10202033}
+.portrait{width:70px;height:80px;background:#718679;border-color:#e3d6b333;border-radius:4px}.speaker-row strong{font-size:12px;font-weight:650;color:#ddc795;letter-spacing:.03em}
+#line{font-size:19px;line-height:1.9;font-weight:400;max-width:780px;margin:12px 0 10px}
+#next{font-size:11px;color:#dbe5d4;min-height:30px}.dialogue kbd{background:#ecdfbe08;border-color:#d4deca30;color:#c3cebf}
+.minimum-mode #skip-dialogue{font-size:10px;min-height:28px;color:#91a79b;padding:4px 0}.minimum-mode #skip-dialogue:hover{color:#e6dbb9}
+.health-card{top:92px;width:255px;padding:14px 17px 12px;background:#182c30f0;color:#e4e8da;border:1px solid #cfdbbf24;border-radius:6px;box-shadow:0 4px 18px #10232322;backdrop-filter:blur(10px)}
+.health-card.player{left:5%}.health-card.opponent{right:5%}.health-card>span{font-size:13px;font-weight:600;gap:10px}.health-card small{font-size:10px;color:#9cafa3}.health-card strong{font-size:11px;font-weight:550;color:#dce7d6}.health-track{height:5px;background:#d3d9c31c;border-radius:2px;margin:12px 0 9px}.health-track i{background:#91b29a}.opponent .health-track i{background:#b99678}
+#round-label{top:104px;font-size:9px;letter-spacing:.14em;font-weight:550;color:#d6c69f;background:#172c30b8;border:1px solid #d3d9c324;border-radius:3px;padding:7px 13px}
+.combat-panel{width:460px;padding:16px 20px;bottom:4%;border-radius:7px;background:#172c30f5;border:1px solid #cfdbbf24;box-shadow:0 10px 35px #10202033;color:#dbe3d4;backdrop-filter:blur(12px)}
+.combat-heading{font-size:11px;color:#a7bcae;margin-bottom:10px}.combat-heading strong{font-weight:450;letter-spacing:.02em}
+.actions button{min-height:43px;border-radius:4px;font-weight:600;padding:11px 14px}.action-primary{background:#ddc99c!important;border-color:#ddc99c!important;color:#283e36;font-size:14px}.action-primary:hover{background:#eddbb5!important}.action-primary .action-icon{font-size:18px}.action-primary kbd{color:#4b5d4e;background:#2941370a;border-color:#29413726}
+.action-secondary{background:#d4deca0d;color:#bdcec1;border-color:#d4deca29!important;font-size:12px}.action-secondary:hover:not(:disabled){background:#d4deca20}.action-secondary:disabled{background:transparent;color:#839b8d;opacity:.45}.action-secondary kbd{color:inherit}
+.gauge{height:20px;border-radius:3px;border-color:#d5dcca38;background:#384c48}.good-zone{background:#7a9a85}.perfect-zone{background:#d9c18d}.minimum-mode .normal-zone{background:#5a7468}#needle{width:3px;background:#f6eddb;box-shadow:0 0 0 1px #223d32}
+#timing-guide{font-size:10px;font-weight:400;color:#a2b5a7;letter-spacing:.01em}
+.strike{min-height:43px;font-size:14px;border-radius:4px;background:#ddc99c;color:#283e36;border-color:#ddc99c}.strike:hover{background:#eddbb5}.strike kbd{background:#2941370a;border-color:#29413726}
+.game-menu{width:min(960px,90%);height:min(670px,86svh);grid-template-columns:218px minmax(0,1fr);border-radius:9px;border-color:#dae0ca45;box-shadow:0 28px 90px #06171b66}
+.modal-backdrop{background:#0b1c22b8;backdrop-filter:blur(9px)}
+.menu-sidebar{background:#1b3033;color:#d9e2d5;border-color:#c7d6bb26;padding:30px 18px}.menu-sidebar h2{font-size:13px;letter-spacing:.1em;font-weight:500;margin:0 12px 28px;color:#9fb4a6}
+.menu-sidebar nav{gap:4px}.menu-sidebar nav button{border:0;border-left:2px solid transparent;border-radius:0;color:#9db2a4;padding:12px 13px;font-size:12px;font-weight:450}
+.menu-sidebar nav button:hover{background:#d4deca0a}.menu-sidebar nav button.active{background:#d4deca0c;border-left-color:#ddc99c;color:#eadfc0;font-weight:600}.menu-sidebar kbd{background:#d4deca05;border-color:#d4deca24;color:#a6baaa}
+.menu-sidebar-bottom{padding-top:22px;gap:8px}.menu-sidebar-bottom .menu-primary{min-height:42px;background:#d9c59b;border-color:#d9c59b;color:#263d35;box-shadow:none}.menu-sidebar-bottom .menu-secondary{min-height:38px;border-color:#d4deca2e;color:#b5c8b7;background:transparent;font-weight:400;font-size:11px}
+.menu-main{padding:30px 32px}.menu-header{margin-bottom:22px;padding-bottom:20px}.menu-header h3{font-size:23px;letter-spacing:-.03em}.menu-header button{font-size:11px;min-height:30px;padding:6px 9px;border-color:transparent}.menu-header button:hover{border-color:#cdd3c2}
+.equipped-summary{background:#eeeee2;border-color:#e1e2d5;border-radius:5px;padding:20px 22px;gap:22px}.equipped-summary img{width:100px;height:100px}.equipped-summary h4{font-size:21px!important;letter-spacing:-.04em}
+.menu-eyebrow{font-size:9px;letter-spacing:.05em}.menu-metrics strong{font-weight:600}.save-note{font-size:10px!important}
+.facility{width:min(620px,82%);padding:32px 34px;border-radius:8px}.facility header{padding-bottom:20px;margin-bottom:20px}.facility h2{font-size:24px;letter-spacing:-.04em;font-weight:700}.facility header>span{font-size:10px}.facility p{font-size:13px;line-height:1.9}.facility-choice{border-radius:4px;font-size:12px;min-height:46px;padding:12px 15px}.facility .menu-secondary{margin-top:24px;border-radius:4px;font-size:12px}
+.bracket{margin:26px 0}.bracket li{padding:17px 2px;font-size:12px;font-weight:500;letter-spacing:.01em}
+.result{width:min(480px,80%);padding:38px;border-radius:8px}.result h2{font-size:29px;letter-spacing:-.055em}.result p{font-size:13px;line-height:1.9}.result .menu-primary{margin-top:28px}.item-slot{border-radius:4px}.item-slot.selected{border-color:#91a68a;box-shadow:inset 0 -2px #91a68a}.item-level,.equipped-badge{font-size:9px}
+.toast{font-size:10px;border-radius:4px;background:#1c383bea;border-color:#c1d0b92e;padding:10px 16px}
+@media(max-height:700px){
+ .title-copy{top:47%;width:440px}.title-kicker{margin-bottom:18px;font-size:10px}.title-copy h1{font-size:86px}.version-note{font-size:13px;line-height:1.8;margin:18px 0 24px}.title-menu .menu-primary{min-height:57px;padding:11px 17px}.title-menu .menu-secondary{min-height:38px;padding:10px 15px}.title-menu .campaign-start{min-height:28px;padding:7px 0}.title-menu #new-game{margin-top:8px;padding-top:11px}.title-footer{bottom:22px;font-size:9px}.title-footer>div{gap:16px}
+ .dialogue{min-height:142px;padding:18px 24px 13px}#line{font-size:17px;line-height:1.75;margin:10px 0}.health-card{top:82px}.combat-panel{padding:13px 18px}.game-menu{height:90svh}.menu-sidebar{padding:20px 16px}.menu-sidebar h2{margin-bottom:18px}.menu-sidebar nav button{padding:9px 12px}.menu-main{padding:20px 26px}.menu-header{padding-bottom:14px;margin-bottom:18px}.equipped-summary{padding:16px}.equipped-summary img{width:80px;height:80px}.facility{max-height:82%;padding:24px 28px}.facility h2{font-size:22px}.bracket{margin:20px 0}.bracket li{padding:13px 0}.result{padding:28px}
+}
+/* Round status has its own header space, clear of the arena sign. */
+#round-label{top:32px}
+
+/* Portraits crop the same authored character image used in the world. */
+.portrait.image-portrait,.player-avatar.image-portrait{background-color:#e9dfc9;background-size:cover;background-position:center;background-repeat:no-repeat;image-rendering:pixelated;border-radius:0}
+.portrait.image-portrait::before,.portrait.image-portrait i{display:none}
+
+/* The classroom's only story branch stays distinct from facility menus. */
+.story-choice{position:absolute;left:50%;bottom:4%;translate:-50% 0;width:min(620px,82%);padding:18px 28px;background:#f7f2e7;z-index:5}
+.story-eyebrow{font-size:10px;letter-spacing:.09em;color:#758577;margin:0 0 8px}.story-choice h2{font-size:24px;letter-spacing:-.04em;margin:0 0 10px}.story-choice>p:not(.story-eyebrow){font-size:13px;line-height:1.8;color:#677360;margin:0 0 20px}.story-choice .menu-primary{width:100%;display:flex;justify-content:space-between;align-items:center;background:#d9c59b;border-color:#d9c59b;color:#263d35}.story-choice .menu-primary:hover{background:#ead8af}
+@media(max-height:700px){.story-choice{padding:16px 24px;bottom:3%}.story-choice .story-eyebrow{display:none}.story-choice h2{font-size:22px;margin-bottom:8px}.story-choice>p:not(.story-eyebrow){font-size:12px;line-height:1.5;margin-bottom:12px}}

@@ -147,10 +147,23 @@ attacks and transitions. Sound preferences are also saved locally.
 
 ### Source and verification
 
-- `game.js`: chapter state, input, simulation clock, save, combat and audio.
-- `world.js`: canvas scenes, movement rendering, fold / hit / flip effects.
+Scripts are plain classic scripts loaded in order by `index.html`; later files use
+what earlier files declare.
+
+- `game-core.js`: shared state, settings, save/checkpoints, panels and transitions.
+- `game-cinematics.js`: opening rally, near-flip and chapter cards.
+- `game-audio.js`: procedural sound effects and music.
+- `game-flow.js`: title, naming, new game / resume, school exploration and dialogue.
+- `game-battle.js`: battle HUD, skills, timing gauge, enemy turns and results.
+- `game-input.js`: pause menu, title settings, buttons, touch, keyboard and pointer.
+- `game.js`: simulation clock (`update`) and boot.
+- `world-core.js`: canvas, ttakji sprites, palette and drawing primitives (`WorldKit`).
+- `world-scenery.js`: scenery, school, characters and paper ttakji.
+- `world-scenes.js`: village, arenas, battle, home, ending, classroom and title scenes.
+- `world.js`: viewport, resize, `window.World` API and the frame loop.
 - `rules.js`: shared timing and damage rules.
-- `style.css`: integrated game HUD and PC controls.
+- `css/*.css`: base tokens, title, dialogue, combat, panels, exploration, campaign,
+  responsive, desktop composition, touch and ending styles (in that order).
 
 Run `npm test` for rules and `npm run check` for JavaScript syntax.
 Browser verification covers the full chapter, movement, paused timing, folding,

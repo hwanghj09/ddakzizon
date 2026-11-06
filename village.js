@@ -7,7 +7,7 @@ const Village={
  hubCheckpoint(){return P.stageIds.includes(G.hub)?G.hub:'village'},
  hubLabel(){return P.stageIds.includes(G.hub)?`${P.tournament(G.hub).stage}장으로`:'마을로 돌아가기'},
  returnHub(){this.hub().enter()},
- hud(){const p=G.profile;setInventory(`${P.items[p.equipped].name} +${p.upgrades[p.equipped]} · ${p.coins}원`,false,false);$('inventory').classList.add('campaign-item');$('inventory').style.setProperty('--item-icon',`url('${window.World?.spriteReady(p.equipped,'inventory')===false?spriteSrc(p.equipped,'base'):spriteSrc(p.equipped)}')`)},
+ hud(){const p=G.profile;setInventory(`${P.items[p.equipped].name} +${p.upgrades[p.equipped]} · ${p.coins}원`,false,false);$('inventory').classList.add('campaign-item');/* Absolute URL: a url() inside a custom property resolves against the stylesheet in css/. */$('inventory').style.setProperty('--item-icon',`url('${new URL(window.World?.spriteReady(p.equipped,'inventory')===false?spriteSrc(p.equipped,'base'):spriteSrc(p.equipped),document.baseURI).href}')`)},
  // Rematch won: Minsu hands over his ttakji and tells the news; the hero stays in the yard to look at the empty bench.
  epilogue(){
   cancelScene();G.scene='school';P.schoolReward(G.profile);checkpoint('complete');this.hud();

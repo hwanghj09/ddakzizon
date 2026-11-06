@@ -1,0 +1,14 @@
+/* Title: typography and a clear first action, with the longer campaign secondary. */
+.title-screen{position:absolute;inset:0;z-index:4;overflow-y:auto;overscroll-behavior:contain;background:linear-gradient(90deg,#17382ff2 0%,#17382fe0 26%,#17382f70 52%,#17382f0a 78%)}
+.title-copy{position:absolute;left:9%;top:50%;translate:0 -50%;width:min(460px,82%);padding:24px 0}
+.title-kicker{display:flex;align-items:center;gap:10px;color:#d7dfc9;font-size:12px;letter-spacing:.16em;font-weight:550;margin:0 0 24px}
+.title-kicker:before{content:'';width:12px;height:12px;rotate:45deg;border:1px solid var(--gold);background:#dfb96833}
+h1{font-size:clamp(64px,8vw,108px);font-weight:800;letter-spacing:-.07em;line-height:1.12;margin:0;color:#faf7ef;white-space:nowrap}h1 br{display:none}h1>span{color:var(--gold)}h1>span:first-child{margin-right:.06em}.title-dot{color:var(--gold)}
+.version-note{font-size:15px;line-height:1.8;color:#d2ddcd;margin:20px 0 30px;font-weight:400}
+.title-menu{display:flex;flex-direction:column;gap:10px;width:min(294px,100%)}
+.title-menu .menu-primary{background:#e5c98c;border-color:#e5c98c;color:#273d31;font-size:15px;padding:15px 19px;min-height:52px}
+.title-menu .menu-primary:hover{background:#efdab0;border-color:#efdab0}
+.title-menu .menu-secondary{background:#ffffff0b;border-color:#d8dfcf44;color:#eeeede}
+.title-menu .menu-secondary:hover{background:#ffffff19;border-color:#e6dfc777}
+.title-menu .campaign-start{background:transparent;border-color:transparent;box-shadow:none;font-size:12px;font-weight:450;color:#bfcdbb;min-height:42px;padding:9px 2px}
+.title-menu #new-game{margin-top:12px;border-top:1px solid #d8dfcf30;border-radius:0;padding-top:17px}

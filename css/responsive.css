@@ -1,0 +1,6 @@
+@media(min-aspect-ratio:17/10){#game{max-width:177.7778svh}}
+@media(max-height:700px){.game-menu{height:92svh}.menu-sidebar{padding:18px 14px}.menu-sidebar h2{margin-bottom:16px}.menu-sidebar nav button{padding:8px 10px;min-height:36px}.menu-main{padding:18px 22px}.menu-header{margin-bottom:14px;padding-bottom:12px}.item-slot{min-height:96px}.item-slot img{width:52px;height:52px}.item-art{width:88px;height:88px}.item-stats{margin:12px 0}.menu-sidebar-bottom{padding-top:14px}.facility{padding:20px 24px;max-height:78%}.home-workbench{top:14%;padding:18px}.home-workbench h2{font-size:21px}.home-stat-preview{margin:10px 0}.forge-summary img{width:58px;height:58px}.forge-form{padding:10px 6px}.forge-stats{margin:12px 0}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Location is already named by reading panels; do not cover their headings. */
+#game:has(#dialogue:not([hidden]),#facility:not([hidden]),#result:not([hidden]),#battle-hud:not([hidden])) #toast[data-kind="location"]{display:none}

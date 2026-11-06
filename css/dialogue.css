@@ -1,0 +1,11 @@
+/* Dialogue is a reading surface; the speaker and advance action stay inside it. */
+.dialogue{position:absolute;bottom:4%;left:6%;right:6%;min-height:156px;display:flex;padding:24px 28px 18px;gap:22px}
+.portrait{width:76px;height:86px;flex:none;align-self:center;position:relative;overflow:hidden;border:1px solid #bfc5b4;border-radius:8px;background:#dfe9d9;--skin:#e1b695;--hair:#3d68a8;--shirt:#c96b5f}
+.portrait::before{content:'';position:absolute;left:18px;top:15px;width:36px;height:38px;background:radial-gradient(circle at 33% 55%,#263b32 0 2px,transparent 3px),radial-gradient(circle at 70% 55%,#263b32 0 2px,transparent 3px),var(--skin);border:2px solid #263b32;border-top:11px solid var(--hair);border-radius:6px;z-index:1}
+.portrait i{position:absolute;left:12px;bottom:-5px;width:50px;height:37px;background:var(--shirt);border:2px solid #263b32;border-radius:10px 10px 0 0}
+.portrait.rival{--skin:#e4b993;--hair:#be874c;--shirt:#499563}.portrait.boss{--hair:#30343c;--shirt:#8a64ac;--skin:#d2a17c}.portrait.neighbor{--skin:#d9ac85;--hair:#554536;--shirt:#4f8eae}.portrait.friend{--skin:#e7c19f;--hair:#704a34;--shirt:#c9b356}.portrait.uncle{--skin:#d9ac85;--hair:#d9ac85;--shirt:#bd9057}.portrait.sprinter{--skin:#dfb18c;--hair:#30343c;--shirt:#c46672}.portrait.folder{--hair:#8a73b3;--shirt:#45958a}
+.dialogue-content{flex:1;min-width:0;display:flex;flex-direction:column}.speaker-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.speaker-row strong{font-size:13px;color:var(--navy);font-weight:750}.speaker-row strong:empty{visibility:hidden}
+#line{font-size:clamp(16px,1.5vw,20px);font-weight:500;line-height:1.75;margin:10px 0 12px;min-height:30px;word-break:keep-all;overflow-wrap:anywhere}
+#next{border:0;background:transparent;display:flex;align-items:center;gap:10px;color:var(--navy);font-size:12px;margin:0 0 0 auto;padding:8px 0 8px 12px;min-height:36px}#next>span{font-size:14px}
+#skip-dialogue{display:none}.minimum-mode #skip-dialogue{display:block;background:none;border:0;border-radius:4px;padding:6px 0 6px 10px;font-size:11px;font-weight:450;color:var(--muted);min-height:32px}

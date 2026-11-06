@@ -1,0 +1,7 @@
+/* Touch controls stay in the bottom corners during exploration, inside the safe area. */
+.touch-controls{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));pointer-events:none;z-index:4}
+.touch-move{display:flex;gap:12px}
+.touch-controls button{pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;min-width:64px;height:64px;padding:0 16px;font-size:22px;background:#fff8e6dd;border:3px solid var(--ink);border-radius:18px;box-shadow:0 4px 0 var(--ink);color:var(--ink)}
+.touch-controls button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);background:var(--gold)}
+#touch-interact{font-size:16px;min-width:104px;background:#ffe14ddd}
+@media(max-height:500px){.touch-controls button{height:52px;min-width:52px;font-size:18px}#touch-interact{min-width:88px;font-size:14px}}
