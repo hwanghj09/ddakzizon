@@ -4,6 +4,7 @@ window.GameArt=(()=>{
  const manifest=window.ART_MANIFEST||{},images={},portraits=new Map();
  const aliases={rival:'minsu',examinee:'folder',doyun:'boss',boxer:'neighbor',compressed:'folder',timing:'sprinter',mender:'friend',official:'folder',regulator:'champ',endurance:'friend',striker:'sprinter',reverse:'champ',glass:'friend',federation:'folder',situational:'globe',triangle:'alien',sparkle:'alien',wall:'folder',offbeat:'sprinter',champion:'boss',charger:'sprinter',fortress:'folder',national_champion:'champ',gust:'sprinter',glacier:'folder',continent_champion:'champ',showman:'minsu',architect:'folder',world_champion:'globe',martian:'alien',lunar:'alien',planet_champion:'alien_champ'};
  const canonical=kind=>aliases[kind]||kind;
+ const loading=key=>images[key]?.complete===false;
  const loaded=key=>{const image=images[key];return image?.complete&&image.naturalWidth&&!image.failed?image:null};
  const ready=Promise.all(Object.entries(manifest).map(([key,entry])=>new Promise(resolve=>{
   const image=new Image();images[key]=image;
@@ -45,11 +46,12 @@ window.GameArt=(()=>{
   const pose=attack?'attack':walk?(Math.floor(walk/140)%2?'walk-b':'walk-a'):'idle';
   let key=`characters/${who}/${pose}`;if(!loaded(key))key=`characters/${who}/idle`;
   const image=loaded(key),idle=manifest[`characters/${who}/idle`];if(!image||!idle)return false;
-  // Integer magnification and one common anchor prevent animation size/feet jitter.
-  const pixel=Math.max(1,Math.round(3*scale)),[ax,ay]=idle.anchor;
+  // Magnify the logical 32px grid in whole steps regardless of the PNG export size.
+  const pixel=Math.max(1,Math.round(3*scale)),[ax,ay]=idle.anchor,[width,height]=idle.size;
+  const zoom=pixel*32/width;
   ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(facing<0?-1:1,1);smooth(ctx);
   ctx.fillStyle='#25392b30';ctx.fillRect(-3*pixel,0,6*pixel,pixel);
-  ctx.drawImage(image,-ax*pixel,-ay*pixel,image.naturalWidth*pixel,image.naturalHeight*pixel);ctx.restore();return true;
+  ctx.drawImage(image,-ax*zoom,-ay*zoom,width*zoom,height*zoom);ctx.restore();return true;
  }
  function portrait(element,kind='hero'){
   if(!element)return;
@@ -59,10 +61,11 @@ window.GameArt=(()=>{
   const key=`characters/${element.dataset.artCharacter}/idle`,image=loaded(key);
   if(!image)return;
   if(!portraits.has(key)){
-   const tile=document.createElement('canvas');tile.width=tile.height=24;
+   const unit=image.naturalWidth/32,size=24*unit;
+   const tile=document.createElement('canvas');tile.width=tile.height=size;
    const c=tile.getContext('2d');smooth(c);
-   // Same 24x24 head/shoulder crop for all 32x32 characters, including antennae.
-   c.drawImage(image,4,0,24,24,0,0,24,24);
+   // Keep the same logical head and shoulder crop, including antennae.
+   c.drawImage(image,4*unit,0,size,size,0,0,size,size);
    portraits.set(key,tile.toDataURL());
   }
   element.style.backgroundImage=`url("${portraits.get(key)}")`;element.classList.add('image-portrait');
@@ -73,7 +76,7 @@ window.GameArt=(()=>{
   const camera=Math.round(G.camera||0);
   if(!panorama(ctx,theme,camera))return false;
   const {text,actor:person,paper}=a,objects=Exploration.objects(),nearest=G.state==='explore'?Exploration.nearest():null;
-  const npc={minsu:'rival',doyun:'boss',neighbor:'neighbor',father:'neighbor',hana:'friend',uncle:'uncle',reception:'folder',spectator:'friend'};
+  const npc={minsu:'rival',doyun:'boss',neighbor:'neighbor',father:'father',hana:'friend',uncle:'uncle',reception:'reception',spectator:'friend'};
   const sign=(label,x,y,width=180,active=false)=>{
    ctx.save();ctx.fillStyle=active?'#172437':'#fffaf0';ctx.strokeStyle=active?'#ffd477':'#526579';ctx.lineWidth=1;
    ctx.beginPath();ctx.roundRect(x-width/2,y,width,26,2);ctx.fill();ctx.stroke();
@@ -123,5 +126,5 @@ window.GameArt=(()=>{
   }
   ctx.restore();return true;
  }
- return {manifest,ready,loaded,background,panorama,prop,actor,portrait,map,hub};
+ return {manifest,ready,loading,loaded,background,panorama,prop,actor,portrait,map,hub};
 })();

@@ -36,7 +36,7 @@
  const nationalOpponents=[
   {name:'테이프 딱지 선수',title:'1회전',hp:300,attack:50,defense:18,stability:18,material:'tape',prize:400,kind:'mender',skill:'master',skills:['press'],heals:2,healAt:.5,hint:'회복형. 짝수 턴에는 막고, 내구도가 절반 아래로 내려가면 테이프를 감아 두 번까지 꾹 눌러 편다.'},
   {name:'공인 딱지 선수',title:'준결승',hp:320,attack:40,defense:22,stability:20,material:'certificate',prize:500,kind:'official',skill:'master',skills:['precise'],hint:'공인 딱지의 균형형. 방어 → 정타 → 힘 뺀 반격(빈틈) 세 박자를 정확히 지킨다.'},
-  {name:'이규격',title:'결승',hp:360,attack:34,defense:22,stability:20,material:'encyclopedia',prize:1200,kind:'regulator',skill:'master',skills:['precise','smash'],hidden:true,hint:'규칙과 정확성. 매 턴 같은 준비 동작(자로 재기)을 하지만, 다음 수는 일정한 주기로 반복되지 않는다.',unlocks:['융합기 해금','대륙 대회 참가권']}
+  {name:'이규격',title:'결승',hp:360,attack:34,defense:22,stability:20,material:'encyclopedia',prize:1200,kind:'regulator',sprite:'gyugyeok',skill:'master',skills:['precise','smash'],hidden:true,hint:'규칙과 정확성. 매 턴 같은 준비 동작(자로 재기)을 하지만, 다음 수는 일정한 주기로 반복되지 않는다.',unlocks:['융합기 해금','대륙 대회 참가권']}
  ];
  const continentOpponents=[
   {name:'마리',title:'1회전',hp:380,attack:38,defense:24,stability:22,material:'bread',prize:800,kind:'endurance',skill:'master',hint:'식빵 무늬 종이 딱지. 회복 대신 버틴다. 홀수 턴엔 막고, 네 번째 턴마다 빈틈이 생긴다.'},
@@ -46,12 +46,12 @@
  const worldOpponents=[
   {name:'미라',title:'1회전',hp:500,attack:46,defense:36,stability:20,material:'glass',prize:1500,kind:'glass',skill:'legend',hint:'유리 모양의 투명 종이 딱지. 첫 턴은 단단히 막고(완벽만 뚫린다), 세 번째 턴마다 빈틈.'},
   {name:'연맹 추천 선수',title:'준결승',hp:540,attack:44,defense:26,stability:22,material:'semiconductor',prize:2000,kind:'federation',skill:'legend',skills:['precise','smash'],hint:'공인 딱지에 숙련된 균형형. 방어 → 정타 → 보통 → 빈틈 네 박자.'},
-  {name:'한결',title:'결승',hp:640,attack:58,defense:36,stability:26,material:'diamond',prize:5000,kind:'situational',skill:'legend',skills:['precise','smash','press'],hint:'세계 챔피언. 공격·정밀 타격·회복을 상황에 따라 고른다. 자기 내구도가 뒤지면 막고, 앞서면 몰아친다.',unlocks:['세계 우승 트로피','행성 교류전 초대장']}
+  {name:'한결',title:'결승',hp:640,attack:58,defense:36,stability:26,material:'diamond',prize:5000,kind:'situational',sprite:'hangyeol',skill:'legend',skills:['precise','smash','press'],hint:'세계 챔피언. 공격·정밀 타격·회복을 상황에 따라 고른다. 자기 내구도가 뒤지면 막고, 앞서면 몰아친다.',unlocks:['세계 우승 트로피','행성 교류전 초대장']}
  ];
  const planetOpponents=[
   {name:'모서리 셋',title:'1회전',hp:580,attack:36,defense:28,stability:32,material:'quartz',prize:3000,kind:'triangle',skill:'legend',hint:'삼각형 딱지. 안정성이 아주 높고 공격은 약하다. 막고 → 보통 → 빈틈 세 박자.'},
   {name:'반짝',title:'준결승',hp:640,attack:58,defense:28,stability:20,material:'shuriken',prize:4000,kind:'sparkle',skill:'legend',skills:['precise'],gaugeScale:.8,hint:'별무늬 딱지. 빠른 박자 — 이 경기는 게이지가 빨라진다(설정이 느리게면 그대로). 세 번째 턴마다 숨을 고르며 빈틈.'},
-  {name:'무중',title:'결승',hp:720,attack:62,defense:36,stability:28,material:'slime',prize:10000,kind:'situational',skill:'legend',skills:['precise','smash','press'],hint:'여러 기술을 상황에 따라 쓴다. 지금까지 배운 타이밍과 기술을 모두 써야 한다.',unlocks:['교류전 우승 장식']}
+  {name:'무중',title:'결승',hp:720,attack:62,defense:36,stability:28,material:'slime',prize:10000,kind:'situational',sprite:'mujung',skill:'legend',skills:['precise','smash','press'],hint:'여러 기술을 상황에 따라 쓴다. 지금까지 배운 타이밍과 기술을 모두 써야 한다.',unlocks:['교류전 우승 장식']}
  ];
  // Catalog ttakji: rival trophies (won the first time their owner is beaten) and shop stock by tier.
  const trophy=(tier,round)=>({tier,round}),stock=(shop,price)=>({shop,price});

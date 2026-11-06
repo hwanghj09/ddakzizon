@@ -75,7 +75,7 @@ fs.mkdirSync(artifacts,{recursive:true});
   // Returning to title cancels scene work; the campaign keeps its own save.
   await p.keyboard.press('Escape');if(await p.evaluate(()=>!G.paused))await p.keyboard.press('Escape');await p.locator('#return-title').click();assert.equal(await p.evaluate(()=>Minimum.active),false);
   await p.locator('#new-game').click();assert.equal(await p.evaluate(()=>Minimum.active),false);await p.locator('#name-confirm').click();await p.waitForFunction(()=>localStorage.getItem(SAVE_KEY));
-  assert(await p.evaluate(()=>JSON.parse(localStorage.getItem(SAVE_KEY)).checkpoint==='school'));
+  assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem(SAVE_KEY)).checkpoint),'classroom');
   assert.deepEqual(await p.evaluate(()=>invalidCanvasTransforms),[]);
   console.log('PASS minimum desktop: complete keyboard route, scripted loss, crafting, MISS practice/retry, fair loss/retry/win, pause, all event reloads, poster/registration idempotency and isolated saves');
 

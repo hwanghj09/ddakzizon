@@ -47,7 +47,13 @@ function drawBattle(){const practice=['practice','training','story_training'].in
  rect(162,296,636,131,'#365471');ctx.strokeStyle='#d9e6ec';ctx.lineWidth=2;
  ctx.strokeRect(169,303,622,117);ctx.beginPath();ctx.ellipse(480,362,84,43,0,0,Math.PI*2);ctx.stroke();
  line(480,303,480,420,'#d9e6ec',2);text('1',188,323,13,'#a9d7b7','center');text('2',772,323,13,'#ee9c75','center');
- actor(125,347,'hero',0,1.1,1,'player');if(!practice){actor(837,347,Village.isBattle()?G.opponent.kind:'rival',0,1.1,-1,'enemy');if(G.mode==='intro_battle'&&!window.Minimum?.active)actor(891,313,'boss',0,.85,-1)}let px=310,py=350,ex=650,ey=350,pa=-.16,ea=.15,ps=1,es=1;
+ actor(125,347,'hero',0,1.1,1,'player');
+ if(!practice){
+  const opponent=Village.isBattle()?G.opponent:null;
+  actor(837,347,opponent?.sprite||opponent?.kind||'rival',0,1.1,-1,'enemy');
+  if(G.mode==='intro_battle'&&!window.Minimum?.active)actor(891,313,'boss',0,.85,-1);
+ }
+ let px=310,py=350,ex=650,ey=350,pa=-.16,ea=.15,ps=1,es=1;
 if(G.animation){const t=(G.now-G.animation.at)/1000;const grade=G.animation.grade;const power=grade==='PERFECT'?1:grade==='GOOD'?.65:grade==='NORMAL'?.45:.3;if(G.animation.kind==='player-hit'){if(t<.36){const q=t/.36;px=310+Math.pow(q,2)*320;py=350-Math.sin(q*Math.PI)*95;pa=-.16-q*.7;ps=1+Math.sin(q*Math.PI)*.25}else if(t<.7){const q=(t-.36)/.34;px=630-(630-310)*q;py=350-55*Math.sin(q*Math.PI);ey-=Math.sin(q*Math.PI)*55*power;ea+=Math.sin(q*Math.PI*2)*.35*power}}else if(G.animation.kind==='enemy-ready'){ey-=Math.sin(Math.min(t/.75,1)*Math.PI/2)*35;ea-=.2*Math.min(t/.75,1)}else if(G.animation.kind==='enemy-hit'){if(t<.36){const q=t/.36;ex=650-Math.pow(q,2)*320;ey=315-Math.sin(q*Math.PI)*105;ea=.15+q*.8;es=1+Math.sin(q*Math.PI)*.35}else if(t<.7){const q=(t-.36)/.34;ex=330+320*q;ey=350-Math.sin(q*Math.PI)*50;py-=Math.sin(q*Math.PI)*25}}}
 let psy=.76,esy=.76;if(G.animation?.kind==='near-flip'&&!reducedMotion){const q=Math.min(1,(G.now-G.animation.at)/1500),lift=Math.sin(q*Math.PI);ey-=lift*60;ea+=lift*.7;ex+=Math.sin(q*Math.PI*4)*7;esy*=1-lift*.93}if(G.flipPlayer){const t=Math.min((G.now-G.flipPlayer)/800,1);psy=Math.cos(t*Math.PI)*.76;py-=Math.sin(t*Math.PI)*95;pa+=t*.18}if(G.flipEnemy){const t=Math.min((G.now-G.flipEnemy)/800,1);esy=Math.cos(t*Math.PI)*.76;ey-=Math.sin(t*Math.PI)*95;ea-=t*.2}if(G.stolen){const t=Math.min((G.now-G.stolenAt)/900,1);px+=t*560;py-=t*90;ctx.globalAlpha=1-t}
  // Ground shadows under each ttakji sell the height of each throw.
@@ -75,20 +81,19 @@ function drawEndingSky(){const t=Math.min(1,Math.max(0,(G.now-G.endingAt)/2600))
  const meet=Math.min(1,Math.max(0,(G.now-G.endingAt-1700)/700));paper(430+meet*40,370-Math.sin(meet*Math.PI)*60,46,'news',-.2,1);paper(530-meet*40,370-Math.sin(meet*Math.PI)*60,46,'accordion_folder',.2,1);
  for(let i=0;i<4;i++)actor(120+i*45,330,'friend',0,.6,1);ctx.restore();
  if(G.state==='credits'){ctx.fillStyle='#1b1230d9';ctx.fillRect(0,0,960,600);stars(80,600)}}
-function drawClassroom(){
- if(!window.GameArt?.background(ctx,'classroom',402)){
-  rect(0,0,960,402,'#d7c9a9');rect(0,402,960,198,'#b68c59');
-  panel(225,105,510,173,8,'#46675b','#a87949',10);
-  for(const x of [80,850]){box(x,120,75,170,'#b9d9da');line(x+37,120,x+37,290,'#f0e2c2',4)}
- }
- actor(340,410,'hero',0,1.3,1);actor(570,410,'rival',0,1.2,1);actor(705,410,'boss',0,1.2,-1);
+const classroomArt=['backgrounds/classroom','characters/hero/idle','characters/minsu/idle','characters/boss/idle','characters/teacher/idle','props/door'];
+function drawClassroom(title=false){
+ if(classroomArt.some(GameArt.loading)||!GameArt.background(ctx,'classroom',402))return;
+ const teacherPresent=title||(G.state==='dialogue'&&G.dialogIndex<=classroomExitLine);
+ const walking=!title&&teacherPresent&&G.dialogIndex===classroomExitLine?G.now-G.dialogStart:0;
+ const doorOpen=walking>=classroomExitTime-220&&walking<classroomExitTime;
+ if(doorOpen)box(891,235,66,110,'#223231',2);
+ if(teacherPresent&&walking<classroomExitTime)GameArt.actor(ctx,666+258*walking/classroomExitTime,343,'teacher',walking,1.24,1);
+ if(!doorOpen)GameArt.prop(ctx,'door',924,345,66,115);
+ GameArt.actor(ctx,340,410,'hero',0,1.3,1);
+ GameArt.actor(ctx,570,410,'minsu',0,1.2,1);
+ GameArt.actor(ctx,705,410,'boss',0,1.2,-1);
  panel(388,53,184,46,7,'#f4ead7e8','#a68c6244',1);text('수업 끝',480,83,23,'#304b43','center',700);
 }
-function drawTitle(){
- if(!GameArt.panorama(ctx,'yard',0,418))school();
- actor(620,459,'hero',0,1.48,1);
- actor(788,442,'rival',0,1.15,-1);
- paper(698,500,112,'news',-.21,.8);paper(808,479,81,'red',.17,.8);
-}
-Object.assign(WorldKit,{villageBackground,drawVillage,TIER_LOOK,stars,tierArena,drawAdvert,drawBattle,drawHome,drawEndingSky,drawClassroom,drawTitle});
+Object.assign(WorldKit,{villageBackground,drawVillage,TIER_LOOK,stars,tierArena,drawAdvert,drawBattle,drawHome,drawEndingSky,drawClassroom});
 })();

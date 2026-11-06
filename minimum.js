@@ -6,7 +6,6 @@ const Minimum={
  init(){
   try{this.saved=MinimumRules.restore(JSON.parse(localStorage.getItem(this.key)))}catch{/* Private mode or an invalid save: start normally. */}
   $('minimum-new').onclick=()=>this.start();$('minimum-load').onclick=()=>this.start(true);
-  $('follow-friends').onclick=()=>this.followFriends();
   $('skip-dialogue').onclick=()=>{if(!this.active||G.paused||G.state!=='dialogue')return;G.state='transition';G.dialogDone()};
   // Exploration owns the shared world coordinates. Select this story's behavior
   // only while it is active; campaign functions remain available unchanged.
@@ -35,21 +34,14 @@ const Minimum={
  opening(){
   G.mapZone=null;G.scene='classroom';G.mode='minimum';this.hud();this.save();
   if(this.progress.opening==='choice'){this.openingChoice();return}
-  this.talk([
-   ['나','딩동댕동—. 마지막 수업이 끝났다. 책을 챙기는데 옆자리에서 이야기가 들려온다.'],
-   ['민수','야, 오늘 딱지 어디서 칠 거야?'],
-   ['도윤','운동장 정자에서. 수업 끝났으니까 바로 가자.'],
-   ['나','딱지…? 둘이 뭘 하는지 궁금해졌다.']
-  ],()=>this.openingChoice());$('game').focus({preventScroll:true});
+  classroomOpening(()=>this.openingChoice());
  },
  openingChoice(){
-  this.progress.opening='choice';G.state='choice';G.keys.clear();G.target=null;
-  panels('story-choice');this.save();$('follow-friends').focus({preventScroll:true});
- },
- followFriends(){
-  if(!this.active||G.paused||G.state!=='choice'||this.progress.opening!=='choice')return;
-  sound('click');this.progress.opening='done';this.progress.zone='yard';this.progress.x=760;this.save();
-  transition(()=>this.enter('yard',760));
+  this.progress.opening='choice';this.save();
+  classroomChoice(()=>{
+   this.progress.opening='done';this.progress.zone='yard';this.progress.x=760;this.save();
+   transition(()=>this.enter('yard',760));
+  });
  },
  zoneData(){const z=Exploration.zones[this.progress.zone];return this.progress.zone==='yard'?{...z,name:'운동장 정자',theme:'gazebo'}:z},
  phase(){return this.progress.stage==='school'?'school':MinimumRules.atLeast(this.progress,'won')?'campaign':MinimumRules.atLeast(this.progress,'practiced')?'rematch':'lost'},

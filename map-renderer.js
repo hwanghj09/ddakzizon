@@ -19,8 +19,9 @@ const MapRenderer={
   r(20,272,920,6,'#e0cda0');for(let x=0;x<960;x+=80)l(x,280,x+65,600,'#787e6a44',1);
  },
  draw(ctx,a){
-  if(globalThis.GameArt?.map(ctx,a))return;
-  const {rect:r,text:t,line:l,tree,actor,paper}=a,z=Exploration.data(),theme=z.theme,w=z.width,camera=G.camera||0,p=G.profile;
+  const z=Exploration.data(),theme=z.theme;
+  if(globalThis.GameArt?.loading('panoramas/'+theme)||globalThis.GameArt?.map(ctx,a))return;
+  const {rect:r,text:t,line:l,tree,actor,paper}=a,w=z.width,camera=G.camera||0,p=G.profile;
   const indoor=['home','lobby',...P.stageIds].includes(theme),night=['national','world','planet'].includes(theme);
   r(0,0,960,600,night?'#182c3a':indoor?'#b8b59c':'#b5cfc7');
   if(!indoor){
@@ -81,7 +82,7 @@ const MapRenderer={
    }
   }
   for(const o of Exploration.objects()){
-   if(o.type==='npc')actor(o.x,438,({minsu:'rival',doyun:'boss',neighbor:'neighbor',hana:'friend',uncle:'uncle',reception:'folder',spectator:'friend'})[o.id],0,.95,o.x<G.hero.x?1:-1);
+   if(o.type==='npc')actor(o.x,438,({minsu:'rival',doyun:'boss',neighbor:'neighbor',father:'father',hana:'friend',uncle:'uncle',reception:'reception',spectator:'friend'})[o.id],0,.95,o.x<G.hero.x?1:-1);
    if(G.state==='explore'){const near=Exploration.nearest()?.id===o.id;r(o.x-9,326,18,18,near?'#e9c77c':'#345f5677');t(o.type==='npc'?'…':o.type==='door'?'↗':'·',o.x,340,14,near?'#294d49':'#e7dcba','center')}
   }
   if(z.left){sign('← '+Exploration.zones[z.left].name,130,463,200);r(125,498,6,40,'#455f54')}if(z.right){sign(Exploration.zones[z.right].name+' →',w-140,463,210);r(w-145,498,6,40,'#455f54')}

@@ -17,6 +17,7 @@ function sound(kind,grade='GOOD'){
  else if(kind==='whoosh')rustle(.25,500,.09,0,3000);
  else if(kind==='flip'){rustle(.2,2400,.12,0,600);rustle(.07,1800,.15,.22);note(180,.1,'triangle',.06,.22,80)}
  else if(kind==='perfect'){note(660,.16);note(880,.2,'triangle',.06,.09);note(1320,.25,'sine',.04,.18)}
+ else if(kind==='school-bell'){[784,659,698,523].forEach((pitch,i)=>note(pitch,.35,'sine',.075,i*.19))}
  else if(kind==='fold'){rustle(.18,3400,.15,0,1100);rustle(.065,1700,.1,.13);note(210,.09,'triangle',.035,.12,120)}
  else if(kind==='win'){[523,659,784,1046].forEach((n,i)=>note(n,.4,'triangle',.07,i*.14))}
  else if(kind==='lose'){[330,294,220].forEach((n,i)=>note(n,.3,'triangle',.06,i*.15))}

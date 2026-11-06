@@ -12,8 +12,9 @@ function tree(x,y,s=1){const cx=x+28*s,cy=y+22*s;ell(cx,y+95*s,32*s,7*s,'#000000
 function grassEdge(y){rect(0,y-3,960,3,OUT);rect(0,y,960,14,'#4cc95a');rect(0,y+10,960,4,'#2f9e44');for(let i=0;i<48;i++)rect(i*20+(i%3)*4,y-2,4,6,'#4cc95a')}
 
 function school(){
- if(!window.Minimum?.active&&GameArt.panorama(ctx,'yard',40,322,3))return;
- if(window.GameArt?.background(ctx,window.Minimum?.active?'gazebo':'yard',290))return;
+ const theme=window.Minimum?.active?'gazebo':'yard';
+ if(theme==='yard'&&(GameArt.loading('panoramas/yard')||GameArt.panorama(ctx,'yard',40,322,3)))return;
+ if(GameArt.loading('backgrounds/'+theme)||GameArt.background(ctx,theme,290))return;
  sky(290);sun(866,70);cloud(98+Math.sin(G.now/20000)*15,69);cloud(640+Math.sin(G.now/24000)*12,98,.75);cloud(345,40,.5);hills(250);
  // School building with a red roof and bright glass.
  box(175,114,620,150,'#fff1d0');rect(175,240,620,24,'#f4d6a2');poly([[158,116],[812,116],[790,90],[180,90]],RED);rect(190,95,590,4,'#ff8f85');

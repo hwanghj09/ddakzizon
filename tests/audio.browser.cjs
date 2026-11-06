@@ -9,7 +9,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   const rendered=await page.evaluate(async()=>{
    cancelScene();const live=G.audio,results=[];
    try{
-    for(const [kind,grade,muted,paused] of [['click'],['whoosh'],['hit','BAD'],['hit','GOOD'],['hit','PERFECT'],['perfect'],['fold'],['flip'],['win'],['lose'],['hit','GOOD',true],['hit','GOOD',false,true]]){
+    for(const [kind,grade,muted,paused] of [['click'],['school-bell'],['whoosh'],['hit','BAD'],['hit','GOOD'],['hit','PERFECT'],['perfect'],['fold'],['flip'],['win'],['lose'],['hit','GOOD',true],['hit','GOOD',false,true]]){
      G.audio=new OfflineAudioContext(1,48000,48000);G.sound=!muted;G.paused=!!paused;sound(kind,grade);
      const samples=(await G.audio.startRendering()).getChannelData(0);
      let energy=0,peak=0,tail=0,finite=true;
@@ -53,7 +53,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   const fallback=await browser.newPage();fallback.on('pageerror',e=>errors.push(e.message));
   await fallback.addInitScript(()=>{window.AudioContext=undefined;window.webkitAudioContext=undefined});
   await fallback.goto(process.env.TEST_URL||'http://127.0.0.1:4173');await fallback.locator('#new-game').click();
-  await fallback.evaluate(()=>['click','whoosh','hit','perfect','fold','flip','win','lose'].forEach(kind=>sound(kind)));
+  await fallback.evaluate(()=>['click','whoosh','hit','perfect','fold','flip','win','lose','school-bell'].forEach(kind=>sound(kind)));
   assert.equal(await fallback.evaluate(()=>G.audio),null);assert.deepEqual(errors,[]);
   console.log('PASS rendered effects, hit strength, combat/folding cues, mute persistence, pause/resume and missing Web Audio')
  }finally{await browser.close()}
