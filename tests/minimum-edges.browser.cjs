@@ -24,7 +24,8 @@ const url=process.env.TEST_URL||'http://127.0.0.1:4173';
   await p.evaluate(()=>Minimum.battle('practice'));await p.locator('#attack').click();await p.locator('#strike').click();
   await p.waitForFunction(()=>Minimum.progress.stage==='practiced');await p.reload();await p.locator('#minimum-load').click();
   assert.equal(await p.evaluate(()=>Minimum.progress.stage),'practiced');
-  await p.evaluate(()=>Minimum.battle('rematch'));await p.locator('#attack').click();await p.locator('#strike').click();
+  // This scenario must reach an enemy turn; random early flips are tested below.
+  await p.evaluate(()=>{Minimum.battle('rematch');Math.random=()=>.999});await p.locator('#attack').click();await p.locator('#strike').click();
   await p.waitForFunction(()=>G.state==='enemy');await p.keyboard.press('Escape');await p.locator('#return-title').click();
   await p.waitForTimeout(1500);assert.equal(await p.evaluate(()=>G.state),'title');assert.equal(await p.evaluate(()=>G.tasks.length),0);
   // Starting/reloading a short story does not replace an existing campaign save.

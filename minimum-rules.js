@@ -11,7 +11,7 @@
   labels:{PERFECT:'완벽',GOOD:'좋음',NORMAL:'보통',MISS:'빗나감'},
   bracket:[['1회전','나 vs 앞집 아저씨'],['1회전','유치원 친구 vs 마을 선수'],['결승','1회전 승자끼리 대결']]
  };
- function fresh(){return {version:1,stage:'school',opening:'classroom',zone:'yard',x:180,visited:{yard:true},guidance:true}}
+ function fresh(){return {version:1,stage:'school',opening:'classroom',homeLesson:'unseen',zone:'yard',x:180,visited:{yard:true},guidance:true}}
  function restore(raw){
   if(!raw||raw.version!==1||!stages.includes(raw.stage))return null;
   const p=fresh();p.stage=raw.stage;p.zone=Object.hasOwn(zones,raw.zone)?raw.zone:'yard';
@@ -19,11 +19,12 @@
   p.opening=raw.stage==='school'&&['classroom','choice'].includes(raw.opening)?raw.opening:'done';
   p.x=Number.isFinite(raw.x)?Math.max(45,Math.min(zones[p.zone]-45,raw.x)):180;
   p.guidance=raw.guidance!==false;
+  p.homeLesson=p.stage==='school'?'unseen':p.stage==='lost'?(raw.homeLesson==='heard'?'heard':'pending'):'heard';
   for(const zone of Object.keys(zones))if(raw.visited?.[zone]===true)p.visited[zone]=true;
   p.visited[p.zone]=true;return p;
  }
  const atLeast=(p,stage)=>stages.indexOf(p.stage)>=stages.indexOf(stage);
- function advance(p,stage){if(stages.indexOf(stage)!==stages.indexOf(p.stage)+1)return false;p.stage=stage;p.opening='done';return true}
+ function advance(p,stage){if(stages.indexOf(stage)!==stages.indexOf(p.stage)+1)return false;p.stage=stage;p.opening='done';if(stage==='lost')p.homeLesson='pending';if(stage==='crafted')p.homeLesson='heard';return true}
  const owned=p=>p.stage==='school'||atLeast(p,'crafted');
  const judge=position=>{const d=Math.abs(position-.5);return d<=config.timing.perfect?'PERFECT':d<=config.timing.good?'GOOD':d<=config.timing.normal?'NORMAL':'MISS'};
  function damage(grade,attacker=config.tile,strength=config.player.strength,defender=config.tile){return Math.max(1,Math.round((attacker.attack+strength-defender.defense*.5)*(config.multipliers[grade]??1)))}
@@ -32,6 +33,7 @@
   const amount=damage(grade,attacker,strength,defender),remaining=Math.max(0,hp-amount),flipped=remaining===0||roll<flipChance(remaining,defender.hp,defender.stability);
   return {damage:amount,hp:remaining,flipped};
  }
- const api={config,stages,zones,fresh,restore,atLeast,advance,owned,judge,damage,flipChance,hit};
+ const playerTile=p=>({...config.tile,hp:config.tile.hp+(atLeast(p,'crafted')?10:0),attack:config.tile.attack+(atLeast(p,'crafted')?3:0)});
+ const api={config,stages,zones,fresh,restore,atLeast,advance,owned,judge,damage,flipChance,hit,playerTile};
  if(typeof module!=='undefined')module.exports=api;else root.MinimumRules=api;
 })(globalThis);

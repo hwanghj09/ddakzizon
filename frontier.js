@@ -1,7 +1,7 @@
 'use strict';
 // Continent, world and planet tournaments share one hub flow. Each tier opens after the previous title.
 function makeTier(c){return{
- id:c.id,name:c.name,places:c.places,
+ id:c.id,name:c.name,width:1920,places:c.places.map(p=>({...p,x:p.x*2})),
  opponents(){return P.tiers[c.id].opponents},
  eligible(){const prev=P.tiers[c.id].after;return !!G.profile[`${prev}Entered`]&&G.profile[`${prev}Round`]===3},
  entered(){return G.profile[`${c.id}Entered`]},
@@ -11,7 +11,7 @@ function makeTier(c){return{
   if(!this.entered()){P.enterTier(G.profile,c.id);checkpoint(`${c.id}_intro`);transition(()=>this.intro())}
   else transition(()=>this.enter())
  },
- setup(){cancelScene();G.hub=c.id;G.scene=c.id;G.mode=c.id;G.stolen=false;G.flipPlayer=G.flipEnemy=0;G.hero={x:145,y:393,walk:0,facing:1};Village.hud()},
+ setup(){cancelScene();G.hub=c.id;G.scene=c.id;G.mode=c.id;G.camera=0;G.stolen=false;G.flipPlayer=G.flipEnemy=0;G.hero={x:145,y:393,walk:0,facing:1};Village.hud()},
  intro(){
   if(!this.eligible()){c.previous().enter();return}
   P.enterTier(G.profile,c.id);this.setup();checkpoint(`${c.id}_intro`);say(c.intro,()=>this.enter())

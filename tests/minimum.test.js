@@ -33,7 +33,7 @@ test('minimum saves validate version/stage, sanitize positions and stay independ
  assert.equal(restored.visited.planet,undefined);assert.equal(restored.coins,undefined);
  assert.equal(M.restore({version:1,stage:'lost',zone:'home',x:999999}).x,1235);
  assert.equal(M.restore({version:1,stage:'lost',zone:'home',x:-10}).x,45);
- for(const stage of M.stages){const p=M.fresh();p.stage=stage;if(stage!=='school')p.opening='done';assert.deepEqual(M.restore(JSON.parse(JSON.stringify(p))),p)}
+ for(const stage of M.stages){const p=M.fresh();p.stage=stage;if(stage!=='school')p.opening='done';p.homeLesson=stage==='school'?'unseen':stage==='lost'?'pending':'heard';assert.deepEqual(M.restore(JSON.parse(JSON.stringify(p))),p)}
 });
 
 test('classroom and choice saves resume; old or later saves never replay the opening',()=>{
@@ -43,4 +43,13 @@ test('classroom and choice saves resume; old or later saves never replay the ope
  assert.equal(M.restore(old).opening,'done');assert.equal(M.restore({...old,opening:'garbage'}).opening,'done');
  for(const stage of M.stages.slice(1))assert.equal(M.restore({...old,stage,opening:'choice'}).opening,'done');
  const p=M.fresh();assert(M.advance(p,'lost'));assert.equal(p.opening,'done');
+});
+test('the father lesson survives interruption and the first upgrade has real combat effects',()=>{
+ const p=M.fresh();assert.equal(M.playerTile(p).attack,20);assert.equal(M.playerTile(p).hp,100);
+ assert(M.advance(p,'lost'));assert.equal(p.homeLesson,'pending');
+ assert.equal(M.restore({version:1,stage:'lost',zone:'yard',x:950}).homeLesson,'pending');
+ p.homeLesson='heard';assert.equal(M.restore(p).homeLesson,'heard');assert(M.advance(p,'crafted'));
+ assert.deepEqual(M.playerTile(p),{...M.config.tile,attack:23,hp:110});
+ assert(M.damage('PERFECT',M.playerTile(p))>M.damage('PERFECT'));
+ assert.equal(M.advance(p,'crafted'),false);assert.equal(M.restore(p).homeLesson,'heard');
 });

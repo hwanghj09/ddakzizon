@@ -37,7 +37,7 @@ const dir=process.env.ARTIFACT_DIR||'/tmp/ddakzizon-opening';fs.mkdirSync(dir,{r
   await page.screenshot({path:path.join(dir,'followed-to-gazebo.png')});
   await page.reload();await page.locator('#minimum-load').click();await page.waitForFunction(()=>G.state==='explore');assert(await page.locator('#story-choice').isHidden());
   await page.keyboard.down('ArrowRight');try{await page.waitForFunction(()=>Exploration.nearest()?.id==='minsu')}finally{await page.keyboard.up('ArrowRight')}
-  await page.keyboard.press('KeyE');assert.match(await page.locator('#line').getAttribute('aria-label'),/이야기상 패배/);
+  await page.keyboard.press('KeyE');assert.match(await page.locator('#line').getAttribute('aria-label'),/딱지 한 장씩 걸고/);
   await page.locator('#skip-dialogue').click();await page.waitForFunction(()=>G.state==='ready');
   // Repeated native clicks cannot replay the decision from the battle scene.
   await page.locator('#follow-friends').evaluate(el=>el.click());assert.equal(await page.evaluate(()=>G.scene),'battle');

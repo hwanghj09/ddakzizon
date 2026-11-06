@@ -15,9 +15,9 @@ function ttakji(x,y,size,material='newspaper',state='base',angle=0,flipScale=1){
  if(image?.failed)image=ttakjiSprites[material].base;
  if(!image?.complete||!image.naturalWidth)return false;
  ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(1,Math.max(.001,Math.abs(flipScale)));
- ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- // The authored artwork occupies 204px of each 256px canvas. Preserve padding and aspect ratio.
- const extent=size*256/204;ctx.drawImage(image,-extent/2,-extent/2,extent,extent);ctx.restore();return true;
+ ctx.imageSmoothingEnabled=false;
+ // The 32px tile keeps its original transparent margins (about 26px of artwork).
+ const extent=size*32/26;ctx.drawImage(image,-extent/2,-extent/2,extent,extent);ctx.restore();return true;
 }
 // Shared palette: one dark ink outlines every shape so scenes read like a cartoon game.
 const OUT='#1b1230',NAVY='#2b2d6e',YELLOW='#ffe14d',RED='#ff5a4e',BLUE='#3d9be9',WHITE='#ffffff';
@@ -33,8 +33,8 @@ function poly(points,fill,o=OUT,t=3){ctx.beginPath();points.forEach((p,i)=>i?ctx
 function grad(x,y,w,h,top,bottom){const g=ctx.createLinearGradient(0,y,0,y+h);g.addColorStop(0,top);g.addColorStop(1,bottom);ctx.fillStyle=g;ctx.fillRect(x,y,w,h)}
 // Desktop scenes share a fixed logical viewport.
 function viewWidth(){return 960}
-function resize(){const b=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);width=b.width;height=b.height;viewportWidth=viewWidth();canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);scale=Math.min(width/viewportWidth,height/600);ox=(width-viewportWidth*scale)/2;oy=(height-600*scale)/2;ctx.imageSmoothingEnabled=false;if(window.Minimum?.active&&Exploration.active())G.camera=Math.max(0,Math.min(Exploration.data().width-viewportWidth,G.hero.x-viewportWidth/2))}
-window.World={viewWidth,spriteReady(id,state){const image=ttakjiSprites[id]?.[state];return image?.failed?false:image?.naturalWidth?true:undefined},screenToWorld(x,y){const b=canvas.getBoundingClientRect();return{x:(x-b.left-ox)/scale,y:(y-b.top-oy)/scale}}};new ResizeObserver(resize).observe(canvas);window.addEventListener('resize',resize);
+function resize(){const b=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);width=b.width;height=b.height;viewportWidth=viewWidth();canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);scale=Math.min(width/viewportWidth,height/600);ox=(width-viewportWidth*scale)/2;oy=(height-600*scale)/2;ctx.imageSmoothingEnabled=false;if(Exploration.active())G.camera=Math.max(0,Math.min(Exploration.data().width-viewportWidth,G.hero.x-viewportWidth/2))}
+window.World={viewWidth,areaWidth(){return Tiers[G.scene]?.width||960},spriteReady(id,state){const image=ttakjiSprites[id]?.[state];return image?.failed?false:image?.naturalWidth?true:undefined},screenToWorld(x,y){const b=canvas.getBoundingClientRect();return{x:(x-b.left-ox)/scale,y:(y-b.top-oy)/scale}}};new ResizeObserver(resize).observe(canvas);window.addEventListener('resize',resize);
 
 // --- Scenery pieces ---
 function sky(h,top='#45b8ff',bottom='#c9f1ff'){grad(0,0,960,h,top,bottom)}
@@ -84,9 +84,9 @@ const LOOKS={
  alien:{skin:'#9cbe79',hair:'#567d4c',shirt:'#8a73b3',trim:'#c7a953',pants:'#48465e',shoe:'#ddd8ca',bald:true,antenna:true},
  alien_champ:{skin:'#9cbe79',hair:'#567d4c',shirt:'#c3a04a',trim:'#bc6769',pants:'#48465e',shoe:'#e1dac8',bald:true,antenna:true,shades:true}
 };
-function actor(x,y,kind='hero',walk=0,scaleActor=1,facing=1){
+function actor(x,y,kind='hero',walk=0,scaleActor=1,facing=1,role){
  kind=({wall:'folder',offbeat:'sprinter',champion:'boss',charger:'sprinter',fortress:'folder',national_champion:'champ',gust:'sprinter',glacier:'folder',continent_champion:'champ',showman:'rival',architect:'folder',world_champion:'globe',martian:'alien',lunar:'alien',planet_champion:'alien_champ'})[kind]||kind;const L=LOOKS[kind]||LOOKS.friend,f=facing>0?1:-1;
- if(window.GameArt?.actor(ctx,x,y,kind,walk,scaleActor,facing,G.animation,G.now))return;
+ if(window.GameArt?.actor(ctx,x,y,kind,walk,scaleActor,facing,G.animation,G.now,role))return;
  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(scaleActor,scaleActor);
  const bob=walk?Math.abs(Math.sin(walk/90))*3:Math.sin(G.now/500+x)*1.2,step=walk?Math.sin(walk/90)*6:0,liftL=Math.max(0,step)*.7,liftR=Math.max(0,-step)*.7,swing=step*.6;
  ell(0,1,22,6,'#25392b33');ctx.translate(0,-bob);
@@ -117,6 +117,7 @@ function speech(x,y){if(!G.coach||G.now>G.coachUntil)return;const size=13;ctx.fo
 function paper(x,y,size,type='news',angle=.12,sy=.8,folds=4,spriteState='base',flipScale=1){if(ttakji(x,y,size,type==='red'?'colored_paper':type==='news'?'newspaper':type,spriteState,angle,flipScale))return;ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(1,sy);const half=size/2;rect(-half+4,-half+5,size,size,'#1b123044');rect(-half,-half,size,size,type==='red'?'#ff6b4a':'#fff1d0');if(type==='news'){for(let i=0;i<6;i++){rect(-half+10,-half+12+i*(size-20)/6,size*.28,2,'#6b728066');rect(half*.1,-half+12+i*(size-20)/6,size*.3,2,'#6b728066')}}ctx.lineWidth=3;ctx.strokeStyle=OUT;ctx.strokeRect(-half,-half,size,size);if(folds>=1)line(-half,-half,half,half,OUT,2);if(folds>=2)line(half,-half,-half,half,OUT,2);ctx.restore()}
 
 function villageBackground(){
+ if(window.GameArt?.hub(ctx,'village',Village.places,text))return;
  sky(320,'#4fc3ff','#d4f4ff');sun(90,64);cloud(240+Math.sin(G.now/22000)*14,60);cloud(700,46,.8);cloud(480,92,.5);hills(232);
  grassEdge(296);grad(0,310,960,290,'#ffd08a','#f2a65a');rect(0,318,960,8,'#fff1cf');
  for(let i=0;i<24;i++){rect(i*42+2,458,32,16,OUT);rect(i*42+4,460,28,12,'#ffe2ad')}
@@ -145,6 +146,7 @@ function citySkyline(province=false,national=false){
  rect(0,447,960,3,OUT);rect(0,450,960,150,'#434b60');for(let i=0;i<14;i++)rect(i*80,475,42,6,YELLOW);
 }
 function cityHub(province=false,national=false){
+ if(window.GameArt?.hub(ctx,national?'national':province?'province':'city',(national?National:province?Province:City).places,text))return;
  citySkyline(province,national);const walls=[null,'#fff1d0','#d8f3ff','#ffe0ec'],awn=[null,'#3cc464',BLUE,RED];
  (national?National:province?Province:City).places.forEach((place,i)=>{const x=place.x-80;
   if(i===0){box(x+15,215,6,108,'#9aa5b1',2);box(x+139,215,6,108,'#9aa5b1',2);panel(x,181,160,34,8,'#2f80ed');text(place.name,place.x,204,14,WHITE,'center',900);box(x+27,280,106,9,'#ff9f1c');box(x+32,290,6,26,'#9aa5b1',2);box(x+122,290,6,26,'#9aa5b1',2);panel(x+52,232,56,32,5,WHITE);text('무료',place.x,254,13,'#2f80ed','center',900)}
@@ -161,6 +163,7 @@ function drawProvince(){cityHub(true);actor(285,371,'boss',0,.96,1);actor(852,38
 function drawNational(){cityHub(true,true);actor(285,371,'neighbor',0,.96,1);actor(852,380,'national_champion',0,1,-1);actor(G.hero.x,G.hero.y,'hero',G.hero.walk,1,G.hero.facing);if(G.state==='explore'){const place=National.nearest();speech(place?place.x:480,115)}}
 // Indoor arena: spotlights, a cheering crowd and a wooden floor.
 function cityArena(province=false,national=false){
+ if(window.GameArt?.background(ctx,national?'national':province?'province':'city',285))return;
  grad(0,0,960,272,national?'#4a1d6e':'#1f2a6e',national?'#8e3fa8':'#3f4fb8');
  ctx.fillStyle='#fff6c022';for(const k of[160,480,800]){ctx.beginPath();ctx.moveTo(k-14,0);ctx.lineTo(k+14,0);ctx.lineTo(k+130,272);ctx.lineTo(k-130,272);ctx.closePath();ctx.fill()}
  for(let row=0;row<2;row++){rect(40,166+row*57,880,9,OUT);for(let i=0;i<17;i++){const x=78+i*50,y=150+row*57+Math.sin(G.now/220+i*1.7+row)*2;box(x-11,y+10,22,18,[LOOKS.hero.shirt,LOOKS.neighbor.shirt,LOOKS.rival.shirt,LOOKS.friend.shirt][(i+row)%4],2);circle(x,y,10,OUT);circle(x,y,8,[LOOKS.hero.skin,LOOKS.boss.skin,LOOKS.friend.skin][i%3])}}
@@ -189,6 +192,7 @@ function tierGround(id){const L=TIER_LOOK[id];rect(0,252,960,4,OUT);grad(0,255,9
  else for(let i=0;i<24;i++)rect(i*40,256,2,194,'#00000014');
  rect(0,447,960,3,OUT);rect(0,450,960,150,L.road);for(let i=0;i<14;i++)rect(i*80,475,42,6,id==='planet'?'#a259ff':YELLOW)}
 function tierHub(id){
+ if(window.GameArt?.hub(ctx,id,Tiers[id].places,text,Tiers[id].width))return;
  const L=TIER_LOOK[id],walls=[null,'#fff1d0','#d8f3ff','#ffe0ec'],awn=[null,'#3cc464',BLUE,RED];
  tierSky(id);tierGround(id);
  Tiers[id].places.forEach((place,i)=>{const x=place.x-80;
@@ -200,8 +204,9 @@ function tierHub(id){
   }
  });
 }
-function drawTier(id){const L=TIER_LOOK[id];tierHub(id);actor(285,371,L.left,0,.96,1);actor(852,380,L.right,0,1,-1);actor(G.hero.x,G.hero.y,'hero',G.hero.walk,1,G.hero.facing);if(G.state==='explore'){const place=Tiers[id].nearest();speech(place?place.x:480,115)}}
+function drawTier(id){const L=TIER_LOOK[id];tierHub(id);ctx.save();ctx.translate(-Math.round(G.camera||0),0);actor(570,371,L.left,0,.96,1);actor(Tiers[id].width-216,380,L.right,0,1,-1);actor(G.hero.x,G.hero.y,'hero',G.hero.walk,1,G.hero.facing);if(G.state==='explore'){const place=Tiers[id].nearest();speech(place?place.x:G.hero.x,115)}ctx.restore()}
 function tierArena(id){const L=TIER_LOOK[id],planet=id==='planet';
+ if(window.GameArt?.background(ctx,id,285)){text(L.title,480,70,22,WHITE,'center',900,OUT);return}
  grad(0,0,960,272,L.wall[0],L.wall[1]);if(id!=='continent')stars(40,140);
  ctx.fillStyle='#fff6c022';for(const k of[160,480,800]){ctx.beginPath();ctx.moveTo(k-14,0);ctx.lineTo(k+14,0);ctx.lineTo(k+130,272);ctx.lineTo(k-130,272);ctx.closePath();ctx.fill()}
  const skins=planet?[LOOKS.alien.skin,LOOKS.hero.skin,'#83a5bc']:[LOOKS.hero.skin,LOOKS.boss.skin,'#bd9475'];
@@ -215,9 +220,9 @@ function drawBattle(){const practice=['practice','training','story_training'].in
  else{if(Village.isBattle()){if(Tiers[G.hub])tierArena(G.hub);else MapRenderer.arena(ctx,{rect,text,line,actor},G.hub)}else school()}
  // Battle mat.
  if(!window.GameArt?.prop(ctx,'mat',480,437,660,151,true)){ell(480,446,345,16,'#1b123033');panel(150,286,660,151,20,WHITE);panel(160,294,640,135,14,'#3d7bff',OUT,0);ctx.strokeStyle='#ffffffaa';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(480,361,96,42,0,0,Math.PI*2);ctx.stroke();line(480,296,480,427,'#ffffff77',3);rect(160,294,640,6,'#ffffff33')}
- actor(125,347,'hero',0,1.1,1);if(!practice){actor(837,347,Village.isBattle()?G.opponent.kind:'rival',0,1.1,-1);if(!Village.isBattle()&&!window.Minimum?.active)actor(891,313,'boss',0,.85,-1)}let px=310,py=350,ex=650,ey=350,pa=-.16,ea=.15,ps=1,es=1;
+ actor(125,347,'hero',0,1.1,1,'player');if(!practice){actor(837,347,Village.isBattle()?G.opponent.kind:'rival',0,1.1,-1,'enemy');if(!Village.isBattle()&&!window.Minimum?.active)actor(891,313,'boss',0,.85,-1)}let px=310,py=350,ex=650,ey=350,pa=-.16,ea=.15,ps=1,es=1;
 if(G.animation){const t=(G.now-G.animation.at)/1000;const grade=G.animation.grade;const power=grade==='PERFECT'?1:grade==='GOOD'?.65:.3;if(G.animation.kind==='player-hit'){if(t<.36){const q=t/.36;px=310+Math.pow(q,2)*320;py=350-Math.sin(q*Math.PI)*95;pa=-.16-q*.7;ps=1+Math.sin(q*Math.PI)*.25}else if(t<.7){const q=(t-.36)/.34;px=630-(630-310)*q;py=350-55*Math.sin(q*Math.PI);ey-=Math.sin(q*Math.PI)*55*power;ea+=Math.sin(q*Math.PI*2)*.35*power}}else if(G.animation.kind==='enemy-ready'){ey-=Math.sin(Math.min(t/.75,1)*Math.PI/2)*35;ea-=.2*Math.min(t/.75,1)}else if(G.animation.kind==='enemy-hit'){if(t<.36){const q=t/.36;ex=650-Math.pow(q,2)*320;ey=315-Math.sin(q*Math.PI)*105;ea=.15+q*.8;es=1+Math.sin(q*Math.PI)*.35}else if(t<.7){const q=(t-.36)/.34;ex=330+320*q;ey=350-Math.sin(q*Math.PI)*50;py-=Math.sin(q*Math.PI)*25}}}
-let psy=.76,esy=.76;if(G.flipPlayer){const t=Math.min((G.now-G.flipPlayer)/800,1);psy=Math.cos(t*Math.PI)*.76;py-=Math.sin(t*Math.PI)*95;pa+=t*.18}if(G.flipEnemy){const t=Math.min((G.now-G.flipEnemy)/800,1);esy=Math.cos(t*Math.PI)*.76;ey-=Math.sin(t*Math.PI)*95;ea-=t*.2}if(G.stolen){const t=Math.min((G.now-G.stolenAt)/900,1);px+=t*560;py-=t*90;ctx.globalAlpha=1-t}
+let psy=.76,esy=.76;if(G.animation?.kind==='near-flip'&&!reducedMotion){const q=Math.min(1,(G.now-G.animation.at)/1500),lift=Math.sin(q*Math.PI);ey-=lift*60;ea+=lift*.7;ex+=Math.sin(q*Math.PI*4)*7;esy*=1-lift*.93}if(G.flipPlayer){const t=Math.min((G.now-G.flipPlayer)/800,1);psy=Math.cos(t*Math.PI)*.76;py-=Math.sin(t*Math.PI)*95;pa+=t*.18}if(G.flipEnemy){const t=Math.min((G.now-G.flipEnemy)/800,1);esy=Math.cos(t*Math.PI)*.76;ey-=Math.sin(t*Math.PI)*95;ea-=t*.2}if(G.stolen){const t=Math.min((G.now-G.stolenAt)/900,1);px+=t*560;py-=t*90;ctx.globalAlpha=1-t}
  // Ground shadows under each ttakji sell the height of each throw.
  ell(px,402,46*(1-(350-py)/260),9,'#1b123044');ell(ex,402,46*(1-(350-ey)/260),9,'#1b123044');
  const playerSprite=G.flipPlayer&&psy<0?'flipped':G.hp<G.maxHp?'damaged':'base';paper(px,py,106*ps,Village.isBattle()?G.profile.equipped:'news',pa,1,4,playerSprite,Math.abs(psy)/.76);ctx.globalAlpha=1;const enemySprite=G.flipEnemy&&esy<0?'flipped':G.enemyHp<G.enemyMax?'damaged':'base';paper(ex,ey,106*es,Village.isBattle()?G.opponent.material:window.Minimum?.active?'newspaper':'red',ea,1,4,enemySprite,Math.abs(esy)/.76);if(G.mode!=='practice')speech(760,245);

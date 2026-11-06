@@ -2,7 +2,7 @@
 /* Authored artwork is preferred; procedural scenery remains a loading fallback. */
 const MapRenderer={
  arena(ctx,a,region){
-  if(globalThis.GameArt?.background(ctx,'lobby',285)){a.text(region==='village'?'주민센터 컵':region==='city'?'지존시 지역구 예선':region==='province'?'도 딱지 선수권':'전국 딱지 선수권',480,88,22,'#244542','center');return}
+  if(globalThis.GameArt?.background(ctx,region==='village'?'lobby':region,285)){a.text(region==='village'?'주민센터 컵':region==='city'?'지존시 지역구 예선':region==='province'?'도 딱지 선수권':'전국 딱지 선수권',480,88,22,'#efe0b2','center',800,'#283b3d');return}
   const {rect:r,text:t,line:l,actor}=a,village=region==='village',city=region==='city',province=region==='province',national=region==='national';
   r(0,0,960,600,national?'#193542':province?'#879a91':city?'#c1c7ad':'#a8bdb0');
   r(0,270,960,330,village?'#b5aa87':'#a49c81');
