@@ -1,6 +1,27 @@
-@media(min-aspect-ratio:17/10){#game{max-width:177.7778svh}}
-@media(max-height:700px){.game-menu{height:92svh}.menu-sidebar{padding:18px 14px}.menu-sidebar h2{margin-bottom:16px}.menu-sidebar nav button{padding:8px 10px;min-height:36px}.menu-main{padding:18px 22px}.menu-header{margin-bottom:14px;padding-bottom:12px}.item-slot{min-height:96px}.item-slot img{width:52px;height:52px}.item-art{width:88px;height:88px}.item-stats{margin:12px 0}.menu-sidebar-bottom{padding-top:14px}.facility{padding:20px 24px;max-height:78%}.home-workbench{top:14%;padding:18px}.home-workbench h2{font-size:21px}.home-stat-preview{margin:10px 0}.forge-summary img{width:58px;height:58px}.forge-form{padding:10px 6px}.forge-stats{margin:12px 0}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+@media (min-aspect-ratio: 17/10) { #game { max-width: 177.7778svh } }
+@media (max-height: 680px) {
+  .title-copy { padding-block: 22px }
+  .title-series { margin-bottom: 14px }
+  .title-copy h1 { font-size: clamp(63px, 7.4vw, 102px) }
+  .title-tagline { margin: 14px 0 16px }
+  .title-menu button { min-height: 40px }
+  .title-menu .menu-primary { min-height: 44px }
+  #hud { padding-top: 12px }
+  #map-hud { top: 12px }
+  #battle-hud { top: 65px }
+  .dialogue { min-height: 118px; padding-block: 9px; grid-template-columns: 72px minmax(0, 1fr) }
+  .portrait { width: 72px }
+  .game-menu { height: 91% }
+  .menu-main { padding: 12px 15px }
+  .menu-sidebar { padding-block: 12px }
+  .menu-sidebar nav button { min-height: 30px; padding-block: 3px }
+  .item-slot { min-height: 87px }
+  .item-art { width: 72px; height: 72px }
+  .facility { max-height: 76%; padding: 13px 16px }
+  .facility-choice img { width: 34px; height: 34px }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important }
+}
 
-/* Location is already named by reading panels; do not cover their headings. */
-#game:has(#dialogue:not([hidden]),#facility:not([hidden]),#result:not([hidden]),#battle-hud:not([hidden])) #toast[data-kind="location"]{display:none}
+#game:has(#dialogue:not([hidden]), #facility:not([hidden]), #result:not([hidden]), #battle-hud:not([hidden])) #toast[data-kind="location"] { display: none }

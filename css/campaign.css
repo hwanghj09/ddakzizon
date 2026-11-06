@@ -1,12 +1,64 @@
-/* v0.12: name entry, dialogue skip, tournament bracket/prep/result and keepsakes. */
-.name-entry{position:absolute;right:6%;top:50%;transform:translateY(-50%);width:min(440px,88%);padding:22px 24px;z-index:3}.name-entry h2{margin:0 0 8px;font-size:24px;font-weight:900;color:var(--red)}.name-entry p{font-size:14px;line-height:1.6;margin:0 0 12px}
-#hero-name{width:100%;box-sizing:border-box;font:inherit;font-size:22px;font-weight:900;padding:12px 14px;border:3px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink)}#hero-name:focus{outline:4px solid var(--gold);outline-offset:2px}
-.name-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.name-actions .menu-primary{flex:1;justify-content:center}
-.skip{font:inherit;font-size:13px;font-weight:800;padding:5px 12px;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:10px;box-shadow:0 3px 0 var(--ink);cursor:pointer}.skip:hover,.skip:focus-visible{background:var(--gold)}
-.portrait.narration{visibility:hidden}
-.result-extra{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.result-extra button{flex:1;justify-content:center;font-size:13px}
-#result-stats .first-reward{color:#1f9a43}#result-stats .repeat-reward{color:var(--muted)}
-.tournament-head{display:grid;gap:10px;margin-bottom:12px}.opponent-card{display:flex;gap:14px;align-items:center;padding:12px 14px;background:#fff6c7;border:3px solid var(--ink);border-radius:14px;box-shadow:0 4px 0 var(--ink)}.opponent-card img{width:64px;height:64px;object-fit:contain}.opponent-card strong{display:block;font-size:16px}.opponent-card small{color:var(--muted)}.opponent-hint{font-size:13px;line-height:1.6;margin:6px 0 0}
-.bracket-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:8px 0 12px}.bracket-round h4{margin:0 0 6px;font-size:14px}.bracket-match{font-size:12.5px;line-height:1.5;padding:8px 10px;margin-bottom:6px;background:#fff;border:2px solid var(--ink);border-radius:10px;color:var(--muted)}.bracket-match.mine{border-width:3px;color:var(--ink);font-weight:800}.bracket-match.won{border-left:10px solid var(--green)}.bracket-match.next{border-left:10px solid var(--gold);background:#fff6c7}.bracket-match.done{color:var(--ink)}
-.tournament-locked{color:var(--red);font-weight:800}.tournament-meta{display:block;margin:-6px 0 8px 6px;font-size:12px;color:var(--muted)}
-.keepsakes{margin-top:12px;padding:10px 14px;background:#fff;border:3px solid var(--ink);border-radius:14px}.keepsakes h4{margin:0 0 6px}.keepsakes p{margin:4px 0;font-size:13px}
+/* Venues, bracket, workshop and story journal */
+.facility {
+  display: flex; flex-direction: column; width: min(710px, 88%);
+  padding: 18px 22px; overflow: hidden; border-top: 5px solid var(--navy);
+}
+.facility > header, #facility-close { flex: none }
+#facility-content {
+  min-height: 0; overflow: auto; margin: -5px -6px; padding: 5px 6px;
+  scrollbar-color: var(--edge) var(--cream); scrollbar-gutter: stable;
+}
+.facility > header > span { flex: none; padding: 3px 8px; background: var(--navy); color: var(--white); font-size: 13px }
+.facility p { font-size: 14px; line-height: 1.6; color: var(--muted) }
+.facility-choice, .forge-form, .journey-entry {
+  width: 100%; min-height: 40px; border: 1px solid var(--edge); border-radius: 3px;
+  background: var(--white); color: var(--ink); text-align: left; font-size: 14px;
+}
+.facility-choice { display: flex; align-items: center; gap: 10px; margin: 7px 0; padding: 8px 11px }
+.facility-choice:hover:not(:disabled), .journey-entry:hover:not(:disabled), .forge-form:hover:not(:disabled) { background: #e5edf3 }
+.facility-choice.selected, .forge-form.selected, .journey-entry.selected { background: #fff0c8; border-color: var(--navy); box-shadow: inset 3px 0 var(--navy) }
+.facility-choice img { width: 40px; height: 40px; object-fit: contain }
+.facility .menu-primary, .facility .menu-secondary { width: 100%; margin-top: 10px }
+.press-preview { display: block; width: 108px; height: 108px; margin: 0 auto; object-fit: contain }
+.bracket, .journey-steps { list-style: none; padding: 0; display: grid; gap: 6px }
+.bracket li, .journey-steps li, .bracket-match {
+  padding: 8px 10px; border: 1px solid var(--line); border-left: 4px solid var(--edge); background: var(--white); font-size: 13px;
+}
+.bracket .current, .journey-steps .current, .bracket-match.next { border-left-color: var(--red); background: #fff0c8 }
+.bracket .won, .journey-steps .done, .bracket-match.won { border-left-color: var(--good); color: var(--good) }
+.tournament-head { display: grid; gap: 6px; margin-bottom: 8px }
+.opponent-card { border-left: 4px solid var(--navy) }
+.opponent-card img { width: 54px; height: 54px; object-fit: contain }
+.opponent-card strong { display: block; font-size: 16px }
+.opponent-card small, .tournament-meta { color: var(--muted) }
+.opponent-hint { margin: 4px 0 0 }
+.bracket-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 8px 0 12px }
+.bracket-round h4 { margin: 0 0 5px; padding: 3px 5px; border-bottom: 1px solid var(--edge); font-size: 13px }
+.bracket-match { margin-bottom: 4px; color: var(--muted); line-height: 1.4 }
+.bracket-match.mine, .bracket-match.done { color: var(--ink) }
+.bracket-match.mine { font-weight: 900 }
+.tournament-locked { color: var(--red) !important; font-weight: 800 }
+.tournament-meta { display: block; margin: -3px 0 6px 5px; font-size: 12px }
+.prep-choice, .keepsakes { margin: 8px 0; padding: 8px 10px; border: 1px dashed var(--edge) }
+.prep-choice p, .keepsakes h4, .keepsakes p { margin: 0 0 5px }
+.prep-choice .facility-choice img { width: 28px; height: 28px }
+.forge-summary { display: flex; align-items: center; gap: 14px; margin-bottom: 9px }
+.forge-summary img { width: 64px; height: 64px; object-fit: contain }
+.forge-summary h3, .forge-summary p { margin: 0 }
+.forge-forms, .forge-stats { display: grid; gap: 7px }
+.forge-forms { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+.forge-form { display: grid; gap: 4px; padding: 8px; min-width: 0 }
+.forge-form strong { font-size: 15px }
+.forge-form span, .forge-form small { font-size: 12px }
+.forge-form small, .forge-stats dt { color: var(--muted) }
+.forge-stats { grid-template-columns: 1fr 1fr; margin: 9px 0 }
+.forge-stats > div { padding: 7px 9px }
+.forge-stats dt { font-size: 12px }
+.forge-stats dd { margin: 1px 0 0; font-size: 19px; font-weight: 900; font-variant-numeric: tabular-nums }
+#forge-apply, #journey-start { width: 100%; justify-content: center }
+.forge-note { min-height: 16px; margin: 5px 0 !important; color: var(--red) !important }
+.journey-list { display: grid; gap: 5px; margin-bottom: 10px }
+.journey-entry { padding: 6px 9px }
+.journey-summary { color: var(--navy) !important }
+.journal-region { margin-bottom: 12px }
+.journal-region .journey-entry { margin: 3px 0 }

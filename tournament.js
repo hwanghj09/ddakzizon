@@ -68,7 +68,6 @@ const Tournament={
     else row.textContent=m.status==='done'?`${m.a} vs ${m.b} → ${m.winner} 승 (${m.method})`:`${m.a} vs ${m.b} · 예정`;
     col.append(row)}
    board.append(col)});
-  content.append(board);
   if(!won){
    this.button(content,'준비 화면 →',()=>this.prep(id,round,false),{primary:true,id:'tournament-prep'});
    if(s.practice)this.button(content,`무료 연습전 · ${t.opponents[round].name} 특성 확인 · 보상 없음`,()=>this.practice(id,round),{id:'tournament-practice'});
@@ -79,6 +78,7 @@ const Tournament={
    if(next)this.button(content,next.entered(p)?`${next.stage}장으로 이동`:`${next.stage}에 도전`,()=>this.travel(next.id),{id:'tournament-next'});
    else if(!p.story.ending)this.button(content,'운동장으로 돌아가기 (엔딩)',()=>Ending.start(),{id:'tournament-ending'});
   }
+  content.append(board);
   // 전국 대회: the 공인 딱지 is optional equipment, offered for free and never required (spec 04 §8, 05 §8).
   if(s.official&&!p.story.official)this.button(content,'공인 딱지 받기 · 무료 · 선택',()=>{P.takeOfficial(p);checkpoint('tournament');story('national_official',()=>{toast('공인 딱지를 받았다. 써도 되고 안 써도 된다.');this.open(id)})},{id:'take-official'});
   Journeys.link(content);this.focus(content)

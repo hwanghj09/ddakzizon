@@ -1,30 +1,67 @@
-/* Paper, pine and warm ink: one visual language for every game overlay. */
-:root{--ink:#263b32;--navy:#294c3d;--paper:#faf7ef;--cream:#eee7d7;--gold:#dfb968;--orange:#c99850;--red:#ac5b45;--blue:#557d88;--green:#568569;--purple:#54715c;--muted:#5f6f5d;--line:#dcd8ca;--shadow:0 12px 40px #162b2426;--outline:0 2px 8px #142b2666}
-*{box-sizing:border-box}
-img{image-rendering:pixelated}
-#inventory{image-rendering:pixelated}
-body{margin:0;background:#1c302a;color:var(--ink);font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;font-weight:500;overflow:hidden;display:grid;place-items:center;height:100svh}
-button{font:inherit;font-weight:650;cursor:pointer;color:inherit;transition:background .15s,border-color .15s,box-shadow .15s,opacity .15s}
-button:disabled{cursor:default;opacity:.45}button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}button svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-[hidden]{display:none!important}
-#game{width:100vw;height:100svh;max-width:1600px;max-height:1000px;position:relative;isolation:isolate;overflow:hidden;background:#1c302a}
-#world{width:100%;height:100%;display:block;image-rendering:pixelated}
-.vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 110px #162b241a;z-index:1}.film-lines{display:none}
-kbd{font:inherit;font-size:10px;font-weight:550;letter-spacing:.03em;background:#fff8;color:inherit;border:1px solid #84908555;border-radius:4px;padding:3px 6px;line-height:1.1;white-space:nowrap}
-.menu-primary,.menu-secondary{border:1px solid var(--line);border-radius:8px;padding:13px 18px;min-height:46px;font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:14px;text-decoration:none;text-align:left;line-height:1.4}
-.menu-primary{background:var(--navy);color:#fffaf0;border-color:var(--navy);box-shadow:0 3px 8px #294c3d18}
-.menu-primary:hover:not(:disabled){background:#365f4b;border-color:#365f4b}
-.menu-secondary{background:#fff8;color:var(--ink)}.menu-secondary:hover:not(:disabled){background:#eee9dc;border-color:#b6bfae}
-.menu-primary:active:not(:disabled),.menu-secondary:active:not(:disabled){translate:0 1px}
-.panel{background:var(--paper);color:var(--ink);border:1px solid #d5d3c4;border-radius:12px;box-shadow:var(--shadow);z-index:5}
+/* School tournament scorebook */
+:root {
+  --ink: #202b3c;
+  --navy: #263b59;
+  --night: #172437;
+  --paper: #fffaf0;
+  --cream: #f4ebd7;
+  --white: #fffcf5;
+  --gold: #ffd477;
+  --orange: #ee9c75;
+  --red: #9b3e2f;
+  --blue: #a8c9e3;
+  --green: #a9d7b7;
+  --good: #265c45;
+  --muted: #505c69;
+  --line: #c7c8c1;
+  --edge: #84909a;
+  --gutter: clamp(20px, 3vw, 44px);
+  --shadow: 0 5px 0 #17243745, 0 14px 32px #17243735;
+  --grid: linear-gradient(#52657914 1px, transparent 1px), linear-gradient(90deg, #52657914 1px, transparent 1px);
+  --ui-font: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans CJK KR", system-ui, sans-serif;
+}
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+body {
+  margin: 0; min-height: 100svh; display: grid; place-items: center;
+  overflow: hidden; background: var(--night); color: var(--ink);
+  font: 600 15px/1.5 var(--ui-font);
+}
+#game {
+  position: relative; isolation: isolate; overflow: hidden;
+  width: 100vw; height: 100svh; max-width: 1600px; max-height: 1000px;
+  background: var(--night);
+}
+#world { display: block; width: 100%; height: 100%; touch-action: none }
+.vignette {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  box-shadow: inset 0 0 80px #17243738;
+}
+#game.paused .vignette { opacity: .5 }
 
-/* A quiet toolbar leaves the scene and its objective in view. */
-#hud{position:absolute;inset:0 0 auto;padding:20px 24px;display:flex;justify-content:flex-end;pointer-events:none;z-index:3}
-.top-actions{display:flex;align-items:center;gap:6px;pointer-events:auto}
-.top-actions button{display:grid;place-items:center;width:44px;height:44px;flex:none;background:#faf7eff2;border:1px solid #dcd8cabb;border-radius:8px;color:var(--navy);box-shadow:0 2px 8px #172c2412}
-.top-actions button:hover{background:#e8e7d8}.top-actions button[aria-pressed="false"]{color:#89918a}.sound-off{display:none}#sound[aria-pressed="false"] .sound-off{display:block}
-#inventory{display:flex;align-items:center;gap:8px;min-height:44px;font-size:12px;font-weight:600;background:#faf7eff2;color:var(--ink);border:1px solid #dcd8cabb;border-radius:8px;padding:6px 12px;margin-right:5px;white-space:nowrap}
-.has-newspaper::before,.has-colored-paper::after,#inventory.campaign-item::before{content:'';display:inline-block;flex:none;width:28px;height:28px}
-.has-newspaper::before{background:url('../assets/sprites/ttakji/newspaper/ttakji_newspaper_inventory.png') center/contain no-repeat}
-.has-colored-paper::after{background:url('../assets/sprites/ttakji/colored_paper/ttakji_colored_paper_inventory.png') center/contain no-repeat}
-#inventory.campaign-item::before{background:var(--item-icon) center/contain no-repeat}
+button { font: inherit; font-weight: 800; color: inherit; cursor: pointer }
+button:disabled { cursor: default; opacity: .55 }
+button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--ink); outline-offset: 2px; box-shadow: 0 0 0 6px var(--gold);
+}
+button:focus-visible { z-index: 1 }
+kbd {
+  display: inline-block; padding: 2px 6px; min-width: 21px; border: 1px solid var(--edge);
+  background: var(--white); color: var(--ink); border-radius: 3px;
+  font: 800 11px/1.2 var(--ui-font); white-space: nowrap; text-align: center;
+}
+.menu-primary, .menu-secondary, .setting-option {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 42px; padding: 9px 14px; border: 1px solid var(--ink); border-radius: 3px;
+  background: var(--white); color: var(--ink); text-align: left; text-decoration: none;
+  transition: background-color .14s, box-shadow .14s;
+}
+.menu-primary { background: var(--gold); box-shadow: 0 2px 0 var(--ink) }
+.menu-primary:hover:not(:disabled) { background: #ffe4a5 }
+.menu-secondary:hover:not(:disabled), .setting-option:hover:not(:disabled) { background: #e5edf3 }
+.menu-primary:active:not(:disabled), .menu-secondary:active:not(:disabled) { box-shadow: inset 0 2px 0 #17243735 }
+.panel {
+  background: var(--paper); color: var(--ink); border: 1px solid var(--ink);
+  border-radius: 5px; box-shadow: var(--shadow); z-index: 5;
+}
+img[src*="/ttakji/"] { image-rendering: pixelated }
