@@ -49,7 +49,7 @@ fs.mkdirSync(artifacts,{recursive:true});
   await reload('crafted');await p.keyboard.press('KeyI');assert.match(await p.locator('#menu-body').textContent(),/신문지 딱지 \+1 · 장착 중/);await p.keyboard.press('KeyI');
   await at('table');await skip();await stage('crafted');assert.equal(await p.evaluate(()=>G.profile.upgrades.newspaper),1);
   await at('target');await skip();await reach('ready');await p.evaluate(()=>TtakjiRules.positionAt=()=>0);
-  await hit();await reach('result');await stage('practiced');assert.match(await p.locator('#result-text').textContent(),/빗나감/);
+  await hit();await reach('result');await stage('practiced');assert.match(await p.locator('#result-text').textContent(),/약한 타격/);
   await p.locator('#result-secondary').click();await reach('ready');await hit();await reach('result');await stage('practiced');
   await reload('practiced');await at('door');await reach('explore');
   for(const z of ['square','center','schoolfront']){await cross('right');assert.equal(await p.evaluate(()=>G.mapZone),z)}

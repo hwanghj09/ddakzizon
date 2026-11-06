@@ -2,137 +2,137 @@
   "characters/hero/idle": {
     "src": "assets/art/characters/hero/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
       7,
-      51,
-      60
+      4,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/hero/walk-a": {
     "src": "assets/art/characters/hero/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
       6,
-      51,
-      60
+      3,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/hero/walk-b": {
     "src": "assets/art/characters/hero/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
       8,
-      54,
-      60
+      4,
+      27,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/hero/attack": {
     "src": "assets/art/characters/hero/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      15,
-      60,
-      60
+      7,
+      8,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/minsu/idle": {
     "src": "assets/art/characters/minsu/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      49,
-      60
+      7,
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/minsu/walk-a": {
     "src": "assets/art/characters/minsu/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      5,
-      51,
-      60
+      6,
+      3,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/minsu/walk-b": {
     "src": "assets/art/characters/minsu/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      7,
-      53,
-      60
+      8,
+      4,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/minsu/attack": {
     "src": "assets/art/characters/minsu/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      14,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "props/bed": {
@@ -427,171 +427,171 @@
   "characters/boss/idle": {
     "src": "assets/art/characters/boss/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      5,
-      49,
-      60
+      7,
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/champ/idle": {
     "src": "assets/art/characters/champ/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      5,
-      49,
-      60
+      7,
+      2,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/friend/idle": {
     "src": "assets/art/characters/friend/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      12,
-      7,
-      49,
-      60
+      6,
+      4,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/neighbor/idle": {
     "src": "assets/art/characters/neighbor/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      49,
-      60
+      7,
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/uncle/idle": {
     "src": "assets/art/characters/uncle/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      5,
-      49,
-      60
+      7,
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/sprinter/idle": {
     "src": "assets/art/characters/sprinter/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      10,
-      6,
-      49,
-      60
+      5,
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/folder/idle": {
     "src": "assets/art/characters/folder/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      49,
-      60
+      7,
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/globe/idle": {
     "src": "assets/art/characters/globe/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      49,
-      60
+      7,
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/alien/idle": {
     "src": "assets/art/characters/alien/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      49,
-      60
+      7,
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/alien_champ/idle": {
     "src": "assets/art/characters/alien_champ/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      4,
-      49,
-      60
+      7,
+      2,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "backgrounds/yard": {
@@ -678,511 +678,511 @@
   "characters/boss/walk-a": {
     "src": "assets/art/characters/boss/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      4,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/boss/walk-b": {
     "src": "assets/art/characters/boss/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/boss/attack": {
     "src": "assets/art/characters/boss/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      13,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/champ/walk-a": {
     "src": "assets/art/characters/champ/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      4,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/champ/walk-b": {
     "src": "assets/art/characters/champ/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/champ/attack": {
     "src": "assets/art/characters/champ/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      13,
-      60,
-      60
+      7,
+      6,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/friend/walk-a": {
     "src": "assets/art/characters/friend/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      12,
       6,
-      51,
-      60
+      3,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/friend/walk-b": {
     "src": "assets/art/characters/friend/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
       8,
-      53,
-      60
+      4,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/friend/attack": {
     "src": "assets/art/characters/friend/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      15,
-      60,
-      60
+      7,
+      8,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/neighbor/walk-a": {
     "src": "assets/art/characters/neighbor/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      5,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/neighbor/walk-b": {
     "src": "assets/art/characters/neighbor/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      7,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/neighbor/attack": {
     "src": "assets/art/characters/neighbor/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      14,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/uncle/walk-a": {
     "src": "assets/art/characters/uncle/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      4,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/uncle/walk-b": {
     "src": "assets/art/characters/uncle/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/uncle/attack": {
     "src": "assets/art/characters/uncle/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      13,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/sprinter/walk-a": {
     "src": "assets/art/characters/sprinter/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      10,
       5,
-      51,
-      60
+      3,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/sprinter/walk-b": {
     "src": "assets/art/characters/sprinter/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
       7,
-      53,
-      60
+      4,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/sprinter/attack": {
     "src": "assets/art/characters/sprinter/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      14,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/folder/walk-a": {
     "src": "assets/art/characters/folder/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      5,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/folder/walk-b": {
     "src": "assets/art/characters/folder/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      7,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/folder/attack": {
     "src": "assets/art/characters/folder/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      14,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/globe/walk-a": {
     "src": "assets/art/characters/globe/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      5,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/globe/walk-b": {
     "src": "assets/art/characters/globe/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      7,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/globe/attack": {
     "src": "assets/art/characters/globe/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      14,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/alien/walk-a": {
     "src": "assets/art/characters/alien/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      5,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/alien/walk-b": {
     "src": "assets/art/characters/alien/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      7,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/alien/attack": {
     "src": "assets/art/characters/alien/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      14,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/alien_champ/walk-a": {
     "src": "assets/art/characters/alien_champ/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      3,
-      51,
-      60
+      6,
+      1,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/alien_champ/walk-b": {
     "src": "assets/art/characters/alien_champ/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      5,
-      53,
-      60
+      8,
+      2,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/alien_champ/attack": {
     "src": "assets/art/characters/alien_champ/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      12,
-      60,
-      60
+      7,
+      6,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "backgrounds/city": {
@@ -1401,409 +1401,409 @@
   "characters/teacher/idle": {
     "src": "assets/art/characters/teacher/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      12,
       6,
-      49,
-      60
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/teacher/walk-a": {
     "src": "assets/art/characters/teacher/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      12,
-      5,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/teacher/walk-b": {
     "src": "assets/art/characters/teacher/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      7,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/teacher/attack": {
     "src": "assets/art/characters/teacher/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      14,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/father/idle": {
     "src": "assets/art/characters/father/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      5,
-      49,
-      60
+      7,
+      2,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/father/walk-a": {
     "src": "assets/art/characters/father/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      4,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/father/walk-b": {
     "src": "assets/art/characters/father/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/father/attack": {
     "src": "assets/art/characters/father/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      13,
-      60,
-      60
+      7,
+      6,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/reception/idle": {
     "src": "assets/art/characters/reception/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      14,
-      6,
-      49,
-      60
+      7,
+      3,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/reception/walk-a": {
     "src": "assets/art/characters/reception/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      5,
-      51,
-      60
+      6,
+      3,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/reception/walk-b": {
     "src": "assets/art/characters/reception/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      7,
-      53,
-      60
+      8,
+      4,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/reception/attack": {
     "src": "assets/art/characters/reception/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      14,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/gyugyeok/idle": {
     "src": "assets/art/characters/gyugyeok/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      6,
-      51,
-      60
+      7,
+      3,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/gyugyeok/walk-a": {
     "src": "assets/art/characters/gyugyeok/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      5,
-      51,
-      60
+      6,
+      3,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/gyugyeok/walk-b": {
     "src": "assets/art/characters/gyugyeok/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      7,
-      55,
-      60
+      8,
+      4,
+      27,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/gyugyeok/attack": {
     "src": "assets/art/characters/gyugyeok/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      14,
-      60,
-      60
+      7,
+      7,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/hangyeol/idle": {
     "src": "assets/art/characters/hangyeol/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      4,
-      49,
-      60
+      7,
+      2,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/hangyeol/walk-a": {
     "src": "assets/art/characters/hangyeol/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      3,
-      51,
-      60
+      6,
+      2,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/hangyeol/walk-b": {
     "src": "assets/art/characters/hangyeol/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      5,
-      53,
-      60
+      8,
+      3,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/hangyeol/attack": {
     "src": "assets/art/characters/hangyeol/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      12,
-      60,
-      60
+      7,
+      6,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/mujung/idle": {
     "src": "assets/art/characters/mujung/idle.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      12,
-      3,
-      49,
-      60
+      6,
+      2,
+      24,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/mujung/walk-a": {
     "src": "assets/art/characters/mujung/walk-a.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      12,
-      2,
-      51,
-      60
+      6,
+      1,
+      25,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/mujung/walk-b": {
     "src": "assets/art/characters/mujung/walk-b.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      15,
-      4,
-      53,
-      60
+      8,
+      2,
+      26,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   },
   "characters/mujung/attack": {
     "src": "assets/art/characters/mujung/attack.png",
     "size": [
-      64,
-      64
+      32,
+      32
     ],
     "bounds": [
-      13,
-      11,
-      60,
-      60
+      7,
+      6,
+      30,
+      30
     ],
     "anchor": [
-      32,
-      60
+      16,
+      30
     ]
   }
 }

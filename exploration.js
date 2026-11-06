@@ -24,7 +24,7 @@ const Exploration={
  objects(){
   const p=G.profile,live=this.cupLive(),titles=P.titles(p),hide=id=>(id==='doyun'&&this.phase()!=='school'&&!p.story.ending)||(id==='uncle'&&p.round===3&&G.mapZone==='center')||(['neighbor','hana'].includes(id)&&live&&!['lobby'].includes(G.mapZone));
   // House: the 표창장 frame after the village title and a shelf that gains a trophy per title (spec 06 §4-1). Yard after the ending: kids and 도윤.
-  const extra={lobby:live?[['neighbor','앞집 아저씨',880,'npc'],['hana','하나',1180,'npc']]:[],square:p.round===3?[['uncle','박태풍',980,'npc']]:[],home:[...(p.round===3?[['frame','표창장 액자',353,'inspect']]:[]),...(titles.length?[['shelf','트로피 선반',845,'inspect']]:[])],yard:p.story.ending?[['kids','어린 참가자들',700,'npc']]:[]}[G.mapZone]||[];
+  const extra={lobby:live?[['neighbor','앞집 아저씨',880,'npc'],['hana','하나',1180,'npc']]:[],square:p.round===3?[['uncle','박태풍',980,'npc']]:[],home:[['father','아빠',560,'npc'],...(p.round===3?[['frame','표창장 액자',353,'inspect']]:[]),...(titles.length?[['shelf','트로피 선반',845,'inspect']]:[])],yard:p.story.ending?[['kids','어린 참가자들',700,'npc']]:[]}[G.mapZone]||[];
   const label=(id,name)=>id==='forge'&&!P.refineryOpen(p)?'제련소 · 공사 중':id==='fusion'?(P.fusionOpen(p)?'융합기':name):name;
   return this.data().objects.concat(extra).filter(o=>!hide(o[0])).map(([id,name,x,type])=>({id,name:label(id,name),x,type:id==='fusion'&&P.fusionOpen(p)?'facility':type}))
  },
@@ -66,7 +66,8 @@ const Exploration={
   if(id==='hana'){this.talk('하나',G.mapZone==='lobby'?(p.round===0?'나도 나가! 준결승에서 만나면 봐주지 않을 거야.':p.round===1?'다음 상대가 나야. 크레파스 기억하지?':'결승 응원할게! 급하게 치지 마.'):p.round===3?'결승 봤어. 기다릴 줄 알더라. 시 대회에서도 그렇게 해.':'색종이는 접는 방향에 따라 표정이 달라져. 너도 대회 나갈 거지?');return}
   // 정밀 타격 is granted on the final's result screen; here he only explains it.
   if(id==='uncle'){this.talk('박태풍',p.round===3?'R은 정밀 타격. 힘을 빼고 정확히 쳐서 뒤집기 확률을 15%p 올린다. 쓰고 나면 세 턴은 쉬어라. 기술은 이미 네 손에 있다.':'…나? 평범한 지나가는 전설이다.');return}
-  if(id==='table'){if(this.phase()==='lost'){home();return}this.craft();return}
+  if(id==='father'){if(this.phase()==='lost'){School.fatherLesson();return}this.talk('아빠',p.story.ending?'이젠 네가 아빠보다 잘 치네. 그래도 다음 한 판은 같이 하자.':'접힌 선을 단단히 눌렀으면 표적에 연습해 보자. 다음 강화는 마을 압축기에서도 할 수 있어.');return}
+  if(id==='table'){if(this.phase()==='lost'){School.fatherLesson();return}this.craft();return}
   if(id==='bag'){pause('inventory');return}
   if(id==='target'){if(!p.schoolReward){if(this.phase()==='lost'){this.talk('','먼저 식탁에서 딱지를 접자.');return}practice();return}this.freePractice();return}
   if(id==='poster'){if(!p.schoolReward){this.talk('대회 포스터','제1회 마을 딱지 대회 · 참가비 무료. 먼저 학교에서 자신감을 되찾자.');return}if(p.map.poster){this.posterMenu();return}story('poster',()=>this.posterMenu());return}
@@ -81,7 +82,7 @@ const Exploration={
    if(id==='forge'){if(!P.refineryOpen(p)){this.talk('공방 주인','도 대회에서 우승하면 문을 열 거야. 지금은 공사 중이야.');return}Forge.open();return}
    if(id==='training'){this.training();return}Village.hub().open(id);return
   }
-  const lines={bed:'잠은 안 오고, 딱지 뒤집히는 소리만 생각난다.',photo:'아빠도 이 사진에서는 딱지를 들고 있다. 왜 지금은 안 치실까?',shelf:this.shelf(),frame:p.keepsakes.awardUsed?'원본은 딱지로 접었지만, 복사본은 그대로 걸려 있다. 우승은 종이 한 장보다 오래 남으니까.':'마을 대회 표창장 복사본. 원본은 가방에 잘 보관하고 있다.',bike:'페달보다 손목이 빨라지는 날이 올까?',mail:'전기 요금 고지서. 이것까지 접으면 아빠가 뒤집힐 것 같다.',plant:'딱지가 자라지는 않는 것 같다.',bench:this.phase()==='school'?'도윤은 늘 이 벤치에서 경기를 지켜본다.':'딱지는 어디로 간 걸까?',notice:'학교 재대결 승리 → 포스터 확인 → 안쪽 접수원에게 신청. 경기 사이에는 자유롭게 준비할 수 있다.',fusion:'융합기 설계 중 · 재료와 기능은 아직 연구 중이다.',spectator:'신문 한 장으로 온 동네가 모였네. 네 경기, 기대할게!',score:'점수판 뒤에서 사람이 숫자를 넘긴다. 전광판보다 손이 빠르다.',machine:'쾅! 소리만큼 거대한 압축기. 선수 경기장과는 안전하게 분리되어 있다.',inspection:'안전 검사 완료. 지금까지 쓰던 딱지도 출전할 수 있다.',broadcast:'전국으로 나가는 중계. 마이크 앞에서도 딱지 자랑은 멈추지 않는다.',
+  const lines={bed:'잠은 안 오고, 딱지 뒤집히는 소리만 생각난다.',photo:(p.journey.stages.village_1===2||p.journey.stages.continent_2===2)?'사진 속 아빠와도 한 판 해 보고 싶다. 지금은 함께 딱지를 치는 사이가 됐다.':'아빠도 이 사진에서는 딱지를 들고 있다. 이번엔 같이 쳐 달라고 해 볼까?',shelf:this.shelf(),frame:p.keepsakes.awardUsed?'원본은 딱지로 접었지만, 복사본은 그대로 걸려 있다. 우승은 종이 한 장보다 오래 남으니까.':'마을 대회 표창장 복사본. 원본은 가방에 잘 보관하고 있다.',bike:'페달보다 손목이 빨라지는 날이 올까?',mail:'전기 요금 고지서. 이것까지 접으면 아빠가 뒤집힐 것 같다.',plant:'딱지가 자라지는 않는 것 같다.',bench:p.story.ending?'여기서 시작해서, 다시 여기로 돌아왔다. 다음엔 아무것도 걸지 말고 한 판.':p.story.reunion?'돌려받은 첫 딱지를 꺼내 본다. 오래 기다린 끝에 도윤과 다시 만났다.':this.phase()==='school'?'도윤은 늘 이 벤치에서 경기를 지켜본다.':'딱지는 어디로 간 걸까?',notice:'학교 재대결 승리 → 포스터 확인 → 안쪽 접수원에게 신청. 경기 사이에는 자유롭게 준비할 수 있다.',fusion:'융합기 설계 중 · 재료와 기능은 아직 연구 중이다.',spectator:'신문 한 장으로 온 동네가 모였네. 네 경기, 기대할게!',score:'점수판 뒤에서 사람이 숫자를 넘긴다. 전광판보다 손이 빠르다.',machine:'쾅! 소리만큼 거대한 압축기. 선수 경기장과는 안전하게 분리되어 있다.',inspection:'안전 검사 완료. 지금까지 쓰던 딱지도 출전할 수 있다.',broadcast:'전국으로 나가는 중계. 마이크 앞에서도 딱지 자랑은 멈추지 않는다.',
    booth:'지역마다 접는 방향도, 모서리를 넣는 법도 다르다. 같은 딱지는 하나도 없다.',translator:'자막: “절대 뒤집어지지 않은 감자” → (수정) “절대 뒤집히지 않는 자”.',
    safety:'안전 검사 통과. 위험한 재료만 막는다. 모양과 종이는 저마다 다르다.',screen:p.worldRound===3?'시험 운영 공지: 안전 기준을 통과한 다양한 소재 허용.':'대형 스크린에 오늘의 대진표가 돈다.',
    starwindow:'창밖으로 지구가 보인다. 운동장은 너무 작아서 안 보인다.',interpreter:'통역 장치: “딱” 소리는 번역할 필요가 없습니다.'};

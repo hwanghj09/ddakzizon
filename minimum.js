@@ -184,8 +184,8 @@ const Minimum={
   G.gaugeStart=G.now;G.gaugeDuration=MinimumRules.config.timing.duration;
   $('actions').hidden=true;$('timing').hidden=false;$('needle').style.left='0%';
   $('turn-label').textContent='가운데에서 멈추자';$('timing-guide').hidden=false;
-  $('timing-guide').textContent=`왕복 ${G.gaugeDuration/1000}초 · 완벽 ×1.3 · 좋음 ×1.1 · 보통 ×1 · 빗나감 ×0.6`;
-  $('gauge').setAttribute('aria-label','가운데부터 완벽, 좋음, 보통, 빗나감. 공격 버튼이나 스페이스로 정지.');
+  $('timing-guide').textContent=`왕복 ${G.gaugeDuration/1000}초 · 완벽 ×1.3 · 좋음 ×1.1 · 보통 ×1 · 약한 타격 ×0.6`;
+  $('gauge').setAttribute('aria-label','가운데부터 완벽, 좋음, 보통, 약한 타격. 공격 버튼이나 스페이스로 정지.');
  },
  strike(){
   if(G.state!=='timing'||G.paused)return;
@@ -201,7 +201,7 @@ const Minimum={
    if(G.mode==='practice'){
     G.practice=[grade];this.complete('practiced');
     after(950,()=>{
-     G.animation=null;result('연습 완료',`${MinimumRules.config.labels[grade]} · 피해 ${hit.damage}. 빗나가도 연습은 완료된다. 다시 해 보거나 학교로 가자.`, '연습 끝내기',()=>this.enter('home',720));
+     G.animation=null;result('연습 완료',`${MinimumRules.config.labels[grade]} · 피해 ${hit.damage}. 약하게 쳐도 연습은 완료된다. 다시 해 보거나 학교로 가자.`, '연습 끝내기',()=>this.enter('home',720));
      this.secondary('다시 연습하기',()=>transition(()=>this.battle('practice')));
     });return;
    }
@@ -291,7 +291,7 @@ const Minimum={
    const button=m.button(`게임 소리 · ${G.sound?'켜짐':'꺼짐'}`,()=>{toggleSound();this.menu('settings')});button.id='menu-sound';button.setAttribute('aria-pressed',String(G.sound));
    body.append(button,m.button(`목적지 안내 · ${this.progress.guidance?'켜짐':'꺼짐'}`,()=>{this.progress.guidance=!this.progress.guidance;this.save();this.menu('settings')}));
   }else if(view==='controls'){
-   body.append(m.el('p','','이동: ← → 또는 A / D'),m.el('p','','대화·조사: E · 화면 버튼은 마우스로 선택'),m.el('p','','공격·게이지 정지: 스페이스 또는 공격 버튼'),m.el('p','','대화: 다음 / 스페이스 · 건너뛰기 버튼'),m.el('p','','인벤토리 I · 지도 M · 메뉴 Esc'),m.el('p','','완벽 1.3배 · 좋음 1.1배 · 보통 1배 · 빗나감 0.6배. 스킬은 아직 배우지 않았다.'));
+   body.append(m.el('p','','이동: ← → 또는 A / D'),m.el('p','','대화·조사: E · 화면 버튼은 마우스로 선택'),m.el('p','','공격·게이지 정지: 스페이스 또는 공격 버튼'),m.el('p','','대화: 다음 / 스페이스 · 건너뛰기 버튼'),m.el('p','','인벤토리 I · 지도 M · 메뉴 Esc'),m.el('p','','완벽 1.3배 · 좋음 1.1배 · 보통 1배 · 약한 타격 0.6배. 스킬은 아직 배우지 않았다.'));
   }else{
    body.append(m.el('h4','',this.objective()[1]),m.el('p','','한 끗 차이의 첫 패배 → 집에서 아빠에게 첫 강화 배우기 → 연습과 재대결 → 마을 대회 접수.'),m.el('p','save-note',G.storageOK?'주요 사건과 멈춘 위치가 자동 저장된다.':'저장 공간에 접근할 수 없다. 현재 플레이는 계속할 수 있다.'));
    if(!G.storageOK)body.append(m.button('자동 저장 다시 시도',()=>{this.save();this.menu('overview')}));

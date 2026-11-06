@@ -1,5 +1,5 @@
 'use strict';
-// Draw each pose directly on the 64x64 pixel grid.
+// Rasterize the pose geometry directly onto a native 32x32 pixel grid.
 // Run with: node scripts/draw-characters.cjs (Node's standard library only).
 const fs=require('node:fs'),path=require('node:path'),zlib=require('node:zlib');
 const root=path.join(__dirname,'..'),out=path.join(root,'assets/art');
@@ -32,7 +32,7 @@ const skinTones={
  cosmic:['#93d5d4','#56979e','#d0f0de']
 };
 
-// Pose coordinates use the 64px canvas. Each pose plants at least one shoe on y=59.
+// Pose geometry is measured in half-pixels. Each pose plants a shoe at final y=30.
 const posesByName={
  idle:{body:[32,32],head:[31,6],farLeg:[27,24,60],nearLeg:[36,38,60],farArm:[19,39,18,46],nearArm:[44,39,45,46]},
  'walk-a':{body:[31,31],head:[31,5],farLeg:[26,19,57],nearLeg:[34,43,60],farArm:[44,37,47,40],nearArm:[20,39,16,44]},
@@ -41,14 +41,16 @@ const posesByName={
 };
 const poses=Object.keys(posesByName);
 
-// Pixel-center scan conversion keeps edges hard and makes every coordinate editable.
+// Geometry uses half-pixel coordinates on the final grid; sample pixel centers,
+// without resizing a bitmap or blending palette colors.
 function brush(pixels,originX=0,originY=0){
  function fill(x,y,width,height,color){
-  const left=Math.max(0,x+originX),right=Math.min(64,x+originX+width);
+  const left=Math.max(0,Math.ceil((x+originX)/2-.5)),right=Math.min(32,Math.ceil((x+originX+width)/2-.5));
   if(left>=right)return;
-  for(let row=Math.max(0,y+originY);row<Math.min(64,y+originY+height);row++)pixels[row].fill(color,left,right);
+  for(let row=Math.max(0,Math.ceil((y+originY)/2-.5));row<Math.min(32,Math.ceil((y+originY+height)/2-.5));row++)pixels[row].fill(color,left,right);
  }
  function shape(vertices,color){
+  vertices=vertices.map(([x,y])=>[(x+originX)/2,(y+originY)/2]);
   const top=Math.ceil(Math.min(...vertices.map(([,y])=>y))-.5);
   const bottom=Math.ceil(Math.max(...vertices.map(([,y])=>y))-.5);
   for(let y=top;y<bottom;y++){
@@ -60,7 +62,7 @@ function brush(pixels,originX=0,originY=0){
    cuts.sort((a,b)=>a-b);
    for(let i=0;i+1<cuts.length;i+=2){
     const left=Math.ceil(cuts[i]-.5),right=Math.ceil(cuts[i+1]-.5);
-    fill(left,y,right-left,1,color);
+    if(y>=0&&y<32&&right>0&&left<32)pixels[y].fill(color,Math.max(0,left),Math.min(32,right));
    }
   }
  }
@@ -336,7 +338,7 @@ function drawHead(pixels,x,y,look,attacking){
 }
 
 function drawing(who,pose){
- const look=looks[who],design=posesByName[pose],pixels=Array.from({length:64},()=>Array(64).fill(null));
+ const look=looks[who],design=posesByName[pose],pixels=Array.from({length:32},()=>Array(32).fill(null));
  const [x,y]=design.body,[hx,hy]=design.head;
  const [hair,hairLight]=look.hair,[coat,coatDark,coatLight]=look.coat;
  const [pants,pantsLight]=look.pants,[skin,skinDark,skinLight]=skinTones[look.skin];
@@ -376,11 +378,11 @@ function generate(){
   const pixels=drawing(who,pose);
   fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,png(pixels));
   const points=pixels.flatMap((row,y)=>row.flatMap((p,x)=>p[3]?[[x,y]]:[]));
-  manifest[key]={src:`assets/art/${key}.png`,size:[64,64],bounds:[Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[0]))+1,Math.max(...points.map(p=>p[1]))+1],anchor:[32,60]};
+  manifest[key]={src:`assets/art/${key}.png`,size:[32,32],bounds:[Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[0]))+1,Math.max(...points.map(p=>p[1]))+1],anchor:[16,30]};
  }
  fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
  fs.writeFileSync(path.join(root,'art-manifest.js'),"'use strict';\nwindow.ART_MANIFEST="+JSON.stringify(manifest)+';\n');
- console.log(`Drew ${Object.keys(looks).length} characters / ${Object.keys(looks).length*poses.length} 64x64 RGBA frames`);
+ console.log(`Drew ${Object.keys(looks).length} characters / ${Object.keys(looks).length*poses.length} 32x32 RGBA frames`);
 }
 if(require.main===module)generate();
 module.exports={looks,poses,drawing,png};

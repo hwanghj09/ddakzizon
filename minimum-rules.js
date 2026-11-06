@@ -8,7 +8,7 @@
   player:{strength:4},enemy:{name:'민수',strength:4,grade:'GOOD'},
   timing:{duration:1800,perfect:.07,good:.20,normal:.35},
   multipliers:{PERFECT:1.3,GOOD:1.1,NORMAL:1,MISS:.6},
-  labels:{PERFECT:'완벽',GOOD:'좋음',NORMAL:'보통',MISS:'빗나감'},
+  labels:{PERFECT:'완벽',GOOD:'좋음',NORMAL:'보통',MISS:'약한 타격'},
   bracket:[['1회전','나 vs 앞집 아저씨'],['1회전','유치원 친구 vs 마을 선수'],['결승','1회전 승자끼리 대결']]
  };
  function fresh(){return {version:1,stage:'school',opening:'classroom',homeLesson:'unseen',zone:'yard',x:180,visited:{yard:true},guidance:true}}

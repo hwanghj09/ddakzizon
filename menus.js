@@ -99,7 +99,7 @@ window.GameMenu={
   const screen=this.button(document.fullscreenElement?'전체 화면 나가기':'전체 화면으로',async()=>{await $('fullscreen').onclick();if(G.paused&&this.view==='settings')this.show('settings')});screen.id='menu-fullscreen';body.append(soundButton,screen,this.button(`목적지 안내 · ${G.profile.map.guidance?'켜짐':'꺼짐'}`,()=>{G.profile.map.guidance=!G.profile.map.guidance;checkpoint(G.checkpoint);this.show('settings')}));settingsControls(body,()=>{const d=document.activeElement?.dataset;this.show('settings');if(d?.setting)$('menu-body').querySelector(`[data-setting="${d.setting}"][data-value="${d.value}"]`)?.focus({preventScroll:true})})
  },
  controls(body){
-  const list=this.el('dl','controls-list');for(const [label,key] of [['이동','← → / A D'],['지도','M'],['대화 · 시설 이용','E'],['대화 넘기기 · 딱지 치기','Space'],['딱지 접기','1 · 2 · 3 · 4'],['정밀 타격 / 강타 / 꾹 눌러 펴기','R / C / F'],['터치 · 마우스 이동','화면 아래 ◀ ▶ · 상호작용'],['이야기 수첩','J'],['인벤토리','I'],['열린 창 닫기 · 메뉴','Esc'],['메뉴 선택 / 실행','방향키 · Tab / Enter']]){const row=this.el('div');row.append(this.el('dt','',label),this.el('dd','',key));list.append(row)}body.append(list)
+  const list=this.el('dl','controls-list');for(const [label,key] of [['이동','← → / A D'],['지도','M'],['대화 · 시설 이용','E'],['대화 넘기기 · 딱지 치기','Space'],['딱지 접기','1 · 2 · 3 · 4'],['정밀 타격 / 강타 / 꾹 눌러 펴기','R / C / F'],['이야기 수첩','J'],['인벤토리','I'],['열린 창 닫기 · 메뉴','Esc'],['메뉴 선택 / 실행','방향키 · Tab / Enter']]){const row=this.el('div');row.append(this.el('dt','',label),this.el('dd','',key));list.append(row)}body.append(list)
  },
  keys(event){
   if(event.altKey||event.ctrlKey||event.metaKey)return;

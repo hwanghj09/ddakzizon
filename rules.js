@@ -1,7 +1,7 @@
 /* Shared fair combat rules (spec 03 §2). Intro defeat is deliberately handled by the intro event only. */
 (function(root){
  const grades=['PERFECT','GOOD','NORMAL','BAD'];
- const labels={PERFECT:'완벽',GOOD:'좋음',NORMAL:'보통',BAD:'빗나감'};
+ const labels={PERFECT:'완벽',GOOD:'좋음',NORMAL:'보통',BAD:'약한 타격'};
  const timing={PERFECT:1.3,GOOD:1.1,NORMAL:1,BAD:.6};
  const skills={
   precise:{name:'정밀 타격',key:'R',damage:.8,flip:.15,cooldown:3},

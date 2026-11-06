@@ -35,7 +35,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   await page.waitForFunction(()=>G.state==='result');
   assert.deepEqual(await page.evaluate(()=>audioEvents.map(e=>e[0])),['click','whoosh','hit','perfect','flip','win']);
   assert.equal(await page.evaluate(()=>audioEvents.find(e=>e[0]==='hit')[1]),'PERFECT');
-  await page.evaluate(()=>{audioEvents=[];cancelScene();battle('intro_battle');enemyTurn()});
+  await page.evaluate(()=>{audioEvents=[];cancelScene();battle('intro_battle');cancelScene();enemyTurn()});
   await page.waitForFunction(()=>audioEvents.some(e=>e[0]==='lose'));
   assert.deepEqual(await page.evaluate(()=>audioEvents.map(e=>e[0])),['whoosh','hit','flip','lose']);
   await page.evaluate(()=>{audioEvents=[];cancelScene();G.state='folding';G.fold=0;foldCorner(0)});

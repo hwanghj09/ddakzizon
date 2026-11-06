@@ -34,10 +34,10 @@ fs.mkdirSync(dir,{recursive:true});
    return {key,width:im.naturalWidth,height:im.naturalHeight,corners,bounds:entry.bounds,expected:entry.size};
   }));
   assert.equal(assets.length,120);
-  for(const a of assets){const character=a.key.startsWith('characters/'),scene=a.key.startsWith('backgrounds/')||a.key.startsWith('panoramas/');assert.deepEqual([a.width,a.height],character?[64,64]:a.expected,a.key);if(!scene){assert.deepEqual(a.corners,[0,0,0,0],a.key+' has transparent margins');assert(character?a.bounds[0]>=4&&a.bounds[1]>=0&&a.bounds[2]<=60&&a.bounds[3]===60:a.bounds[0]>=1&&a.bounds[1]>=1&&a.bounds[2]<=31&&a.bounds[3]<=30,a.key+' fits its canvas')}}
+  for(const a of assets){const character=a.key.startsWith('characters/'),scene=a.key.startsWith('backgrounds/')||a.key.startsWith('panoramas/');assert.deepEqual([a.width,a.height],character?[32,32]:a.expected,a.key);if(!scene){assert.deepEqual(a.corners,[0,0,0,0],a.key+' has transparent margins');assert(character?a.bounds[0]>=2&&a.bounds[1]>=0&&a.bounds[2]<=30&&a.bounds[3]===30:a.bounds[0]>=1&&a.bounds[1]>=1&&a.bounds[2]<=31&&a.bounds[3]<=30,a.key+' fits its canvas')}}
   // Walking and attacks reuse a fixed feet anchor without resizing crouched poses.
   const alignment=await page.evaluate(()=>[...new Set(Object.keys(GameArt.manifest).filter(k=>k.startsWith('characters/')).map(k=>k.split('/')[1]))].map(who=>['idle','walk-a','walk-b','attack'].map(pose=>GameArt.manifest[`characters/${who}/${pose}`])));
-  for(const frames of alignment){for(const frame of frames)assert.deepEqual(frame.anchor,[32,60]);assert(frames[3].bounds[3]-frames[3].bounds[1]<frames[0].bounds[3]-frames[0].bounds[1])}
+  for(const frames of alignment){for(const frame of frames)assert.deepEqual(frame.anchor,[16,30]);assert(frames[3].bounds[3]-frames[3].bounds[1]<frames[0].bounds[3]-frames[0].bounds[1])}
   // Every tournament kind resolves to pixel art and uses its own attacking frame.
   const drawn=await page.evaluate(()=>{
    const kinds=['hero','rival',...['opponents','cityOpponents','provinceOpponents','nationalOpponents','continentOpponents','worldOpponents','planetOpponents'].flatMap(k=>TtakjiProgression[k].map(o=>o.sprite||o.kind))];
@@ -78,7 +78,7 @@ fs.mkdirSync(dir,{recursive:true});
   const portraitSize=await page.locator('#portrait').evaluate(async el=>{
    const portrait=new Image();portrait.src=el.style.backgroundImage.slice(5,-2);await portrait.decode();
    return [portrait.naturalWidth,portrait.naturalHeight];
-  });assert.deepEqual(portraitSize,[48,48]);
+  });assert.deepEqual(portraitSize,[24,24]);
   await page.screenshot({path:path.join(dir,'art-dialogue.png')});
   await page.locator('#skip-dialogue').click();
   // A missing background keeps the original canvas scene usable.
@@ -97,6 +97,6 @@ fs.mkdirSync(dir,{recursive:true});
    finally{frame.failed=false}
   }));
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
-  console.log('PASS 72 64x64 character frames + 48 scene assets, dedicated NPCs and final opponents, fixed feet, walking, mirroring, pixel portraits and fallback');
+  console.log('PASS 72 32x32 character frames + 48 scene assets, dedicated NPCs and final opponents, fixed feet, walking, mirroring, pixel portraits and fallback');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

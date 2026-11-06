@@ -35,7 +35,7 @@ const Tournament={
   $('facility-close').onclick=()=>{if(!G.paused)this.leave()};return content
  },
  button(content,label,action,{disabled=false,primary=false,id}={}){const b=this.el('button',primary?'menu-primary':'facility-choice',label);b.disabled=disabled;if(id)b.id=id;b.onclick=()=>{if(!G.paused&&G.state==='facility')action()};content.append(b);return b},
- focus(content){(content.querySelector('.menu-primary:not(:disabled)')||content.querySelector('button:not(:disabled)')||$('facility-close')).focus({preventScroll:true})},
+ focus(content){(content.querySelector('.menu-primary:not(:disabled)')||content.querySelector('button:not(:disabled)')||$('facility-close')).focus()},
  refresh(){const v=this.view;if(!v)return;if(v.kind==='prep')this.prep(v.id,v.index,v.replay);else if(v.kind==='bracket')this.open(v.id)},
  // Leaving the bracket returns to the venue lane; reconnecting then starts in the village/venue again.
  leave(){const id=this.view?.id;this.view=null;G.profile.map.tournament=null;Village.hub().close();checkpoint(this.stages[id]?.checkpoint||Village.hubCheckpoint())},
