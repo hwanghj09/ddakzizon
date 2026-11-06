@@ -19,7 +19,7 @@ const assert=require('node:assert/strict'),{launch,champion}=require('./stage-he
  await page.locator('#tournament-prep').click();await page.locator('#match-start').click();lines=await h.dialogue();
  for(const t of ['접힌 선이 정확히 일치하지 않습니다','허용 오차 이내입니다','오차를 허용한다고요?','백지훈'])assert(lines.some(l=>l.includes(t)),t);
  await h.until(()=>G.state==='ready');assert((await page.evaluate(()=>G.coach)).includes('다음 수를 알 수 없다'),'이규격 hides his next move');await h.shot('national-final-battle.png');
- await h.win();assert.equal(await page.evaluate(()=>G.checkpoint),'national_reward');assert((await page.locator('#result-stats').textContent()).includes('융합기 해금'));
+ await h.win();assert.equal(await page.evaluate(()=>G.checkpoint),'national_reward');assert((await page.locator('#result-stats').textContent()).includes('융합기'));
  await page.locator('#continue').click();lines=await h.dialogue();assert(lines.some(l=>l.includes('틀린 접기인 줄 알았는데, 다른 접기였군요')));
  await h.until(()=>G.scene==='national'&&G.state==='explore');assert(await page.evaluate(()=>P.fusionOpen(G.profile)));assert.equal(await page.evaluate(()=>G.profile.nationalRound),3);
  // Fusion machine opens after the national title (spec 05 §2-3) and keeps the average compression.

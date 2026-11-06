@@ -103,7 +103,8 @@ const Tournament={
  },
  // 도 대회 prep (spec 04 §7): the strongest owned 공격형 and 방어형 ttakji side by side, one tap to equip. Nothing is forced.
  choice(content,id,index,replay){
-  const p=G.profile,score=(id,k)=>{const s=P.stats(p,id);return k==='attack'?s.attack*2-s.defense:s.defense*2+s.stability+s.hp/10-s.attack};
+  // 방어형 ranks by defense, stability and HP only; subtracting attack made upgraded ttakji lose to an unupgraded keepsake.
+  const p=G.profile,score=(id,k)=>{const s=P.stats(p,id);return k==='attack'?s.attack*2-s.defense:s.defense*2+s.stability+s.hp/10};
   const pick=k=>[...p.owned].sort((a,b)=>score(b,k)-score(a,k))[0];
   const box=this.el('section','prep-choice');box.id='prep-choice';box.append(this.el('p','',`공격형과 방어형 중 골라 보자. 두껍다고 강한 건 아니다. 정답은 없다.`));
   for(const [k,label] of [['attack','공격형'],['defense','방어형']]){const item=pick(k),s=P.stats(p,item);const b=this.button(box,`${label} · ${P.items[item].name} +${p.upgrades[item]} · 공격 ${s.attack} / 방어 ${s.defense} / 안정 ${s.stability} / 내구 ${s.hp}${item===p.equipped?' · 장착 중':''}`,()=>{if(P.equip(p,item)){checkpoint('tournament');Village.hud();sound('click');this.prep(id,index,replay)}},{disabled:item===p.equipped});b.dataset.form=k;const img=spriteImg(this.el('img'),item);img.alt='';b.prepend(img)}
@@ -138,7 +139,8 @@ const Tournament={
   for(const id of reward.items)stats.push({value:P.items[id].name,label:'획득'});
   for(const id of reward.skills)stats.push({value:R.skills[id].name,label:'기술 습득'});
   for(const [id,n] of Object.entries(reward.materials))stats.push({value:`${P.items[id].name.replace(' 딱지','')} 재료 +${n}`,label:'재료'});
-  for(const u of reward.unlocks)stats.push({value:u,label:'해금'});
+  // Skip unlock notes that repeat a skill listed above, and drop a trailing '해금' that the label already says.
+  for(const u of reward.unlocks)if(!reward.skills.some(id=>u.startsWith(R.skills[id].name)))stats.push({value:u.replace(/ 해금$/,''),label:'해금'});
   // Trophies (상대 딱지) are listed by result() itself.
   const after=reward.first&&final?{label:s.finalLabel,checkpoint:`${m.id}_reward`,run:s.final}:reward.first&&s.afterWin?.[m.index]||null;
   checkpoint(after?.checkpoint||'tournament');
@@ -155,7 +157,7 @@ const Tournament={
  select(){
   const p=G.profile;this.view=null;const content=this.frame('시외 정류장 · 대회 선택','select');$('facility-close').onclick=()=>{if(!G.paused)Village.close()};
   content.append(this.el('p','',p.story.ending?'자유 경기 · 우승한 대회는 언제든 다시 할 수 있다. 이동 요금 무료.':'이동 요금 무료 · 열린 대회만 갈 수 있다.'));
-  this.button(content,'뒤집마을',()=>Exploration.move('center',1300));
+  if(G.mapZone!=='center')this.button(content,'뒤집마을로 돌아가기 · 주민센터 앞',()=>Exploration.move('center',1300));
   for(const t of P.tournaments){
    const open=t.entered(p)||t.open(p),round=p[t.field],progress=!t.entered(p)?'미접수':round===t.opponents.length?'우승':`${round} / ${t.opponents.length} 승`;
    const b=this.button(content,`${t.stage} · ${t.name}${open?` · ${progress}`:` · 잠김 — ${t.condition}`}`,()=>this.travel(t.id),{disabled:!open});b.dataset.tournament=t.id;
