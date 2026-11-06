@@ -82,9 +82,9 @@ test('national saves preserve equipment and expanded caps while normalizing prem
 test('openings compose with timing, 강타 and defense without leaking into earlier opponents',()=>{
  const R=require('../rules.js'),me={attack:62,strength:4},foe={defense:8};
  const normal=P.intent('charger',1),opening=P.intent('charger',2);assert(normal.defending&&normal.weak);assert(opening.exposed&&opening.perfect);
- assert.equal(R.damage(me,foe,'GOOD',P.stance(normal,'GOOD')),34);
- assert.equal(R.damage(me,foe,'PERFECT',R.skills.smash.damage*P.stance(opening,'PERFECT')),169);
- assert.equal(R.damage(me,foe,'BAD',R.skills.smash.damage*P.stance(opening,'BAD')),78);
+ assert.equal(R.damage(me,foe,'GOOD',P.stance(normal,'GOOD')),17);
+ assert.equal(R.damage(me,foe,'PERFECT',R.skills.smash.damage*P.stance(opening,'PERFECT')),85);
+ assert.equal(R.damage(me,foe,'BAD',R.skills.smash.damage*P.stance(opening,'BAD')),39);
  for(let t=1;t<=8;t++){assert.equal(P.intent('fortress',t).exposed,t%3===0);assert.equal(P.intent('national_champion',t).exposed,t%4===0);assert.equal(P.intent('national_champion',t).perfect,t%4===3);assert(!P.intent('boss',t).exposed)}
 });
 const champion=()=>{const p=P.fresh();P.schoolReward(p);for(let i=0;i<3;i++)P.award(p,i);P.enterCity(p);for(let i=0;i<3;i++)P.awardCity(p,i);P.enterProvince(p);for(let i=0;i<3;i++)P.awardProvince(p,i);P.enterNational(p);for(let i=0;i<3;i++)P.awardNational(p,i);return p};

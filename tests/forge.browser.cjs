@@ -41,7 +41,7 @@ const artifacts=process.env.ARTIFACT_DIR||path.join(require('node:os').tmpdir(),
  await page.getByRole('button',{name:'연습 대결 · 보상 없음',exact:true}).click();await page.waitForFunction(()=>G.state==='ready');assert.equal(await page.evaluate(()=>G.hp),105);
  assert((await page.locator('.health-card.player small').first().textContent()).includes('공격형'));
  await page.locator('#game').focus();await page.keyboard.press('KeyC');await page.keyboard.press('KeyR');await page.keyboard.press('Space');await page.keyboard.press('Space');await page.waitForFunction(()=>G.state==='ready'&&G.round===2);
- assert.equal(await page.evaluate(()=>G.enemyMax-G.enemyHp),15,'Refined attack composes with 강타, BAD timing and the folder guard: (36+4-4.5)*0.6*1.4*0.5');assert.equal(await page.evaluate(()=>G.hp),71,'Refined HP and hair defense: 105-(32+4-5)*1.1 from 도윤 GOOD');assert.equal(await page.evaluate(()=>G.cool.smash),2);
+ assert.equal(await page.evaluate(()=>G.enemyMax-G.enemyHp),7,'Refined attack composes with 강타, BAD timing and the folder guard: (36+4-4.5)*0.6*1.4*0.5*pace 0.5');assert.equal(await page.evaluate(()=>G.hp),88,'Refined HP and hair defense: 105-(32+4-5)*1.1*pace 0.5 from 도윤 GOOD');assert.equal(await page.evaluate(()=>G.cool.smash),2);
  await page.evaluate(()=>{Forge.selected='sturdy';Forge.apply()});assert.equal(await page.evaluate(()=>P.formOf(G.profile)),'striker','Cannot refine during a battle');
  await page.keyboard.press('KeyI');assert(await page.locator('#equip-item').isDisabled());await page.keyboard.press('KeyI');
  await page.keyboard.press('Escape');await page.locator('#return-title').click();await page.locator('#load-game').click();await page.waitForFunction(()=>G.state==='explore');
