@@ -2,7 +2,7 @@
 /* Native pixel characters share a fixed foot anchor in every scene and portrait. */
 window.GameArt=(()=>{
  const manifest=window.ART_MANIFEST||{},images={},portraits=new Map();
- const aliases={rival:'minsu',examinee:'folder',doyun:'boss',boxer:'neighbor',compressed:'folder',timing:'sprinter',mender:'friend',official:'folder',regulator:'champ',endurance:'friend',striker:'sprinter',reverse:'globe',glass:'friend',federation:'folder',situational:'globe',triangle:'alien',sparkle:'alien',wall:'folder',offbeat:'sprinter',champion:'boss',charger:'sprinter',fortress:'folder',national_champion:'champ',gust:'sprinter',glacier:'folder',continent_champion:'champ',showman:'minsu',architect:'folder',world_champion:'globe',martian:'alien',lunar:'alien',planet_champion:'alien_champ'};
+ const aliases={rival:'minsu',examinee:'folder',doyun:'boss',boxer:'neighbor',compressed:'folder',timing:'sprinter',mender:'friend',official:'folder',regulator:'champ',endurance:'friend',striker:'sprinter',reverse:'champ',glass:'friend',federation:'folder',situational:'globe',triangle:'alien',sparkle:'alien',wall:'folder',offbeat:'sprinter',champion:'boss',charger:'sprinter',fortress:'folder',national_champion:'champ',gust:'sprinter',glacier:'folder',continent_champion:'champ',showman:'minsu',architect:'folder',world_champion:'globe',martian:'alien',lunar:'alien',planet_champion:'alien_champ'};
  const canonical=kind=>aliases[kind]||kind;
  const loaded=key=>{const image=images[key];return image?.complete&&image.naturalWidth&&!image.failed?image:null};
  const ready=Promise.all(Object.entries(manifest).map(([key,entry])=>new Promise(resolve=>{

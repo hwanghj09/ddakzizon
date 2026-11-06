@@ -318,7 +318,7 @@ completion-time estimate. Reading speed, accuracy and retry frequency vary.
 
 기준 문서: `docs/game-planning/07-minimum-playable-version.md`.
 타이틀의 기본 **처음부터 시작 / 이어서 하기**가 이 버전을 연다.
-기존 전체 캠페인은 별도 버튼과 기존 저장 키를 유지한다.
+전체 캠페인(‘처음부터 시작’)과 짧은 체험판은 별도 버튼과 별도 저장 키를 쓴다.
 
 - `npm run check`: 기존 스크립트와 새 `minimum-rules.js`, `minimum.js` 문법 검사 통과.
 - `npm test`: 기존 규칙·성장·탐험·이미지 검사를 포함한 단위 테스트 52개 통과.

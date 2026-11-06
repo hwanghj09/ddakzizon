@@ -105,7 +105,7 @@ const Minimum={
  },
  back(){G.state='explore';panels('explore-ui');this.hud();this.updateInteract();$('game').focus({preventScroll:true})},
  menuPanel(title,lines,choices=[]){
-  Exploration.menu(title,lines,choices);$('facility-wallet').textContent='최소 플레이 버전';
+  Exploration.menu(title,lines,choices);$('facility-wallet').textContent='짧은 체험판';
   $('facility-close').onclick=()=>{if(!G.paused)this.back()};
   ($('facility-content').querySelector('button:not(:disabled)')||$('facility-close')).focus({preventScroll:true});
  },
@@ -160,7 +160,7 @@ const Minimum={
   this.talk([[o.type==='npc'?o.name:'나',notices[id]||'평범한 마을 풍경. 오늘도 딱지 이야기가 한창이다.']]);
  },
  bracket(){
-  this.menuPanel('접수 완료 · 마을 주민센터 컵',['최소 플레이 버전 완료! 패배에서 다시 일어나 대회 접수까지 마쳤다.','아래는 임시 대진표다. 대회 경기는 다음 단계에서 이어진다.']);
+  this.menuPanel('접수 완료 · 마을 주민센터 컵',['체험판 끝! 패배에서 다시 일어나 대회 접수까지 마쳤다.','대회 경기와 그 뒤의 모험은 타이틀의 ‘처음부터 시작’(전체 이야기)에서 즐길 수 있다.']);
   const list=document.createElement('ol');list.className='bracket';list.id='minimum-bracket';
   for(const [round,match] of MinimumRules.config.bracket){const li=document.createElement('li');li.textContent=`${round} · ${match}`;list.append(li)}
   $('facility-content').append(list);

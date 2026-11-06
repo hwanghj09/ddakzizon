@@ -1,8 +1,9 @@
 'use strict';
 /* Authored artwork is preferred; procedural scenery remains a loading fallback. */
 const MapRenderer={
+ // The village cup is held outdoors in front of the community center (poster: '장소: 주민센터 앞').
  arena(ctx,a,region){
-  if(globalThis.GameArt?.background(ctx,region==='village'?'lobby':region,285)){a.text(region==='village'?'주민센터 컵':region==='city'?'지존시 지역구 예선':region==='province'?'도 딱지 선수권':'전국 딱지 선수권',480,88,22,'#efe0b2','center',800,'#283b3d');return}
+  if(globalThis.GameArt?.background(ctx,region==='village'?'center':region,285)){a.text(region==='village'?(G.profile.round===2?'주민센터 컵 · 결승':'세계로 가는 첫걸음'):region==='city'?'지존시 지역구 예선':region==='province'?'도 딱지 선수권':'전국 딱지 선수권',480,88,22,'#efe0b2','center',800,'#283b3d');return}
   const {rect:r,text:t,line:l,actor}=a,village=region==='village',city=region==='city',province=region==='province',national=region==='national';
   r(0,0,960,600,national?'#193542':province?'#879a91':city?'#c1c7ad':'#a8bdb0');
   r(0,270,960,330,village?'#b5aa87':'#a49c81');

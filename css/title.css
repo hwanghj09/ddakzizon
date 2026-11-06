@@ -11,4 +11,4 @@ h1{font-size:clamp(64px,8vw,108px);font-weight:800;letter-spacing:-.07em;line-he
 .title-menu .menu-secondary{background:#ffffff0b;border-color:#d8dfcf44;color:#eeeede}
 .title-menu .menu-secondary:hover{background:#ffffff19;border-color:#e6dfc777}
 .title-menu .campaign-start{background:transparent;border-color:transparent;box-shadow:none;font-size:12px;font-weight:450;color:#bfcdbb;min-height:42px;padding:9px 2px}
-.title-menu #new-game{margin-top:12px;border-top:1px solid #d8dfcf30;border-radius:0;padding-top:17px}
+.title-menu #minimum-new{margin-top:12px;border-top:1px solid #d8dfcf30;border-radius:0;padding-top:17px}
