@@ -20,8 +20,8 @@ const Journeys={
   const steps=node('ol','journey-steps','');e.steps.forEach((a,i)=>steps.append(node('li',i<stage?'done':i===stage?'current':'',`${i<stage?'✓ ':''}${a.title} · ${this.objective(a)}`)));content.append(steps);
   const available=J.available(p,e),button=node('button','menu-primary',stage===2?'지난 이야기 다시 읽기':available?`${stage+1}번째 이야기 시작`:'이전 대회 경기부터 마치자');button.id='journey-start';button.disabled=!available;
   button.onclick=()=>{if(G.paused||G.state!=='facility')return;if(stage===2)this.replay(e);else this.start(e.id)};content.append(button);
-  if(stage<2&&available)content.append(node('p','',`과제마다 ${J.reward(e)}원 · 훈련 +1`));
-  $('facility-close').onclick=()=>{if(!G.paused)Village.close()};if(!G.paused)(button.disabled?content.querySelector(`[data-episode="${this.selected}"]`):button).focus({preventScroll:true})
+  if(stage<2&&available)content.append(node('p','',`과제마다 ${J.reward(e)}원 · ${p.xp<P.trainingLimit(p)?'훈련 +1':'현재 훈련 한도 도달'}`));
+  $('facility-close').onclick=()=>{if(!G.paused)Village.close()};if(!G.paused)(button.disabled?content.querySelector(`[data-episode="${this.selected}"]`):button).focus()
  },
  start(id){
   const e=J.byId(id),p=G.profile,step=p.journey.stages[id]||0;
@@ -40,9 +40,11 @@ const Journeys={
   const job=G.storyJob;if(!job)return;G.animation=null;const e=J.byId(job.id),success=won&&J.passed(job.activity,G.practice,G.storyUsed);
   G.storyJob=null;
   if(!success){checkpoint(Village.hubCheckpoint());result(won?'약속한 기술도 써보자.':'한 번 더 해보자.',this.objective(job.activity),'다시 도전',()=>{Village.hub().enter();this.start(job.id)},[{value:G.stats.damage,label:'가한 피해'}]);$('result-secondary').hidden=false;$('result-secondary').textContent='준비하고 돌아오기';$('result-secondary').onclick=()=>{if(!G.paused&&G.state==='result')transition(()=>Village.returnHub())};return}
+  const beforeXp=G.profile.xp;
   if(!J.complete(G.profile,job.id,job.step,P.trainingLimit(G.profile)))return;
+  const gainedXp=G.profile.xp-beforeXp;
   checkpoint(Village.hubCheckpoint());Village.hud();sound('win');
-  result(job.step===1?'또 하나의 이야기.':'조금 더 가까워졌다.',job.activity.title,'이야기 계속',()=>this.ending(e,job.step),[{value:`+${J.reward(e)}원`,label:'보상'},{value:'+1',label:'훈련'}])
+  result(job.step===1?'또 하나의 이야기.':'조금 더 가까워졌다.',job.activity.title,'이야기 계속',()=>this.ending(e,job.step),[{value:`+${J.reward(e)}원`,label:'보상'},{value:gainedXp?`+${gainedXp}`:'한도 도달',label:'훈련'}])
  },
  ending(e,step){
   cancelScene();G.hub=e.region;G.scene=e.region;G.mode=e.region;G.mapZone=e.region==='village'?'square':e.region;G.camera=0;G.hero={x:420,y:440,walk:0,facing:1};Village.hud();

@@ -34,7 +34,7 @@ const Forge={
   const note=el('p','forge-note');note.id='forge-note';note.setAttribute('role','status');content.append(note);
   const back=el('button','facility-choice','압축 공방으로');back.onclick=()=>{if(!G.paused&&G.state==='facility')Village.hub().open('press')};content.append(back);
   $('facility-close').onclick=()=>{if(!G.paused)Village.hub().close()};
-  if(!G.paused)content.querySelector(`[data-form="${this.selected}"]`).focus({preventScroll:true})
+  if(!G.paused)content.querySelector(`[data-form="${this.selected}"]`).focus()
  },
  apply(){
   if(!this.available()||G.paused||G.state!=='facility'||G.facility!=='forge')return;

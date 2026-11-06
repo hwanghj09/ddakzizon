@@ -17,18 +17,25 @@
    ['도윤','잃어버리면 곤란하잖아.'],
    ['','딩동댕— 하교 종이 울리자 아이들이 우르르 교문 밖으로 흩어진다.'],
    ['','바닥에 신문 조각 하나가 남았다. 주워서 주머니에 넣었다.']]},
+  tutorial_father:{title:'튜토리얼 · 아빠의 첫 강화',lines:[
+   ['아빠','거의 뒤집었는데 졌다고? 아쉬웠겠네. 그래도 다음 한 판은 다시 해 볼 수 있지.'],
+   ['나','더 센 딱지는 어떻게 만들어요?'],
+   ['아빠','같은 신문지도 접힌 선을 꾹 누르고 한 겹 보강하면 강해져. 그게 강화야.'],
+   ['아빠','한 겹마다 공격은 3, 내구는 10 늘고 방어는 1 줄어. 무작정 두껍게만 하는 게 답은 아니지.'],
+   ['아빠','첫 강화는 아빠랑 무료로 해 보자. 순서대로 접고 모서리를 단단히 눌러 봐.'],
+   ['나','이번엔 내 손으로 제대로 접어 볼게요.']]},
   tutorial_fold:{title:'튜토리얼 · 다시 접기',lines:[
    ['','집. 식탁 위에 신문지를 펼쳤다. 주머니에서 꺼낸 신문 조각도 옆에 놓는다.'],
    ['나','딱지 한 장 잃었다고 끝낼 순 없지.'],
    ['','빛나는 모서리 순서대로 숫자키 1, 2, 3, 4를 누르거나 모서리를 눌러 접자. 틀려도 계속 접을 수 있다.']]},
   tutorial_crooked:{lines:[
    ['','…딱지가 비뚤어졌다.'],
-   ['아빠','(지나가며) 그건 딱지야, 종이비행기야?'],
-   ['나','……'],
-   ['','말없이 신문지를 다시 편다. 이번엔 접힌 선을 한 번 더 꾹 누르면서.']]},
+   ['아빠','순서가 조금 헷갈렸지? 괜찮아. 빛나는 모서리부터 같이 다시 접자.'],
+   ['나','이번에는 천천히 해 볼게요.'],
+   ['','신문지를 다시 편다. 접힌 선을 한 번 더 꾹 누르면서.']]},
   tutorial_practice:{title:'튜토리얼 · 지우개 표적',lines:[
    ['','바닥에 지우개를 올려 두었다. 오늘의 표적이다.'],
-   ['','내려치기를 누르고, 바늘이 가운데 노란 구간에 왔을 때 다시 눌러 멈추자. 가운데일수록 완벽, 좋음, 보통. 바깥은 빗나감.'],
+   ['','내려치기를 누르고, 바늘이 가운데 노란 구간에 왔을 때 다시 눌러 멈추자. 가운데일수록 완벽, 좋음, 보통. 바깥은 약한 타격.'],
    ['','세 번 쳐 보자. 실패해도 괜찮다. 연습은 몇 번이든 다시 할 수 있다.']]},
   practice_sock:{lines:[
    ['','딱지가 지우개 대신 양말을 맞혔다.'],
@@ -390,7 +397,7 @@
    ['나','아저씨?!']]}
  };
  // 다시 보기 order for the menu and the notice board.
- const replayOrder=['prologue_bet','prologue_loss','tutorial_fold','tutorial_practice','rematch_intro','rematch_win','poster','village_r1_intro','village_r1_win','village_r2_intro','village_r2_win','village_final_intro','village_award','city_intro','city_reunion','city_r1_intro','city_r2_intro','city_final_intro','city_award',
+ const replayOrder=['prologue_bet','prologue_loss','tutorial_father','tutorial_fold','tutorial_practice','rematch_intro','rematch_win','poster','village_r1_intro','village_r1_win','village_r2_intro','village_r2_win','village_final_intro','village_award','city_intro','city_reunion','city_r1_intro','city_r2_intro','city_final_intro','city_award',
   'province_intro','province_letter','province_r1_intro','province_skill','province_r2_intro','province_r2_win','province_final_intro','province_award',
   'national_intro','national_r1_intro','national_doyun_loss','national_r2_intro','national_final_intro','national_award',
   'continent_intro','continent_r1_intro','continent_r1_win','continent_r2_intro','continent_final_intro','continent_award',
@@ -401,10 +408,10 @@
  const credits=[['주인공','{name}'],['운동장의 라이벌','민수'],['대장이자 라이벌','도윤'],['유치원 친구','하나'],['앞집 아저씨','앞집 아저씨'],['평범한 지나가는 전설','박태풍'],['세계 딱지 연맹 회장','백지훈'],['시 대회','서준 · 한별'],['도 대회','상자왕 · 최단단 · 윤서'],['전국 대회','테이프 딱지 선수 · 공인 딱지 선수 · 이규격'],['대륙 대회','마리 · 리오 · 아라 · 절대 뒤집히지 않는 자'],['세계 대회','미라 · 연맹 추천 선수 · 한결'],['행성 교류전','모서리 셋 · 반짝 · 무중'],['대회를 만든 사람들','사회자 · 접수원 · 심판 · 통역사 · 후원사 직원'],['집에서','아빠'],['그리고','딱지를 접은 모든 사람']];
  // Before the scripted first attack lands, the rival reacts to the grade the player actually got.
  const introReaction={
-  PERFECT:'…방금 그 소리 좋았다? 그래도 내 딱지는 안 넘어가지.',
-  GOOD:'오, 제법인데? 그래도 그 정도로는 안 뒤집혀.',
-  NORMAL:'그냥 툭 쳤네. 가운데에 맞춰야 세게 들어가지.',
-  BAD:'어디 쳐? 바닥이 뒤집히겠다!'
+  PERFECT:'…완벽하게 쳤네! 넘어가는 줄 알았다. 아직 내 차례 남았어.',
+  GOOD:'오, 좋았어. 모서리까지 들렸잖아. 이번엔 내가 친다!',
+  NORMAL:'가운데면 더 셌을 텐데. 그래도 거의 넘어갈 뻔했어.',
+  BAD:'힘이 덜 실렸네. 그래도 아까 주고받은 것 때문에 내 딱지도 아슬아슬해.'
  };
  const api={scenes,replayOrder,introReaction,credits};
  if(typeof module!=='undefined')module.exports=api;else root.TtakjiStory=api;

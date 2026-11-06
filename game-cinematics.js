@@ -1,6 +1,6 @@
 'use strict';
 /* Opening rally, near-flip and chapter cards. */
-// Minimum mode's opening rally and near-flip cinematics.
+// Shared campaign and short-demo opening rally and near-flip cinematics.
 function openingRally(done){
  G.state='cinematic';G.round=3;panels('battle-hud');$('actions').hidden=true;$('timing').hidden=true;
  coach('몇 번이고 주고받았다. 이제 둘 다 마지막 한 수…');

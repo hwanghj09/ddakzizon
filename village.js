@@ -59,9 +59,9 @@ const Village={
    Tournament.open('village');return;
   }
   if(id==='training'||id==='cup')Journeys.link(content);
-  $('facility-close').onclick=()=>{if(!G.paused)this.close()};const first=content.querySelector('button:not(:disabled)');(first||$('facility-close')).focus({preventScroll:true})
+  $('facility-close').onclick=()=>{if(!G.paused)this.close()};const first=content.querySelector('button:not(:disabled)');(first||$('facility-close')).focus()
  },
- close(){G.state='explore';panels('explore-ui');updateInteract();$('game').focus({preventScroll:true})},
+ close(){G.state='explore';panels('explore-ui');updateInteract();$('game').focus()},
  // Back-compat entry used by tests and old buttons: start the next village match directly.
  startTournament(){if(G.profile.round>=3)return;if(!G.profile.map.poster){Exploration.talk('접수원','학교 앞 포스터를 먼저 확인해 줘.');return}P.enterVillage(G.profile);Tournament.start('village',G.profile.round,false)},
  configureBattle(mode){
@@ -71,7 +71,7 @@ const Village={
  },
  ready(){
   if(G.mode==='training')$('turn-label').textContent=`훈련 ${G.practice.length+1} / 3`;
-  else {const intent=G.intent||{};if(intent.hidden)coach(`${G.opponent.name}이(가) 자로 각도를 잰다… 다음 수를 알 수 없다!`,0);else if(intent.skill&&G.foe.skills.includes(intent.skill)&&G.foeCool[intent.skill]>=0&&G.foeCool[intent.skill]<=1)coach(`${intent.defending?'방어하면서 ':''}다음 반격은 ${R.skills[intent.skill].name}!`,0);else if(intent.exposed)coach(intent.perfect?'빈틈! 피해 1.5배 · 반격은 완벽!':'빈틈! 피해 1.5배 · 반격은 빗나감!',0);else if(intent.defending)coach(intent.pierce?'방어한다! 완벽만 뚫을 수 있어!':'이번엔 방어! 들어오는 피해 절반!',0);else if(intent.perfect)coach('다음 반격은 완벽이다!',0);else if(intent.weak)coach('이번 반격은 힘을 뺀다! 빗나감 타격!',0)}
+  else {const intent=G.intent||{};if(intent.hidden)coach(`${G.opponent.name}이(가) 자로 각도를 잰다… 다음 수를 알 수 없다!`,0);else if(intent.skill&&G.foe.skills.includes(intent.skill)&&G.foeCool[intent.skill]>=0&&G.foeCool[intent.skill]<=1)coach(`${intent.defending?'방어하면서 ':''}다음 반격은 ${R.skills[intent.skill].name}!`,0);else if(intent.exposed)coach(intent.perfect?'빈틈! 피해 1.5배 · 반격은 완벽!':'빈틈! 피해 1.5배 · 반격은 약한 타격!',0);else if(intent.defending)coach(intent.pierce?'방어한다! 완벽만 뚫을 수 있어!':'이번엔 방어! 들어오는 피해 절반!',0);else if(intent.perfect)coach('다음 반격은 완벽이다!',0);else if(intent.weak)coach('이번 반격은 힘을 뺀다! 약한 타격이 온다!',0)}
  },
  stance(grade){return G.mode==='training'?1:P.stance(G.intent||{},grade)},
  trainingComplete(){if(G.mapPractice){G.mapPractice=false;checkpoint(this.hubCheckpoint());result('손목을 풀었다.','무료 연습 · 재화와 능력치는 그대로다.','돌아가기',()=>transition(()=>this.returnHub()));return}const before=P.level(G.profile);P.train(G.profile,G.practice);checkpoint(this.hubCheckpoint());this.hud();result('손에 감이 붙었다.',P.level(G.profile)>before?'힘 +2 · 집중력 +1':'세 번 더, 조금 더 정확하게.',this.hubLabel(),()=>transition(()=>this.returnHub()),[{value:'+5원',label:'훈련 보상'},{value:`Lv.${P.level(G.profile)+1}`,label:'선수'}])},
@@ -89,6 +89,6 @@ document.addEventListener('keydown',e=>{
  if(G.state!=='facility')return;
  if(e.code==='KeyE'){e.preventDefault();$('facility-close').click();return}
  if(['ArrowDown','ArrowRight','ArrowUp','ArrowLeft'].includes(e.code)){
-  e.preventDefault();const buttons=[...$('facility').querySelectorAll('button:not(:disabled)')],i=buttons.indexOf(document.activeElement),step=['ArrowDown','ArrowRight'].includes(e.code)?1:-1;buttons[(i+step+buttons.length)%buttons.length].focus({preventScroll:true})
+  e.preventDefault();const buttons=[...$('facility').querySelectorAll('button:not(:disabled)')],i=buttons.indexOf(document.activeElement),step=['ArrowDown','ArrowRight'].includes(e.code)?1:-1;buttons[(i+step+buttons.length)%buttons.length].focus()
  }
 });

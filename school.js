@@ -1,7 +1,14 @@
 'use strict';
-/* Tutorial (spec 04 §4, 06 §5): fold at the home table, practise on an eraser, then the real school rematch.
-   Folding and practice never change stats; the finished ttakji is the same basic newspaper ttakji. */
+/* Home lesson: Dad explains reinforcement, the first completed fold grants +1 once,
+   then free timing practice leads directly to the school rematch. */
 const School={
+ fatherLesson(){
+  const p=G.profile;
+  if(p.schoolReward||P.phases.indexOf(p.map.phase)>=P.phases.indexOf('folded')){practice();return}
+  if(G.mapZone!=='home'||!Exploration.active())Exploration.enter('home',420);
+  checkpoint('home');
+  story('tutorial_father',home)
+ },
  offerPractice(){
   const button=$('result-secondary');button.hidden=false;button.textContent='집에서 연습';button.onclick=()=>{if(G.paused||G.state!=='result')return;G.state='transition';checkpoint('practice');transition(practice)}
  }
@@ -22,15 +29,17 @@ function foldCorner(index){
  G.state='folding-busy';G.fold++;G.foldAt=G.now;sound('fold');renderFold(missed);
  after(450,()=>{
   if(G.fold<4){G.state='folding';document.querySelector(`[data-fold="${G.fold}"]`)?.focus({preventScroll:true});return}
-  // The first attempt always comes out crooked (story beat); the second attempt finishes the ttakji.
-  if(G.foldTry===0){G.foldTry=1;say(TtakjiStory.scenes.tutorial_crooked.lines,()=>{G.fold=0;G.foldAt=G.now;G.state='folding';panels('fold-controls');renderFold();$('game').focus({preventScroll:true})},false,true);return}
+  // A correct sequence succeeds immediately. Only an actual wrong corner needs another try.
+  if(G.foldTry===0&&G.foldMiss>0){G.foldTry=1;say(TtakjiStory.scenes.tutorial_crooked.lines,()=>{G.fold=0;G.foldAt=G.now;G.state='folding';panels('fold-controls');renderFold();$('game').focus({preventScroll:true})},false,true);return}
   finishFold()
  })
 }
 function finishFold(){
  const p=G.profile;if(!p.schoolReward&&P.phases.indexOf(p.map.phase)<P.phases.indexOf('folded'))p.map.phase='folded';
- setInventory('◇ 신문지 딱지 × 1');checkpoint('practice');sound('perfect');
- result('다시, 한 장.','접는 솜씨와 상관없이 같은 신문지 딱지다. 이제 지우개 표적으로 연습해 보자.','연습하기 →',()=>transition(practice),[{value:'신문지 딱지',label:'완성'},{value:G.foldMiss?`${G.foldMiss}번 어긋남`:'반듯하게',label:'두 번째 접기'}])
+ const reinforced=!p.schoolReward&&!p.story.seen.tutorial_upgrade_done,before=p.upgrades.newspaper;
+ if(reinforced){p.upgrades.newspaper=Math.max(1,p.upgrades.newspaper);p.story.seen.tutorial_upgrade_done=true}
+ setInventory(`◇ 신문지 딱지 +${p.upgrades.newspaper}`);checkpoint('practice');sound('perfect');
+ result('다시, 한 장.',p.upgrades.newspaper>before?'아빠와 접힌 선을 눌러 첫 강화를 마쳤다. 공격 +3 · 내구 +10 · 방어 −1. 이제 표적에 연습해 보자.':'접기를 마쳤다. 이미 배운 첫 강화는 유지된다. 이제 표적에 연습해 보자.','연습하기 →',()=>transition(practice),[{value:`신문지 +${p.upgrades.newspaper}`,label:'완성'},{value:G.foldMiss?`${G.foldMiss}번 어긋남`:'반듯하게',label:'접기'}])
 }
 function practice(){cancelScene();G.practice=[];G.fold=4;setInventory('◇ 신문지 딱지 × 1');battle('practice')}
 function practiceIntro(){const go=()=>{panels('battle-hud','combat-controls');ready()};if(G.profile.story.seen.tutorial_practice){go();return}story('tutorial_practice',go)}
@@ -44,6 +53,6 @@ function practiceHit(sock){
 function flipDemo(){G.flipEnemy=G.now;sound('flip');sound('win');impact('뒤집기!','PERFECT');after(1100,()=>say(TtakjiStory.scenes.practice_flip.lines,practiceComplete))}
 function practiceComplete(){
  G.animation=null;const counts=g=>G.practice.filter(x=>x===g).length;if(!G.profile.schoolReward)checkpoint('rematch');sound('perfect');
- result('이제, 다시 한 판.','연습은 집 연습 표적에서 언제든 다시 할 수 있다. 능력치는 그대로, 손만 익숙해졌다.','학교로 가기 →',()=>transition(()=>Exploration.enter('home',720)),[{value:counts('PERFECT')+counts('GOOD'),label:'좋음 이상'},{value:counts('BAD'),label:'빗나감'},{value:'뒤집기 성공',label:'마무리'}]);
+ result('이제, 다시 한 판.','연습은 집 연습 표적에서 언제든 다시 할 수 있다. 학교로 가서 민수에게 다시 도전하자.','학교로 가기 →',()=>transition(()=>Exploration.enter('yard',760)),[{value:counts('PERFECT')+counts('GOOD'),label:'좋음 이상'},{value:counts('BAD'),label:'약한 타격'},{value:'뒤집기 성공',label:'마무리'}]);
  const again=$('result-secondary');again.hidden=false;again.textContent='한 번 더 연습';again.onclick=()=>{if(G.paused||G.state!=='result')return;G.state='transition';transition(practice)}
 }
