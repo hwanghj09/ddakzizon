@@ -1,15 +1,37 @@
-/* Desktop exploration. */
-#map-hud{position:absolute;left:24px;top:22px;display:flex;flex-direction:column;gap:6px;max-width:min(390px,48%);padding:14px 18px;background:#faf7eff0;border:1px solid #dcd8cabb;border-radius:8px;pointer-events:none;box-shadow:0 3px 16px #162b2412}
-#map-location{font-size:10px;letter-spacing:.05em;color:#66735e}#map-objective{font-size:14px;line-height:1.6;font-weight:650;color:var(--ink);word-break:keep-all}#map-direction{font-size:11px;color:#5d744e}#map-direction:empty{display:none}
-.map-route{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}.map-node{flex:1 1 130px;padding:14px 12px;background:#eeeee3;border:1px solid #daddcc;border-radius:6px;font-size:13px;color:#6b7963}.map-node.current{border-color:#92a982;background:#e1e9d5;color:var(--navy)}.map-node small{display:block;margin-top:8px;font-size:10px;color:#86907b}
-#minimum-help{position:absolute;left:24px;bottom:18px;color:#ececda;font-size:11px;text-shadow:0 1px 6px #152c22;z-index:3;pointer-events:none}
-.minimum-mode #focus,.minimum-mode #guard,.minimum-mode #power,.minimum-mode [data-menu="journal"],.minimum-mode [data-menu="achievements"],.minimum-mode [data-menu="player"]{display:none!important}
+/* Field HUD */
+#hud { position: absolute; inset: 0 0 auto; padding: 20px var(--gutter); z-index: 3; pointer-events: none }
+.top-actions { display: flex; justify-content: flex-end; align-items: center; gap: 5px }
+.top-actions button, #inventory {
+  display: flex; align-items: center; justify-content: center; min-height: 44px;
+  border: 1px solid #d7e1ec66; border-radius: 3px; background: var(--night); color: var(--white);
+  pointer-events: auto;
+}
+.top-actions button { width: 44px; padding: 0 }
+.top-actions button:hover { background: var(--gold); color: var(--ink); border-color: var(--ink) }
+.top-actions button:active { background: var(--orange) }
+.top-actions svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6 }
+#sound[aria-pressed="false"] .sound-on, #sound[aria-pressed="true"] .sound-off { display: none }
+#inventory { gap: 7px; padding: 0 12px; margin-right: 5px; font-size: 13px; pointer-events: none }
+.has-newspaper::before, .has-colored-paper::after, #inventory.campaign-item::before {
+  content: ""; flex: none; width: 28px; height: 28px; image-rendering: pixelated;
+}
+.has-newspaper::before { background: url("../assets/sprites/ttakji/newspaper/ttakji_newspaper_inventory.png") center/contain no-repeat }
+.has-colored-paper::after { background: url("../assets/sprites/ttakji/colored_paper/ttakji_colored_paper_inventory.png") center/contain no-repeat }
+#inventory.campaign-item::before { background: var(--item-icon) center/contain no-repeat }
+#map-hud {
+  position: absolute; left: var(--gutter); top: 20px; z-index: 3; display: grid; gap: 2px;
+  width: max-content; max-width: 46%; padding: 9px 14px; border: 1px solid #d7e1ec66;
+  border-left: 4px solid var(--gold); border-radius: 3px; background: var(--night); color: var(--white);
+  pointer-events: none;
+}
+#map-location { color: var(--gold); font-size: 12px; font-weight: 800 }
+#map-objective { font-size: 15px }
+#map-direction { color: #c8dbea; font-size: 12px }
+#map-hud > :empty { display: none }
 
-.result,.game-menu{animation-name:reveal}@keyframes reveal{from{opacity:0}to{opacity:1}}@keyframes impact{from{opacity:0;scale:1.12}to{opacity:1;scale:1}}
-.title-settings{position:absolute;right:6%;top:50%;transform:translateY(-50%);width:min(460px,88%);padding:20px 22px}.title-settings header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.title-settings h2{margin:0;font-size:24px}.title-settings .menu-secondary{padding:8px 12px}
-.setting-group{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}.setting-group>span{flex:1 0 100%;font-size:13px;color:var(--muted)}.setting-option{padding:9px 14px;border:3px solid var(--ink);border-radius:10px;background:var(--paper);box-shadow:0 3px 0 var(--ink);font-size:14px}.setting-option[aria-pressed="true"]{background:var(--gold)}.setting-option.wide{width:100%;text-align:left}
-.combat-panel:has(#skill-precise:not([hidden])){width:620px}.combat-panel:has(#skill-smash:not([hidden])){width:760px}.combat-panel:has(#skill-press:not([hidden])){width:880px}
-.combat-panel:has(#skill-smash:not([hidden])) .actions button{padding:12px}.skill kbd{font-size:9px;margin-left:5px}.skill{font-size:13px}.skill>span:first-child{white-space:nowrap}
-.normal-zone,.good-zone,.perfect-zone{position:absolute;top:0;bottom:0}.normal-zone{left:26%;right:26%;background:#5a8fd8}.good-zone{left:38%;right:38%;background:var(--green)}.perfect-zone{left:45%;right:45%;background:var(--gold);box-shadow:0 0 14px var(--gold)}
-.gauge-legend{display:flex;justify-content:center;gap:12px;margin:-6px 0 10px;font-size:11px;font-weight:900}.gauge-legend span::before{content:'';display:inline-block;width:10px;height:10px;margin-right:4px;border:2px solid var(--ink);border-radius:3px;vertical-align:-1px}.legend-perfect::before{background:var(--gold)}.legend-good::before{background:var(--green)}.legend-normal::before{background:#5a8fd8}.legend-bad::before{background:#3b3456}
-.item-stats{margin:14px 0;display:grid;grid-template-columns:1fr 1fr;gap:6px}.item-stats>div{display:flex;justify-content:space-between;gap:6px;font-size:12px;padding:5px 8px;background:#fff;border:2px solid var(--ink);border-radius:8px}
+#minimum-help {
+  position: absolute; z-index: 3; left: var(--gutter); bottom: 74px; padding: 4px 8px;
+  background: var(--night); color: var(--white); font-size: 11px; pointer-events: none;
+}
+.minimum-mode [data-menu="journal"], .minimum-mode [data-menu="achievements"],
+.minimum-mode [data-menu="player"] { display: none }

@@ -1,24 +1,133 @@
-/* Combat: readable HP, restrained team colours and a single prominent action. */
-.health-card{position:absolute;top:90px;width:29%;padding:14px 16px 12px;background:#faf7eff5;border:1px solid #d5d3c4;border-radius:10px;box-shadow:0 3px 16px #172c2412;z-index:3}
-.health-card.player{left:5%}.health-card.opponent{right:5%}.health-card>span{font-size:15px;font-weight:750;display:flex;align-items:baseline;gap:10px}.health-card small{font-size:11px;font-weight:450;color:var(--muted)}
-.health-track{height:7px;background:#e2e3d6;border-radius:3px;margin:12px 0 8px;overflow:hidden}.health-track i{display:block;height:100%;background:var(--green);transition:width .3s;border-radius:3px}.opponent .health-track i{background:#ba7964}
-.health-card>div:last-child{display:flex;justify-content:space-between;align-items:center}.health-card strong{font-size:12px;font-weight:650;font-variant-numeric:tabular-nums}
-#round-label{position:absolute;top:104px;left:50%;translate:-50% 0;z-index:3;font-size:10px;font-weight:650;letter-spacing:.09em;color:#fff5dd;background:#264737e8;border:1px solid #a5b19c44;border-radius:4px;padding:7px 10px;white-space:nowrap}
-.combat-panel{position:absolute;bottom:4%;left:50%;width:440px;max-width:88%;transform:translateX(-50%);padding:16px 18px}
-.combat-panel:has(#guard:not([hidden])){width:600px}.combat-panel:has(#power:not([hidden])){width:720px}
-.combat-heading{font-size:12px;margin:0 0 10px;color:var(--muted)}.combat-heading strong{font-weight:550}.combat-heading:has(strong:empty){display:none}
-.actions{display:flex;gap:8px}.actions button{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 15px;text-align:left;min-height:48px;border:1px solid var(--line);border-radius:7px}
-.action-primary{flex:1.5;background:var(--navy);border-color:var(--navy)!important;color:#fffaf0;font-size:16px}.action-primary:hover:not(:disabled),.strike:hover{background:#39604a}.action-icon{font-size:20px;font-weight:450}
-.action-secondary{flex:1;background:#eeeadd;color:var(--navy);font-size:13px}.action-secondary:hover:not(:disabled){background:#e1e4d6}.action-secondary>span:last-child{font-size:11px}.action-secondary:disabled{background:#e9e7df;color:#8b9186;opacity:.65}
-#power kbd{font-size:9px;margin-left:3px}#guard{font-size:12px}
-.gauge{height:22px;background:#dcded5;position:relative;margin:8px 0 10px;border:1px solid #aeb6a5;border-radius:5px;overflow:hidden}.good-zone{position:absolute;inset:0 30%;background:#8bab91}.perfect-zone{position:absolute;inset:0 43%;background:#e5c584}.minimum-mode .normal-zone{position:absolute;inset:0 15%;background:#bdcbbc}
-#needle{position:absolute;top:0;bottom:0;width:4px;background:#233c30;box-shadow:0 0 0 1px #fff9;transform:translateX(-50%)}
-.strike{background:var(--navy);color:#fffaf0;border:1px solid var(--navy);border-radius:7px;width:100%;min-height:48px;padding:12px 16px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
-#timing-guide{font-size:11px;font-weight:450;color:var(--muted);margin:8px 0 14px;text-align:center;line-height:1.6}
+/* Match scorecard and controls */
+#battle-hud {
+  position: absolute; top: 80px; left: var(--gutter); right: var(--gutter); z-index: 3;
+  display: grid; grid-template-columns: minmax(0, 1fr) max-content minmax(0, 1fr);
+  align-items: start; gap: clamp(14px, 2.6vw, 36px); pointer-events: none;
+}
+.health-card {
+  --team: var(--green);
+  padding: 9px 12px 7px; background: var(--night); color: var(--white);
+  border: 1px solid #c9d6e399; border-top: 3px solid var(--team); border-radius: 3px;
+}
+.health-card.opponent { --team: var(--orange) }
+.health-card > span { display: flex; align-items: baseline; gap: 8px; min-width: 0; font-size: 16px; font-weight: 900 }
+.health-card small { color: #c8dbea; font-size: 11px }
+.health-card > div:last-child { display: flex; justify-content: space-between; align-items: center }
+.health-card strong { font-size: 12px; font-variant-numeric: tabular-nums }
+.health-track { position: relative; height: 10px; margin: 6px 0 4px; background: #4f6076; overflow: hidden }
+.health-track i { display: block; height: 100%; background: var(--team); transition: width .28s ease-out }
+.health-track::after {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), #17243759 calc(10% - 1px) 10%);
+}
+#round-label {
+  align-self: center; padding: 6px 12px; border: 1px solid var(--ink); border-radius: 3px;
+  background: var(--paper); color: var(--ink); font-weight: 900; font-size: 13px; white-space: nowrap;
+}
+.combat-panel, .fold-controls {
+  position: absolute; bottom: 3%; left: 50%; translate: -50% 0;
+  width: min(440px, calc(100% - var(--gutter) * 2)); padding: 11px 14px 13px;
+}
+.combat-panel:has(#skill-precise:not([hidden])) { width: min(610px, calc(100% - var(--gutter) * 2)) }
+.combat-panel:has(#skill-smash:not([hidden])) { width: min(740px, calc(100% - var(--gutter) * 2)) }
+.combat-panel:has(#skill-press:not([hidden])) { width: min(890px, calc(100% - var(--gutter) * 2)) }
+.combat-panel:has(#timing:not([hidden])) { width: min(650px, calc(100% - var(--gutter) * 2)) }
+.combat-heading { font-size: 13px; color: var(--navy); margin-bottom: 6px }
+.combat-heading:has(strong:empty) { display: none }
+.actions { display: flex; gap: 8px }
+.actions button, .strike {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px;
+  padding: 9px 12px; border: 1px solid var(--ink); border-radius: 3px; text-align: left;
+}
+.action-primary, .strike { flex: 1; background: var(--gold); font-size: 16px }
+.action-primary:hover:not(:disabled), .strike:hover { background: #ffe4a5 }
+.action-icon { font-size: 20px; line-height: 1 }
+.action-primary kbd { margin-left: auto }
+.action-secondary { flex: 1; background: #e4edf2; font-size: 13px }
+.action-secondary:hover:not(:disabled) { background: var(--blue) }
+.skill > span:first-child { white-space: nowrap }
+.skill-state { color: var(--muted); font-size: 11px; text-align: right }
+.gauge {
+  position: relative; height: 25px; margin: 5px 0 6px; overflow: hidden; border: 1px solid var(--night);
+  background: repeating-linear-gradient(135deg, #536479 0 4px, #45556b 4px 8px);
+}
+.normal-zone, .good-zone, .perfect-zone { position: absolute; inset-block: 0; border-inline: 1px solid #17243790 }
+.normal-zone { left: 26%; right: 26%; background: var(--blue) }
+.good-zone { left: 38%; right: 38%; background: var(--green) }
+.perfect-zone { left: 45%; right: 45%; background: var(--gold) }
+#needle { position: absolute; inset-block: 0; width: 6px; transform: translateX(-50%); border-inline: 2px solid var(--night); background: #fff }
+.gauge-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; font-size: 11px; font-weight: 800 }
+.gauge-legend span::before {
+  content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 4px; border: 1px solid var(--ink);
+}
+.legend-perfect::before { background: var(--gold) }
+.legend-good::before { background: var(--green) }
+.legend-normal::before { background: var(--blue) }
+.legend-bad::before { background: #536479 }
+.strike { width: 100% }
+.actions button:active:not(:disabled), .strike:active { box-shadow: inset 0 2px 0 #1724374a }
 
-/* Feedback and scene transitions. */
-.impact{position:absolute;left:50%;top:40%;translate:-50% -50%;font-size:clamp(30px,5vw,62px);font-weight:800;letter-spacing:-.04em;color:#fff1c5;text-shadow:0 3px 14px #102b25aa;pointer-events:none;z-index:6;white-space:nowrap}.impact.pop{animation:impact .32s ease-out}.impact.bad{color:#fff7e9}
-.toast{position:absolute;left:50%;top:24px;translate:-50% -5px;padding:10px 18px;background:#254737ee;color:#f5f0de;border:1px solid #d7e1cc44;border-radius:6px;box-shadow:0 4px 20px #12291f22;font-size:12px;font-weight:500;z-index:30;opacity:0;pointer-events:none;transition:opacity .18s,translate .18s;max-width:92%;text-align:center}.toast.visible{opacity:1;translate:-50% 0}.minimum-mode .toast{top:22px}
-.chapter-card{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;z-index:12;padding:35px;pointer-events:none;color:var(--paper);background:#213e33}
-.chapter-card>span{font-size:11px;letter-spacing:.15em;color:var(--gold)}.chapter-card h2{font-size:clamp(28px,4vw,50px);font-weight:700;line-height:1.6;white-space:pre-line;margin:22px 0}.chapter-card p{font-size:14px;color:#c3ceba}.chapter-card>span:empty,.chapter-card>p:empty,#result-text:empty{display:none}
-.curtain{position:absolute;inset:0;background:#1c302a;opacity:0;pointer-events:none;transition:opacity .3s;z-index:15}.curtain.closed{opacity:1;pointer-events:auto}
+.fold-controls { text-align: center }
+#fold-hint { margin: 0 0 8px; font-weight: 800 }
+.fold-buttons { display: flex; gap: 8px }
+.fold-buttons button {
+  flex: 1; min-height: 44px; border: 1px solid var(--edge); border-radius: 3px;
+  background: var(--cream); color: var(--ink); font-size: 16px;
+}
+.fold-buttons kbd { margin-left: 5px }
+.fold-buttons button.ready { background: var(--gold); border-color: var(--ink); opacity: 1 }
+.fold-buttons button.done { background: var(--green); opacity: 1 }
+
+/* Result, announcements and transitions */
+.result, .facility {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+  max-height: 80%; overflow: auto; scrollbar-color: var(--edge) var(--cream);
+}
+.result { width: min(520px, 88%); z-index: 7; padding: 22px 24px; border-top: 6px solid var(--navy) }
+.result h2 { margin: 0 0 8px; color: var(--navy); font-size: clamp(25px, 3vw, 39px); line-height: 1.2 }
+.result p { margin: 8px 0 14px; color: var(--muted); line-height: 1.65 }
+.result .menu-primary, #result-secondary { width: 100%; margin-top: 10px; justify-content: center }
+#result-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 6px; margin: 14px 0 }
+#result-stats > * {
+  padding: 8px 10px; border: 1px solid var(--line); border-top: 3px solid var(--navy);
+  background: var(--white); color: var(--ink); font-size: 17px; font-weight: 900; font-variant-numeric: tabular-nums;
+}
+#result-stats small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; font-weight: 700 }
+#result-stats .first-reward { color: var(--good); border-top-color: var(--good) }
+#result-stats .repeat-reward { border-top-color: var(--edge) }
+.result-extra { display: flex; gap: 8px; flex-wrap: wrap }
+.result-extra button { flex: 1; justify-content: center }
+#result-stats:empty, #result-text:empty, .result-extra:empty { display: none }
+.impact {
+  position: absolute; left: 50%; top: 38%; translate: -50% -50%; z-index: 6; pointer-events: none;
+  color: var(--gold); font-weight: 900; font-size: clamp(32px, 5vw, 72px); line-height: 1.2; white-space: nowrap;
+  text-shadow: 0 3px 0 var(--night), 2px 0 var(--night), -2px 0 var(--night), 0 -2px var(--night);
+}
+.impact.bad { color: var(--white) }
+.impact.pop { animation: impact .32s ease-out }
+@keyframes impact { from { scale: 1.22; opacity: 0 } to { scale: 1; opacity: 1 } }
+.toast {
+  position: absolute; left: 50%; bottom: 4%; translate: -50% 6px; z-index: 30;
+  max-width: 52%; padding: 8px 13px; border: 1px solid #c9d6e399; border-left: 3px solid var(--gold);
+  border-radius: 3px; background: var(--night); color: var(--white); font-size: 13px;
+  opacity: 0; pointer-events: none; transition: opacity .18s, translate .18s;
+}
+.toast.visible { opacity: 1; translate: -50% 0 }
+#game:has(.combat-panel:not([hidden]), .dialogue:not([hidden]), .fold-controls:not([hidden])) .toast { top: 20px; bottom: auto }
+.chapter-card, .credits {
+  position: absolute; inset: 0; color: var(--white);
+  background: var(--grid), var(--night); background-size: 24px 24px;
+}
+.chapter-card {
+  display: grid; place-content: center; justify-items: center; z-index: 12; padding: 32px;
+  text-align: center; pointer-events: none;
+}
+.chapter-card > span { padding: 4px 12px; background: var(--gold); color: var(--ink); font-size: 13px; font-weight: 900 }
+.chapter-card h2 { margin: 12px 0; color: var(--white); font-size: clamp(30px, 5vw, 66px); line-height: 1.28; white-space: pre-line }
+.chapter-card p { margin: 4px 0; color: #c8dbea }
+.chapter-card > :empty { display: none }
+.curtain { position: absolute; inset: 0; z-index: 15; background: var(--night); opacity: 0; pointer-events: none; transition: opacity .35s }
+.curtain.closed { opacity: 1; pointer-events: auto }
+
+#timing-guide { margin: 4px 0 8px; color: var(--muted); font-size: 12px }
+.minimum-mode #timing:has(#timing-guide:not([hidden])) .gauge-legend { display: none }

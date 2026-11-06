@@ -180,7 +180,7 @@ const Minimum={
  health(){
   $('player-hp').textContent=`${G.hp} / ${G.maxHp}`;$('enemy-hp').textContent=G.mode==='practice'?'연습용':`${G.enemyHp} / ${G.enemyMax}`;
   $('player-bar').style.width=`${100*G.hp/G.maxHp}%`;$('enemy-bar').style.width=`${100*G.enemyHp/G.enemyMax}%`;
-  $('round-label').textContent=G.mode==='practice'?'타이밍 연습':G.mode==='intro_battle'?'마지막 한 수':`ROUND ${G.round}`;
+  $('round-label').textContent=G.mode==='practice'?'타이밍 연습':G.mode==='intro_battle'?'마지막 한 수':`${G.round}라운드`;
  },
  ready(){
   G.state='ready';G.animation=null;$('actions').hidden=false;$('timing').hidden=true;$('attack').disabled=false;

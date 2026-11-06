@@ -23,13 +23,14 @@ window.GameArt=(()=>{
   for(let y=bottom;y<600;y+=16)ctx.drawImage(image,0,image.naturalHeight-12,image.naturalWidth,4,0,y,960,16);
   ctx.restore();return true;
  }
- function panorama(ctx,theme,camera=0,ground=402){
+ function panorama(ctx,theme,camera=0,ground=402,pixel=4){
   const key='panoramas/'+theme,image=loaded(key),entry=manifest[key];if(!image)return false;
-  const x=-Math.round(Math.max(0,Math.min(entry.worldWidth-960,camera))),top=ground-entry.horizon*4,bottom=top+image.naturalHeight*4;
+  const width=image.naturalWidth*pixel,height=image.naturalHeight*pixel,strip=4*pixel;
+  const x=-Math.round(Math.max(0,Math.min(width-960,camera))),top=ground-entry.horizon*pixel,bottom=top+height;
   ctx.save();smooth(ctx);ctx.beginPath();ctx.rect(0,0,960,600);ctx.clip();ctx.fillStyle=entry.sky;ctx.fillRect(0,0,960,600);
   // One continuous scene at its native scale: every landmark shares world coordinates.
-  ctx.drawImage(image,x,top,entry.worldWidth,image.naturalHeight*4);
-  for(let y=bottom;y<600;y+=16)ctx.drawImage(image,0,image.naturalHeight-12,image.naturalWidth,4,x,y,entry.worldWidth,16);
+  ctx.drawImage(image,x,top,width,height);
+  for(let y=bottom;y<600;y+=strip)ctx.drawImage(image,0,image.naturalHeight-12,image.naturalWidth,4,x,y,width,strip);
   ctx.restore();return true;
  }
  function prop(ctx,name,x,y,maxWidth=150,maxHeight=130,stretch=false){
@@ -51,10 +52,12 @@ window.GameArt=(()=>{
   ctx.drawImage(image,-ax*pixel,-ay*pixel,image.naturalWidth*pixel,image.naturalHeight*pixel);ctx.restore();return true;
  }
  function portrait(element,kind='hero'){
-  if(!element)return;element.dataset.artCharacter=canonical(kind);
-  const key=`characters/${canonical(kind)}/idle`,image=loaded(key),b=manifest[key]?.bounds;
+  if(!element)return;
   element.classList.remove('image-portrait');element.style.backgroundImage='';
-  if(!image||!b)return;
+  if(!kind){delete element.dataset.artCharacter;return}
+  element.dataset.artCharacter=canonical(kind);
+  const key=`characters/${element.dataset.artCharacter}/idle`,image=loaded(key);
+  if(!image)return;
   if(!portraits.has(key)){
    const tile=document.createElement('canvas');tile.width=tile.height=24;
    const c=tile.getContext('2d');smooth(c);
@@ -72,9 +75,9 @@ window.GameArt=(()=>{
   const {text,actor:person,paper}=a,objects=Exploration.objects(),nearest=G.state==='explore'?Exploration.nearest():null;
   const npc={minsu:'rival',doyun:'boss',neighbor:'neighbor',father:'neighbor',hana:'friend',uncle:'uncle',reception:'folder',spectator:'friend'};
   const sign=(label,x,y,width=180,active=false)=>{
-   ctx.save();ctx.fillStyle=active?'#173e42f2':'#f3ead8ed';ctx.strokeStyle=active?'#e4bd70':'#796a4b55';ctx.lineWidth=1;
-   ctx.beginPath();ctx.roundRect(x-width/2,y,width,30,6);ctx.fill();ctx.stroke();
-   text(label,x,y+20,12,active?'#f3dfb3':'#394d49','center',650);ctx.restore();
+   ctx.save();ctx.fillStyle=active?'#172437':'#fffaf0';ctx.strokeStyle=active?'#ffd477':'#526579';ctx.lineWidth=1;
+   ctx.beginPath();ctx.roundRect(x-width/2,y,width,26,2);ctx.fill();ctx.stroke();
+   text(label,x,y+17,12,active?'#ffd477':'#202b3c','center',750);ctx.restore();
   };
   ctx.save();ctx.translate(-camera,0);
   // Scene props use the same coordinates as the interaction data.
@@ -94,8 +97,10 @@ window.GameArt=(()=>{
    sign(o.name,o.x,o.type==='npc'?258:o.id==='shop'?177:o.id==='photo'?169:215,Math.min(210,Math.max(92,o.name.length*12+24)));
    if(G.state==='explore'){
     const active=nearest?.id===o.id;
-    ctx.fillStyle=active?'#e4bd70':'#f3ead8';ctx.beginPath();ctx.arc(o.x,o.type==='npc'?298:328,active?11:8,0,Math.PI*2);ctx.fill();
-    text(active?'E':o.type==='npc'?'…':'·',o.x,o.type==='npc'?302:332,active?12:11,'#274340','center',800);
+    const y=o.type==='npc'?288:317;
+    ctx.fillStyle=active?'#ffd477':'#fffaf0';ctx.strokeStyle='#202b3c';ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(o.x-10,y,20,20,2);ctx.fill();ctx.stroke();
+    text(active?'E':o.type==='npc'?'…':'·',o.x,y+14,11,'#202b3c','center',800);
    }
   }
   if(theme==='yard'||theme==='gazebo')paper(1025,430,23,'red',.2);

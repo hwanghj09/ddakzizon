@@ -32,7 +32,7 @@ const Exploration={
  enter(zone,x){
   if(!this.zones[zone])zone='square';cancelScene();G.mapZone=zone;G.hub=P.stageIds.includes(zone)?zone:'village';G.scene=G.hub;G.mode=G.hub;G.state='explore';G.stolen=false;G.flipPlayer=G.flipEnemy=0;
   G.hero={x:Math.max(45,Math.min(this.zones[zone].width-45,x??G.profile.map.x??160)),y:440,walk:0,facing:1};G.camera=Math.max(0,Math.min(this.data().width-960,G.hero.x-480));
-  G.profile.map.zone=zone;G.profile.map.x=G.hero.x;G.profile.map.visited[zone]=true;panels('explore-ui');Village.hud();if(this.phase()==='lost')setInventory('빈 주머니',false);this.save();this.updateInteract();toast(this.data().name,'location');$('game').focus({preventScroll:true});
+  G.profile.map.zone=zone;G.profile.map.x=G.hero.x;G.profile.map.visited[zone]=true;panels('explore-ui');Village.hud();if(this.phase()==='lost')setInventory('빈 주머니',false);this.save();this.updateInteract();$('game').focus({preventScroll:true});
  },
  save(){if(this.active()){G.profile.map.zone=G.mapZone;G.profile.map.x=Math.round(G.hero.x)}checkpoint(G.profile.schoolReward?Village.hubCheckpoint():'exploration')},
  move(zone,x){note(220,.09,'triangle',.025);transition(()=>this.enter(zone,x))},

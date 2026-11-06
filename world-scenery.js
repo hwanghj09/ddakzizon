@@ -12,6 +12,7 @@ function tree(x,y,s=1){const cx=x+28*s,cy=y+22*s;ell(cx,y+95*s,32*s,7*s,'#000000
 function grassEdge(y){rect(0,y-3,960,3,OUT);rect(0,y,960,14,'#4cc95a');rect(0,y+10,960,4,'#2f9e44');for(let i=0;i<48;i++)rect(i*20+(i%3)*4,y-2,4,6,'#4cc95a')}
 
 function school(){
+ if(!window.Minimum?.active&&GameArt.panorama(ctx,'yard',40,322,3))return;
  if(window.GameArt?.background(ctx,window.Minimum?.active?'gazebo':'yard',290))return;
  sky(290);sun(866,70);cloud(98+Math.sin(G.now/20000)*15,69);cloud(640+Math.sin(G.now/24000)*12,98,.75);cloud(345,40,.5);hills(250);
  // School building with a red roof and bright glass.

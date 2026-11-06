@@ -1,12 +1,12 @@
-/* v1.0 — ending credits (spec 04 §12) and the 도 대회 prep choice. */
-.credits{position:absolute;inset:0;z-index:13;overflow:hidden;display:flex;justify-content:center;color:#fff;background:linear-gradient(#0b0620e6,#1b1230f2)}
-.credits-roll{position:absolute;top:100%;width:min(560px,86%);text-align:center;animation:credits-roll 26s linear forwards}
-#game.paused .credits-roll{animation-play-state:paused}
-.credits.static{overflow-y:auto}.credits.static .credits-roll{position:static;margin:40px auto 90px;animation:none}
-.credits-title{font-size:clamp(34px,6vw,64px);font-weight:900;color:var(--gold);text-shadow:var(--outline),0 7px 0 var(--ink);margin:0 0 48px}
-.credits-row{display:flex;flex-direction:column;gap:4px;margin:0 0 26px}.credits-row small{font-size:13px;letter-spacing:2px;color:#c9c2e8}.credits-row strong{font-size:clamp(18px,2.6vw,24px)}
-.credits-end{margin-top:70px;font-size:18px;font-weight:900;color:var(--gold)}
-.credits-skip{position:absolute;right:16px;bottom:16px;z-index:1}
-@keyframes credits-roll{from{transform:translateY(0)}to{transform:translateY(calc(-100% - 100vh))}}
-.prep-choice{border:2px dashed #ffffff55;border-radius:12px;padding:10px 12px;margin:8px 0}.prep-choice p{margin:0 0 6px}
-.prep-choice .facility-choice img{width:28px;height:28px;vertical-align:middle;margin-right:8px}
+.credits { z-index: 13; overflow: hidden; display: flex; justify-content: center }
+.credits-roll { position: absolute; top: 100%; width: min(500px, 80%); text-align: center; animation: credits-roll 26s linear forwards }
+#game.paused .credits-roll { animation-play-state: paused }
+.credits.static { overflow-y: auto }
+.credits.static .credits-roll { position: static; margin: 36px auto 90px; animation: none }
+.credits-title { margin: 0 0 36px; color: var(--gold); font-size: clamp(34px, 5.5vw, 64px); font-weight: 900 }
+.credits-row { display: grid; gap: 3px; padding: 12px 0; border-top: 1px solid #a8c9e355 }
+.credits-row small { color: #c8dbea; font-size: 13px }
+.credits-row strong { font-size: 21px }
+.credits-end { margin-top: 32px; font-size: 18px; font-weight: 900; color: var(--gold) }
+.credits-skip { position: absolute; right: var(--gutter); bottom: 20px; z-index: 1 }
+@keyframes credits-roll { to { transform: translateY(calc(-100% - 100vh)) } }

@@ -49,7 +49,7 @@ fs.mkdirSync(dir,{recursive:true});
    for(let y=0;y<256;y++)for(let x=0;x<256;x++)max=Math.max(max,Math.abs(a[(y*256+x)*4+3]-b[(y*256+255-x)*4+3]));return max;
   });assert.equal(mirror,0,'mirrored pixel contour stays exactly aligned');
   await page.evaluate(()=>{battle('rematch');G.animation={kind:'player-hit',at:G.now,grade:'GOOD'};artDraws.clear()});
-  await page.waitForFunction(()=>[...artDraws].some(s=>s.endsWith('/hero/attack.png'))&&[...artDraws].some(s=>s.endsWith('/props/mat.png')));
+  await page.waitForFunction(()=>[...artDraws].some(s=>s.endsWith('/hero/attack.png')));
   await page.evaluate(()=>{G.animation={kind:'enemy-hit',at:G.now,grade:'GOOD'};artDraws.clear()});
   await page.waitForFunction(()=>[...artDraws].some(s=>s.endsWith('/minsu/attack.png')));
   await page.screenshot({path:path.join(dir,'art-battle.png')});

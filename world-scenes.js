@@ -42,8 +42,11 @@ function drawAdvert(){school();ctx.fillStyle='#1b123055';ctx.fillRect(0,0,960,60
 function drawBattle(){const practice=['practice','training','story_training'].includes(G.mode);
  if(practice){if(!window.GameArt?.background(ctx,'home',285)){rect(0,0,960,275,'#ffe7c2');for(let i=0;i<24;i++)rect(i*40,0,18,275,'#ffdba8');box(35,95,266,180,'#7fd3ff');rect(35,215,266,60,'#5ab8f0');rect(166,95,4,180,OUT);rect(35,183,266,4,OUT);cloud(70,140,.6);panel(380,60,200,60,8,NAVY);text('연 습 장',480,99,22,YELLOW,'center',900);tree(822,160,1.4);rect(0,272,960,4,OUT);grad(0,276,960,324,'#f7c47e','#e09a50');for(let i=0;i<14;i++)rect(i*75,276,3,324,'#c9813f55')}}
  else{if(G.mode==='ending_match')school();else if(Village.isBattle()){if(TIER_LOOK[G.hub])tierArena(G.hub);else MapRenderer.arena(ctx,{rect,text,line,actor},G.hub)}else school()}
- // Battle mat.
- if(!window.GameArt?.prop(ctx,'mat',480,437,660,151,true)){ell(480,446,345,16,'#1b123033');panel(150,286,660,151,20,WHITE);panel(160,294,640,135,14,'#3d7bff',OUT,0);ctx.strokeStyle='#ffffffaa';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(480,361,96,42,0,0,Math.PI*2);ctx.stroke();line(480,296,480,427,'#ffffff77',3);rect(160,294,640,6,'#ffffff33')}
+ // Tournament mat with a center line and numbered sides.
+ ell(480,442,335,12,'#17243740');panel(152,286,656,151,5,'#172437','#fff5d5',2);
+ rect(162,296,636,131,'#365471');ctx.strokeStyle='#d9e6ec';ctx.lineWidth=2;
+ ctx.strokeRect(169,303,622,117);ctx.beginPath();ctx.ellipse(480,362,84,43,0,0,Math.PI*2);ctx.stroke();
+ line(480,303,480,420,'#d9e6ec',2);text('1',188,323,13,'#a9d7b7','center');text('2',772,323,13,'#ee9c75','center');
  actor(125,347,'hero',0,1.1,1,'player');if(!practice){actor(837,347,Village.isBattle()?G.opponent.kind:'rival',0,1.1,-1,'enemy');if(G.mode==='intro_battle'&&!window.Minimum?.active)actor(891,313,'boss',0,.85,-1)}let px=310,py=350,ex=650,ey=350,pa=-.16,ea=.15,ps=1,es=1;
 if(G.animation){const t=(G.now-G.animation.at)/1000;const grade=G.animation.grade;const power=grade==='PERFECT'?1:grade==='GOOD'?.65:grade==='NORMAL'?.45:.3;if(G.animation.kind==='player-hit'){if(t<.36){const q=t/.36;px=310+Math.pow(q,2)*320;py=350-Math.sin(q*Math.PI)*95;pa=-.16-q*.7;ps=1+Math.sin(q*Math.PI)*.25}else if(t<.7){const q=(t-.36)/.34;px=630-(630-310)*q;py=350-55*Math.sin(q*Math.PI);ey-=Math.sin(q*Math.PI)*55*power;ea+=Math.sin(q*Math.PI*2)*.35*power}}else if(G.animation.kind==='enemy-ready'){ey-=Math.sin(Math.min(t/.75,1)*Math.PI/2)*35;ea-=.2*Math.min(t/.75,1)}else if(G.animation.kind==='enemy-hit'){if(t<.36){const q=t/.36;ex=650-Math.pow(q,2)*320;ey=315-Math.sin(q*Math.PI)*105;ea=.15+q*.8;es=1+Math.sin(q*Math.PI)*.35}else if(t<.7){const q=(t-.36)/.34;ex=330+320*q;ey=350-Math.sin(q*Math.PI)*50;py-=Math.sin(q*Math.PI)*25}}}
 let psy=.76,esy=.76;if(G.animation?.kind==='near-flip'&&!reducedMotion){const q=Math.min(1,(G.now-G.animation.at)/1500),lift=Math.sin(q*Math.PI);ey-=lift*60;ea+=lift*.7;ex+=Math.sin(q*Math.PI*4)*7;esy*=1-lift*.93}if(G.flipPlayer){const t=Math.min((G.now-G.flipPlayer)/800,1);psy=Math.cos(t*Math.PI)*.76;py-=Math.sin(t*Math.PI)*95;pa+=t*.18}if(G.flipEnemy){const t=Math.min((G.now-G.flipEnemy)/800,1);esy=Math.cos(t*Math.PI)*.76;ey-=Math.sin(t*Math.PI)*95;ea-=t*.2}if(G.stolen){const t=Math.min((G.now-G.stolenAt)/900,1);px+=t*560;py-=t*90;ctx.globalAlpha=1-t}
@@ -81,6 +84,11 @@ function drawClassroom(){
  actor(340,410,'hero',0,1.3,1);actor(570,410,'rival',0,1.2,1);actor(705,410,'boss',0,1.2,-1);
  panel(388,53,184,46,7,'#f4ead7e8','#a68c6244',1);text('수업 끝',480,83,23,'#304b43','center',700);
 }
-function drawTitle(){school();npcGroup();actor(520,416,'hero',Math.sin(G.now/900)>0?30:0,1.5,1);paper(710,470,155,'news',-.22+Math.sin(G.now/700)*.04,.8);paper(818,420,103,'red',.18+Math.sin(G.now/800+1)*.05,.8)}
+function drawTitle(){
+ if(!GameArt.panorama(ctx,'yard',0,418))school();
+ actor(620,459,'hero',0,1.48,1);
+ actor(788,442,'rival',0,1.15,-1);
+ paper(698,500,112,'news',-.21,.8);paper(808,479,81,'red',.17,.8);
+}
 Object.assign(WorldKit,{villageBackground,drawVillage,TIER_LOOK,stars,tierArena,drawAdvert,drawBattle,drawHome,drawEndingSky,drawClassroom,drawTitle});
 })();
